@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Fact {
   id: number;
@@ -19,6 +20,12 @@ interface Fact {
   context?: string | null;
   display_order?: number;
   [key: string]: unknown;
+}
+
+interface ArchiveItem {
+  id: number;
+  created_at: string;
+  status: string;
 }
 
 // Use same-domain API routes (no CORS needed)
@@ -97,19 +104,39 @@ const handleShare = async (fact: Fact): Promise<void> => {
 };
 
 export default function DidYouKnowPage(): JSX.Element {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setId = searchParams.get("id");
+
   const [facts, setFacts] = useState<Fact[]>([]);
+  const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeSetDate, setActiveSetDate] = useState<string | null>(null);
 
+  // Fetch the specific set (latest or by ID)
   useEffect(() => {
     const fetchFacts = async (): Promise<void> => {
+      setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/shareables/facts`);
+        const url = setId
+          ? `${API_BASE}/shareables/facts?id=${setId}`
+          : `${API_BASE}/shareables/facts`;
 
+        const response = await fetch(url);
         const data = await response.json();
 
         if (data.success) {
           setFacts(data.data || []);
+          if (data.meta?.created_at) {
+            setActiveSetDate(
+              new Date(data.meta.created_at).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            );
+          }
         } else {
           setError(data.error || "Failed to load facts");
         }
@@ -122,6 +149,24 @@ export default function DidYouKnowPage(): JSX.Element {
     };
 
     fetchFacts();
+  }, [setId]);
+
+  // Fetch archive list on mount
+  useEffect(() => {
+    const fetchArchive = async (): Promise<void> => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/shareables/facts?mode=archive`,
+        );
+        const data = await response.json();
+        if (data.success) {
+          setArchiveList(data.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch archive list:", err);
+      }
+    };
+    fetchArchive();
   }, []);
 
   if (loading) {
@@ -161,9 +206,14 @@ export default function DidYouKnowPage(): JSX.Element {
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
             Did you know?
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
             Discover interesting hockey statistics and facts
           </p>
+          {activeSetDate && (
+            <p className="text-sm text-blue-600 dark:text-orange-500 font-medium uppercase tracking-wide">
+              Edition: {activeSetDate}
+            </p>
+          )}
         </div>
 
         {/* Facts Grid - Shareable Card Design */}
@@ -235,7 +285,7 @@ export default function DidYouKnowPage(): JSX.Element {
         </div>
 
         {/* Back to Home */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 mb-16">
           <Link
             href="/"
             className="inline-block px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors"
@@ -243,6 +293,33 @@ export default function DidYouKnowPage(): JSX.Element {
             Back to Home
           </Link>
         </div>
+
+        {/* Past Collections Section */}
+        {archiveList.length > 0 && (
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+              Past Collections
+            </h2>
+            <div className="flex flex-wrap justify-center gap-4">
+              {archiveList.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => router.push(`/did-you-know?id=${item.id}`)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    Number(setId) === item.id
+                      ? "bg-blue-600 dark:bg-orange-500 text-white"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {new Date(item.created_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
