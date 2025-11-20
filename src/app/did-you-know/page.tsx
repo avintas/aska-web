@@ -211,7 +211,7 @@ export default function DidYouKnowPage(): JSX.Element {
           </p>
           {activeSetDate && (
             <p className="text-sm text-blue-600 dark:text-orange-500 font-medium uppercase tracking-wide">
-              Edition: {activeSetDate}
+              Set #{setId || facts[0]?.id || "Latest"} ({activeSetDate})
             </p>
           )}
         </div>
@@ -284,20 +284,10 @@ export default function DidYouKnowPage(): JSX.Element {
           )}
         </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-12 mb-16">
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors"
-          >
-            Back to Home
-          </Link>
-        </div>
-
         {/* Past Collections Section */}
         {archiveList.length > 0 && (
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-12 pb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
               Past Collections
             </h2>
             <div className="flex flex-wrap justify-center gap-4">
@@ -311,10 +301,7 @@ export default function DidYouKnowPage(): JSX.Element {
                       : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                 >
-                  {new Date(item.created_at).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  Set #{item.id}
                 </button>
               ))}
             </div>
