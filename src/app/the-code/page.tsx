@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Motivational {
   id: number;
@@ -12,6 +12,12 @@ interface Motivational {
   category: string | null;
   attribution: string | null;
   display_order: number;
+}
+
+interface ArchiveItem {
+  id: number;
+  created_at: string;
+  status: string;
 }
 
 // Use same-domain API routes (no CORS needed)
@@ -90,18 +96,39 @@ const handleShare = async (item: Motivational): Promise<void> => {
 };
 
 export default function TheCodePage(): JSX.Element {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setId = searchParams.get("id");
+
   const [motivational, setMotivational] = useState<Motivational[]>([]);
+  const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeSetDate, setActiveSetDate] = useState<string | null>(null);
 
+  // Fetch the specific set (latest or by ID)
   useEffect(() => {
     const fetchMotivational = async (): Promise<void> => {
+      setLoading(true);
       try {
-        const response = await fetch(`${API_BASE}/shareables/motivational`);
+        const url = setId
+          ? `${API_BASE}/shareables/motivational?id=${setId}`
+          : `${API_BASE}/shareables/motivational`;
+
+        const response = await fetch(url);
         const data = await response.json();
 
         if (data.success) {
           setMotivational(data.data || []);
+          if (data.meta?.created_at) {
+            setActiveSetDate(
+              new Date(data.meta.created_at).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }),
+            );
+          }
         } else {
           setError(data.error || "Failed to load motivational content");
         }
@@ -116,6 +143,24 @@ export default function TheCodePage(): JSX.Element {
     };
 
     fetchMotivational();
+  }, [setId]);
+
+  // Fetch archive list on mount
+  useEffect(() => {
+    const fetchArchive = async (): Promise<void> => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/shareables/motivational?mode=archive`,
+        );
+        const data = await response.json();
+        if (data.success) {
+          setArchiveList(data.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch archive list:", err);
+      }
+    };
+    fetchArchive();
   }, []);
 
   if (loading) {
@@ -136,12 +181,6 @@ export default function TheCodePage(): JSX.Element {
             Content Unavailable
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors"
-          >
-            Back to Home
-          </Link>
         </div>
       </div>
     );
@@ -155,9 +194,14 @@ export default function TheCodePage(): JSX.Element {
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
             The Code
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
             Inspiring quotes from legendary players and coaches
           </p>
+          {activeSetDate && (
+            <p className="text-sm text-blue-600 dark:text-orange-500 font-medium uppercase tracking-wide">
+              Set #{setId || motivational[0]?.id || "Latest"} ({activeSetDate})
+            </p>
+          )}
         </div>
 
         {/* Motivational Grid - Shareable Card Design */}
@@ -232,15 +276,29 @@ export default function TheCodePage(): JSX.Element {
           )}
         </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-12">
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors"
-          >
-            Back to Home
-          </Link>
-        </div>
+        {/* Past Collections Section */}
+        {archiveList.length > 0 && (
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-12 pb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+              Past Collections
+            </h2>
+            <div className="flex flex-wrap justify-center gap-4">
+              {archiveList.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => router.push(`/the-code?id=${item.id}`)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    Number(setId) === item.id
+                      ? "bg-blue-600 dark:bg-orange-500 text-white"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  Set #{item.id}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
