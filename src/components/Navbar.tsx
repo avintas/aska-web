@@ -10,7 +10,6 @@ export function Navbar(): JSX.Element {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/trivia-arena", label: "Trivia Arena" },
-    { href: "/shareables", label: "Shareables" },
     { href: "/shop", label: "Shop" },
   ];
 

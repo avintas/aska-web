@@ -1,25 +1,21 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-interface Fact {
-  id: number;
-  // Support both naming conventions: stat_* (from collection_stats) and fact_* (from collection_facts)
-  stat_text?: string;
-  fact_text?: string;
-  fact?: string;
-  stat_value?: string | null;
-  fact_value?: string | null;
-  stat_category?: string | null;
-  fact_category?: string | null;
-  year?: number | null;
-  theme?: string | null;
-  attribution?: string | null;
-  context?: string | null;
-  display_order?: number;
+interface FactItem {
+  id?: number;
+  fact_text: string;
+  fact_category?: string;
+  year?: number;
   [key: string]: unknown;
+}
+
+interface FactRecord {
+  id: number;
+  items: FactItem[];
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ArchiveItem {
@@ -28,313 +24,245 @@ interface ArchiveItem {
   status: string;
 }
 
-// Use same-domain API routes (no CORS needed)
-const API_BASE = "/api/public";
+interface ApiResponse {
+  success: boolean;
+  data?: FactRecord | ArchiveItem[];
+  error?: string;
+}
 
-// Get icon emoji based on category/theme
-const getCategoryIcon = (
-  category: string | null | undefined,
-  theme: string | null | undefined,
-): string => {
-  const cat = (category || theme || "").toLowerCase();
+// Graph/Chart icon component for facts
+const FactIcon = (): JSX.Element => (
+  <svg
+    className="w-10 h-10 text-orange-500 dark:text-orange-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+    />
+  </svg>
+);
 
-  if (cat.includes("historical") || cat.includes("history")) return "🏆";
-  if (cat.includes("record") || cat.includes("milestone")) return "📊";
-  if (cat.includes("scoring") || cat.includes("goal")) return "🏒";
-  if (cat.includes("team") || cat.includes("franchise")) return "👥";
-  if (cat.includes("career") || cat.includes("player")) return "⛸️";
-  if (cat.includes("coach") || cat.includes("coaching")) return "📋";
-
-  // Default icons based on theme
-  if (theme) {
-    const themeLower = theme.toLowerCase();
-    if (themeLower.includes("scoring")) return "🏒";
-    if (themeLower.includes("team")) return "👥";
-    if (themeLower.includes("career")) return "⛸️";
-  }
-
-  return "🏒"; // Default hockey stick
-};
-
-// Get category label
-const getCategoryLabel = (
-  category: string | null | undefined,
-  theme: string | null | undefined,
-): string => {
-  if (category) {
-    const cat = category.toLowerCase();
-    if (cat.includes("historical") || cat.includes("history"))
-      return "Historical";
-    if (cat.includes("record") || cat.includes("milestone")) return "Record";
-    if (cat.includes("career")) return "Career";
-    if (cat.includes("team")) return "Team";
-    return category.charAt(0).toUpperCase() + category.slice(1);
-  }
-  if (theme) {
-    return theme.charAt(0).toUpperCase() + theme.slice(1);
-  }
-  return "Fact";
-};
-
-// Share functionality
-const handleShare = async (fact: Fact): Promise<void> => {
-  const mainText = fact.stat_text || fact.fact_text || fact.fact || "";
-  const shareText = `${mainText}${fact.attribution ? ` — ${fact.attribution}` : ""}`;
-
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "Did you know?",
-        text: shareText,
-      });
-    } catch (err) {
-      // User cancelled or error occurred
-      console.log("Share cancelled or failed");
-    }
-  } else {
-    // Fallback: copy to clipboard
-    try {
-      await navigator.clipboard.writeText(shareText);
-      alert("Copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      alert("Failed to copy to clipboard");
-    }
-  }
-};
-
-function DidYouKnowContent(): JSX.Element {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const setId = searchParams.get("id");
-
-  const [facts, setFacts] = useState<Fact[]>([]);
-  const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
+export default function DidYouKnowPage(): JSX.Element {
   const [loading, setLoading] = useState(true);
+  const [facts, setFacts] = useState<FactItem[]>([]);
+  const [currentSetId, setCurrentSetId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeSetDate, setActiveSetDate] = useState<string | null>(null);
+  const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
+  const [loadingArchive, setLoadingArchive] = useState(true);
 
-  // Fetch the specific set (latest or by ID)
   useEffect(() => {
-    const fetchFacts = async (): Promise<void> => {
-      setLoading(true);
+    async function fetchData(): Promise<void> {
       try {
-        const url = setId
-          ? `${API_BASE}/shareables/facts?id=${setId}`
-          : `${API_BASE}/shareables/facts`;
+        const response = await fetch("/api/did-you-know");
+        const result: ApiResponse = await response.json();
 
-        const response = await fetch(url);
-        const data = await response.json();
-
-        console.log("Facts API response:", {
-          success: data.success,
-          hasData: !!data.data,
-          dataLength: data.data?.length,
-          error: data.error,
-          details: data.details,
-          code: data.code,
-          hint: data.hint,
-        });
-
-        if (data.success) {
-          setFacts(data.data || []);
-          if (data.meta?.created_at) {
-            setActiveSetDate(
-              new Date(data.meta.created_at).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
-            );
-          }
+        if (result.success && result.data && !Array.isArray(result.data)) {
+          const record = result.data as FactRecord;
+          // Ensure items is an array
+          const items = Array.isArray(record.items) ? record.items : [];
+          setFacts(items);
+          setCurrentSetId(record.id);
         } else {
-          console.error("Facts API error:", data.error, data.details);
-          setError(data.error || "Failed to load facts");
+          setError(result.error || "Failed to fetch facts");
         }
       } catch (err) {
-        console.error("Failed to fetch facts:", err);
-        setError("Unable to fetch facts. Please try refreshing the page.");
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    fetchFacts();
-  }, [setId]);
-
-  // Fetch archive list on mount
-  useEffect(() => {
-    const fetchArchive = async (): Promise<void> => {
+    async function fetchArchiveList(): Promise<void> {
       try {
-        const response = await fetch(
-          `${API_BASE}/shareables/facts?mode=archive`,
-        );
-        const data = await response.json();
-        if (data.success) {
-          setArchiveList(data.data || []);
+        const response = await fetch("/api/did-you-know?mode=archive");
+        const result: ApiResponse = await response.json();
+
+        if (result.success && result.data && Array.isArray(result.data)) {
+          setArchiveList(result.data as ArchiveItem[]);
         }
       } catch (err) {
-        console.error("Failed to fetch archive list:", err);
+        console.error("Failed to fetch archive:", err);
+      } finally {
+        setLoadingArchive(false);
       }
-    };
-    fetchArchive();
+    }
+
+    fetchData();
+    fetchArchiveList();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 flex items-center justify-center">
-        <div className="text-xl text-gray-600 dark:text-gray-400">
-          Loading facts...
-        </div>
-      </div>
-    );
-  }
+  const loadSet = async (setId: number): Promise<void> => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/did-you-know?id=${setId}`);
+      const result: ApiResponse = await response.json();
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 flex items-center justify-center px-4">
-        <div className="max-w-2xl text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Content Unavailable
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors"
-          >
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
+      if (result.success && result.data && !Array.isArray(result.data)) {
+        const record = result.data as FactRecord;
+        const items = Array.isArray(record.items) ? record.items : [];
+        setFacts(items);
+        setCurrentSetId(record.id);
+      } else {
+        setError(result.error || "Failed to load set");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-            Did you know?
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
-            Discover interesting hockey statistics and facts
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="text-5xl">💡</span>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+              Did You Know?
+            </h1>
+          </div>
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+            Discover fascinating hockey facts, records, and stories that
+            showcase the rich history and culture of the greatest game on ice.
           </p>
-          {activeSetDate && (
-            <p className="text-sm text-blue-600 dark:text-orange-500 font-medium uppercase tracking-wide">
-              Set #{setId || facts[0]?.id || "Latest"} ({activeSetDate})
-            </p>
-          )}
         </div>
 
-        {/* Facts Grid - Shareable Card Design */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
-          {facts.length > 0 ? (
-            facts.map((item) => {
-              // Get the main text from any of the possible fields (support both naming conventions)
-              const mainText =
-                item.stat_text ||
-                item.fact_text ||
-                item.fact ||
-                "No text available";
-              // Get category (support both naming conventions)
-              const category = item.stat_category || item.fact_category;
-              const categoryLabel = getCategoryLabel(category, item.theme);
-              const icon = getCategoryIcon(category, item.theme);
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              Loading facts...
+            </p>
+          </div>
+        )}
 
-              return (
-                <div
-                  key={item.id}
-                  className="relative flex flex-col rounded-xl bg-slate-800 dark:bg-slate-900 border border-slate-700 dark:border-slate-800 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
-                >
-                  {/* Icon */}
-                  <div className="flex justify-center mb-4">
-                    <div className="text-5xl">{icon}</div>
-                  </div>
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6 text-center">
+            <p className="text-red-700 dark:text-red-300">{error}</p>
+          </div>
+        )}
 
-                  {/* Category Label */}
-                  <h3 className="text-center text-white font-bold text-lg mb-4">
-                    {categoryLabel}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-white text-sm leading-relaxed mb-6 flex-grow">
-                    {mainText}
-                  </p>
-
-                  {/* Share Button */}
-                  <div className="flex justify-center mt-auto">
-                    <button
-                      onClick={() => handleShare(item)}
-                      className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center transition-colors shadow-md hover:shadow-lg active:scale-95"
-                      aria-label="Share this fact"
-                      title="Share this fact"
-                    >
-                      <svg
-                        className="w-6 h-6 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+        {/* Facts Grid */}
+        {!loading && !error && facts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {facts.map((fact, index) => (
+              <div
+                key={fact.id || index}
+                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 relative"
+              >
+                {/* Icon */}
+                <div className="mb-4">
+                  <FactIcon />
                 </div>
-              );
-            })
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 col-span-full text-center">
-              No facts available yet.
+
+                {/* Title */}
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                  {fact.fact_category
+                    ? fact.fact_category
+                        .split("_")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() +
+                            word.slice(1).toLowerCase(),
+                        )
+                        .join(" ")
+                    : `Fact ${index + 1}`}
+                </h3>
+
+                {/* Description */}
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                  {fact.fact_text}
+                </p>
+
+                {/* Year badge if available */}
+                {fact.year && (
+                  <div className="inline-block bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-semibold px-2 py-1 rounded mb-4">
+                    {fact.year}
+                  </div>
+                )}
+
+                {/* Share Button */}
+                <button
+                  className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 flex items-center justify-center transition-colors"
+                  aria-label="Share fact"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: "Hockey Fact",
+                        text: fact.fact_text,
+                      });
+                    } else {
+                      navigator.clipboard.writeText(fact.fact_text);
+                    }
+                  }}
+                >
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && facts.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              No facts available at this time.
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Past Collections Section */}
-        {archiveList.length > 0 && (
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-12 pb-12">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+        {!loading && !error && (
+          <div className="mt-12 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">
               Past Collections
             </h2>
-            <div className="flex flex-wrap justify-center gap-4">
-              {archiveList.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => router.push(`/did-you-know?id=${item.id}`)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    Number(setId) === item.id
-                      ? "bg-blue-600 dark:bg-orange-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600"
-                  }`}
-                >
-                  Set #{item.id}
-                </button>
-              ))}
-            </div>
+            {loadingArchive ? (
+              <div className="text-center py-4">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
+              </div>
+            ) : archiveList.length > 0 ? (
+              <div className="flex flex-wrap justify-center gap-3">
+                {archiveList.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => loadSet(item.id)}
+                    className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+                      currentSetId === item.id
+                        ? "bg-orange-500 dark:bg-orange-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    }`}
+                  >
+                    Set #{item.id}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-export default function DidYouKnowPage(): JSX.Element {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 flex items-center justify-center">
-          <div className="text-xl text-gray-600 dark:text-gray-400">
-            Loading facts...
-          </div>
-        </div>
-      }
-    >
-      <DidYouKnowContent />
-    </Suspense>
   );
 }

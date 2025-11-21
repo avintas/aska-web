@@ -39,13 +39,3 @@ export function createApiResponse<T>(
     ...(message && { message }),
   };
 }
-
-// Re-export shareables utilities
-export * from "./shareables-dates";
-export * from "./shareables-selection";
-export {
-  getDayOfWeekName,
-  getWeekOfYear,
-  getSpecialOccasion,
-  getSpecialSeason,
-} from "./shareables-dates";

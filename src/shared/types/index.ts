@@ -7,4 +7,3 @@
 export * from "./content";
 export * from "./collections";
 export * from "./trivia";
-export * from "./shareables";

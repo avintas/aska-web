@@ -38,16 +38,13 @@ export default function Home(): JSX.Element {
       case 3:
         config = {
           id,
-          href: "/shareables",
+          href: "/ethos",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Share
-              <br />
-              ables
+              Ethos
             </span>
           ),
           isHighlighted: true,
-          // imageSrc: '/images/shareables-thumb.jpg'
         };
         break;
       case 5:
@@ -56,15 +53,10 @@ export default function Home(): JSX.Element {
           href: "/did-you-know",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Did
-              <br />
-              you
-              <br />
-              know?
+              Did you know?
             </span>
           ),
           isHighlighted: true,
-          // imageSrc: '/images/did-you-know-thumb.jpg'
         };
         break;
       case 7:
@@ -86,13 +78,10 @@ export default function Home(): JSX.Element {
           href: "/the-code",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              The
-              <br />
-              Code
+              The Code
             </span>
           ),
           isHighlighted: true,
-          // imageSrc: '/images/the-code-thumb.jpg'
         };
         break;
       case 13: // Cell 13 is highlighted but currently empty/placeholder in original code
@@ -138,8 +127,8 @@ export default function Home(): JSX.Element {
             motivational quotes from legendary players and epic coaches. Learn
             interesting facts, anecdotes, curiosities of hockey culture. We hope
             you will discover what makes our hockey community so special.
-            Whether you are here for the shareables or the pure joy of the game,
-            you belong here. 🏠✨
+            Whether you are here for the ethos or the pure joy of the game, you
+            belong here. 🏠✨
           </p>
         </div>
 

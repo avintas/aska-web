@@ -1,13 +1,13 @@
 import Link from "next/link";
 
-export default function TheCodePage(): JSX.Element {
+export default function EthosPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-            The Code
+            Ethos
           </h1>
         </div>
 
@@ -16,84 +16,83 @@ export default function TheCodePage(): JSX.Element {
           {/* Introduction */}
           <section className="mb-12">
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-              The Code represents the unwritten rules and principles that govern
-              hockey culture. It&apos;s about respect, honor, and the traditions
-              that make hockey more than just a game.
+              The ethos of OnlyHockey is built on the core values that make
+              hockey the greatest game on earth. We believe in respect,
+              teamwork, perseverance, and the pure love of the game.
             </p>
           </section>
 
-          {/* Core Principles */}
+          {/* Core Values */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Core Principles
+              Our Core Values
             </h2>
             <div className="space-y-6">
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Respect the Game
+                  Respect
                 </h3>
                 <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Hockey is more than a sport—it&apos;s a tradition passed down
-                  through generations. We honor the game by playing it the right
-                  way, with integrity and passion.
+                  We honor the game, our opponents, our teammates, and
+                  ourselves. Respect is the foundation of everything we do.
                 </p>
               </div>
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Respect Your Opponents
+                  Teamwork
                 </h3>
                 <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Competition is fierce, but respect is non-negotiable. We
-                  compete hard, shake hands after, and recognize that our
-                  opponents share the same love for the game.
+                  Hockey teaches us that we are stronger together. We celebrate
+                  the collective effort and the bonds forged on and off the ice.
                 </p>
               </div>
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Respect Your Teammates
+                  Perseverance
                 </h3>
                 <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  The locker room is sacred. We support each other, hold each
-                  other accountable, and understand that we win and lose as a
-                  team.
+                  The game demands resilience. We embrace challenges, learn from
+                  setbacks, and always get back up.
                 </p>
               </div>
               <div>
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Respect Yourself
+                  Love for the Game
                 </h3>
                 <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Play with pride, work hard, and always give your best effort.
-                  The Code demands that you respect yourself enough to compete
-                  at the highest level you can.
+                  At the heart of it all is passion. Whether you&apos;re playing
+                  in the NHL or on a frozen pond, the love for hockey unites us
+                  all.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Traditions */}
+          {/* Community */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Hockey Traditions
+              Our Community
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              From the handshake line to the Stanley Cup tradition, hockey is
-              built on rituals that honor the game&apos;s history. These
-              traditions connect us to the players who came before and remind us
-              of what makes hockey special.
+              We are a community that welcomes everyone who shares our passion
+              for hockey. From Mini Mites to beer leaguers, from parents to
+              grandparents, from players to fans—if you love the game, you
+              belong here. We create safe, positive spaces where the hockey
+              community can connect, learn, and grow together.
             </p>
           </section>
 
-          {/* Living the Code */}
+          {/* Commitment */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Living the Code
+              Our Commitment
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              The Code isn&apos;t written down—it&apos;s lived. It&apos;s in how
-              we play, how we treat each other, and how we honor the game.
-              Whether you&apos;re on the ice or in the stands, The Code guides
-              how we conduct ourselves as part of the hockey community.
+              We are committed to creating content and experiences that reflect
+              the best of hockey culture. We celebrate the sport&apos;s rich
+              history, its legendary figures, and the values that make it
+              special. Every piece of content we create is designed to inspire,
+              educate, and bring joy to the hockey community.
             </p>
           </section>
         </div>
