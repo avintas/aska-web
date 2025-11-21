@@ -8,7 +8,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const limit = parseInt(searchParams.get("limit") || "5", 10);
 
     const { data, error } = await supabase
-      .from("collection_stats")
+      .from("xxx_collection_stats")
       .select(
         "id, stat_text, stat_value, stat_category, year, theme, attribution",
       )

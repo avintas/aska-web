@@ -7,7 +7,7 @@ export async function GET(): Promise<NextResponse> {
 
     // Fetch all published IDs
     const { data: ids, error: idsError } = await supabase
-      .from("collection_stats")
+      .from("xxx_collection_stats")
       .select("id")
       .eq("status", "published");
 
@@ -31,7 +31,7 @@ export async function GET(): Promise<NextResponse> {
 
     // Fetch the random item
     const { data, error } = await supabase
-      .from("collection_stats")
+      .from("xxx_collection_stats")
       .select(
         "id, stat_text, stat_value, stat_category, year, theme, attribution",
       )
