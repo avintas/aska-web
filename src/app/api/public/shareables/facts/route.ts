@@ -3,7 +3,23 @@ import { createServerClient } from "@/utils/supabase/server";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createServerClient();
+    let supabase;
+    try {
+      supabase = await createServerClient();
+    } catch (clientError) {
+      console.error("Failed to create Supabase client:", clientError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Database connection failed",
+          details:
+            clientError instanceof Error
+              ? clientError.message
+              : String(clientError),
+        },
+        { status: 500 },
+      );
+    }
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get("id");
     const mode = searchParams.get("mode");
@@ -20,7 +36,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       if (archiveError) {
         console.error("Error fetching facts archive:", archiveError);
         return NextResponse.json(
-          { success: false, error: "Failed to fetch archive" },
+          {
+            success: false,
+            error: "Failed to fetch archive",
+            details: archiveError.message || JSON.stringify(archiveError),
+            code: archiveError.code,
+            hint: archiveError.hint,
+          },
           { status: 500 },
         );
       }
@@ -50,13 +72,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     if (error) {
       console.error("Error fetching published facts shareables:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
       return NextResponse.json(
-        { success: false, error: "Failed to fetch facts shareables" },
+        {
+          success: false,
+          error: "Failed to fetch facts shareables",
+          details: error.message || JSON.stringify(error),
+          code: error.code,
+          hint: error.hint,
+        },
         { status: 500 },
       );
     }
 
+    console.log("Facts query result:", {
+      hasData: !!data,
+      dataKeys: data ? Object.keys(data) : null,
+    });
+
     if (!data) {
+      console.log("No data returned from facts query");
       return NextResponse.json(
         { success: false, error: "No published facts shareables found" },
         { status: 404 },
@@ -95,7 +130,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error("Unexpected error:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

@@ -3,7 +3,23 @@ import { createServerClient } from "@/utils/supabase/server";
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const supabase = await createServerClient();
+    let supabase;
+    try {
+      supabase = await createServerClient();
+    } catch (clientError) {
+      console.error("Failed to create Supabase client:", clientError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Database connection failed",
+          details:
+            clientError instanceof Error
+              ? clientError.message
+              : String(clientError),
+        },
+        { status: 500 },
+      );
+    }
 
     // Fetch all published IDs
     const { data: ids, error: idsError } = await supabase

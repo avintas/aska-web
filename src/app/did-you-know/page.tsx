@@ -126,6 +126,16 @@ function DidYouKnowContent(): JSX.Element {
         const response = await fetch(url);
         const data = await response.json();
 
+        console.log("Facts API response:", {
+          success: data.success,
+          hasData: !!data.data,
+          dataLength: data.data?.length,
+          error: data.error,
+          details: data.details,
+          code: data.code,
+          hint: data.hint,
+        });
+
         if (data.success) {
           setFacts(data.data || []);
           if (data.meta?.created_at) {
@@ -138,6 +148,7 @@ function DidYouKnowContent(): JSX.Element {
             );
           }
         } else {
+          console.error("Facts API error:", data.error, data.details);
           setError(data.error || "Failed to load facts");
         }
       } catch (err) {

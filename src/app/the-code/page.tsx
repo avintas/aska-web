@@ -118,6 +118,16 @@ function TheCodeContent(): JSX.Element {
         const response = await fetch(url);
         const data = await response.json();
 
+        console.log("Motivational API response:", {
+          success: data.success,
+          hasData: !!data.data,
+          dataLength: data.data?.length,
+          error: data.error,
+          details: data.details,
+          code: data.code,
+          hint: data.hint,
+        });
+
         if (data.success) {
           setMotivational(data.data || []);
           if (data.meta?.created_at) {
@@ -130,6 +140,7 @@ function TheCodeContent(): JSX.Element {
             );
           }
         } else {
+          console.error("Motivational API error:", data.error, data.details);
           setError(data.error || "Failed to load motivational content");
         }
       } catch (err) {
