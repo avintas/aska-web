@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -103,7 +103,7 @@ const handleShare = async (fact: Fact): Promise<void> => {
   }
 };
 
-export default function DidYouKnowPage(): JSX.Element {
+function DidYouKnowContent(): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   const setId = searchParams.get("id");
@@ -309,5 +309,21 @@ export default function DidYouKnowPage(): JSX.Element {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DidYouKnowPage(): JSX.Element {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 flex items-center justify-center">
+          <div className="text-xl text-gray-600 dark:text-gray-400">
+            Loading facts...
+          </div>
+        </div>
+      }
+    >
+      <DidYouKnowContent />
+    </Suspense>
   );
 }
