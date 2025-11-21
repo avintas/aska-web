@@ -1,0 +1,9 @@
+# Pre-push hook: Run full build check before pushing
+# This is a backup safety net in case pre-commit hook is bypassed
+
+echo "🔍 Pre-push: Running final build check..."
+npm run vercel-check || {
+  echo "❌ Build check failed! Fix errors before pushing."
+  exit 1
+}
+

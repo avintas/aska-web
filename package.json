@@ -10,7 +10,8 @@
     "prepare": "husky",
     "type-check": "tsc --noEmit",
     "type-check:patterns": "npx tsx scripts/type-check.ts",
-    "type-check:all": "npm run type-check && npm run type-check:patterns"
+    "type-check:all": "npm run type-check && npm run type-check:patterns",
+    "vercel-check": "npm run type-check && npm run type-check:patterns && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.3.0",

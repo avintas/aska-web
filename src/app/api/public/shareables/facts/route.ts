@@ -56,7 +56,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    if (!data || !data.items) {
+    if (!data) {
+      return NextResponse.json(
+        { success: false, error: "No published facts shareables found" },
+        { status: 404 },
+      );
+    }
+
+    const shareableData = data as {
+      id: number;
+      items: unknown[];
+      created_at: string;
+    };
+
+    if (!shareableData.items) {
       return NextResponse.json(
         { success: false, error: "No published facts shareables found" },
         { status: 404 },
@@ -67,10 +80,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: true,
-        data: data.items,
+        data: shareableData.items,
         meta: {
-          id: data.id,
-          created_at: data.created_at,
+          id: shareableData.id,
+          created_at: shareableData.created_at,
         },
       },
       {

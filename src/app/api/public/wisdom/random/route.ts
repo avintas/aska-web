@@ -27,7 +27,16 @@ export async function GET(): Promise<NextResponse> {
     }
 
     // Pick random ID
-    const randomId = ids[Math.floor(Math.random() * ids.length)].id;
+    const idsArray = ids as Array<{ id: number }>;
+    const randomItem = idsArray[Math.floor(Math.random() * idsArray.length)];
+    const randomId = randomItem?.id;
+
+    if (!randomId) {
+      return NextResponse.json(
+        { success: false, error: "Failed to select random wisdom" },
+        { status: 500 },
+      );
+    }
 
     // Fetch the random item
     const { data, error } = await supabase

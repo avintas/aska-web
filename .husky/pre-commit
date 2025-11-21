@@ -1,4 +1,8 @@
-# Run pattern-based type check (fast, catches common issues)
+# Run full TypeScript type check (same as Vercel)
+echo "🔍 Running TypeScript type check (same as Vercel)..."
+npm run type-check || exit 1
+
+# Run pattern-based type check (catches common issues)
 echo "🔍 Running type pattern checks..."
 npm run type-check:patterns || exit 1
 
