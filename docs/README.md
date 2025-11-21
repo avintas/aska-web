@@ -1,79 +1,79 @@
-# Documentation
+# OnlyHockey.com Documentation
 
-This directory contains all documentation for the Aska Monorepo project, organized by **functional domain** for easy context gathering.
+**Project:** OnlyHockey.com - The Ultimate Hockey Trivia Game  
+**Framework:** Next.js 15 with TypeScript  
+**Database:** Supabase PostgreSQL  
 
-## 🎯 Domain-Based Organization
+---
 
-Documents are organized by **what you're working on**, not document type. Each domain folder contains complete context for that area.
+## 🏒 Project Overview
 
-### Domain Folders
+OnlyHockey.com is a hockey trivia website featuring:
 
-- **[trivia/](./trivia/)** - Trivia system (Multiple Choice, True/False, Who Am I)
-- **[process-builders/](./process-builders/)** - Automated content generation workflows
-- **[content-sourcing/](./content-sourcing/)** - Content ingestion and metadata extraction
-- **[content-browser/](./content-browser/)** - Content Browser: browsing, filtering, and exploring content by themes
-- **[collections/](./collections/)** - Content collections (Wisdom, Greetings, Stats, etc.)
-- **[system/](./system/)** - System-wide architecture and patterns
-- **[ai-integration/](./ai-integration/)** - AI/Gemini integration
-- **[setup/](./setup/)** - Setup guides and onboarding
-- **[planning/](./planning/)** - Planning documents
-- **[testing/](./testing/)** - Testing guides
-- **[archive/](./archive/)** - Archived historical documents
+- **🎯 Trivia Arena** - Interactive hockey trivia games
+- **💙 Shareables** - Hockey wisdom, greetings, and motivational content  
+- **📖 Did You Know** - Hockey facts and stories
+- **🛍️ Shop** - Hockey merchandise and digital products
 
-## 📖 Quick Start
+## 📁 Project Structure
 
-### For New Developers
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx           # Homepage with 5x4 grid
+│   ├── trivia-arena/      # Trivia games
+│   ├── shareables/        # Shareable content
+│   ├── shop/              # E-commerce
+│   └── api/               # API endpoints
+├── components/            # Reusable UI components
+│   ├── Navbar.tsx         # Site navigation
+│   ├── Footer.tsx         # Site footer
+│   └── ThemeProvider.tsx  # Dark/light theme
+├── shared/                # Shared types and utilities
+└── utils/                 # Utility functions
+```
 
-1. **Start Here**: [system/guides/DEVELOPER-HANDOFF-SUMMARY.md](./system/guides/DEVELOPER-HANDOFF-SUMMARY.md)
-2. **Architecture**: [system/architecture/ARCHITECTURE.md](./system/architecture/ARCHITECTURE.md)
-3. **Patterns**: [collections/implementation/CONTENT-LIBRARY-TABLE-PATTERN.md](./collections/implementation/CONTENT-LIBRARY-TABLE-PATTERN.md)
+## 🚀 Quick Start
 
-### For Feature Work
+1. **Clone and Install:**
+   ```bash
+   git clone <repository>
+   cd aska-web
+   npm install
+   ```
 
-Navigate to the relevant domain folder and read its README.md for complete context:
-- Working on trivia? → [trivia/README.md](./trivia/README.md)
-- Working on process builders? → [process-builders/README.md](./process-builders/README.md)
-- Working on content sourcing? → [content-sourcing/README.md](./content-sourcing/README.md)
-- Working on content browser? → [content-browser/README.md](./content-browser/README.md)
+2. **Environment Setup:**
+   ```bash
+   cp .env.example .env.local
+   # Add your Supabase credentials
+   ```
 
-## 📚 Documentation Index
+3. **Run Development Server:**
+   ```bash
+   npm run dev
+   ```
 
-See [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md) for complete documentation index and search tips.
+4. **Visit:** http://localhost:3000
 
-## 🗄️ SQL Scripts
+## 📚 Documentation
 
-SQL scripts and database migrations are located in the `../sql/` directory at the project root.
+- **[Setup Guide](./SETUP.md)** - Local development setup
+- **[API Documentation](./API.md)** - API endpoints and usage
+- **[Brand Guidelines](./BRAND.md)** - Brand messaging and design
+- **[Deployment](./DEPLOYMENT.md)** - Production deployment guide
 
-## 📝 Key Documents
+## 🎨 Brand Identity
 
-### System Architecture
-- [System Architecture](./system/architecture/ARCHITECTURE.md) - Overall system architecture
-- [System Design](./system/architecture/SYSTEM_DESIGN.md) - Design decisions
-- [Project Organization](./system/architecture/PROJECT_ORGANIZATION.md) - Project structure
+**Core Message:** "There Is Only Hockey!"  
+**Tagline:** "L❤️VE FOR THE GAME IS ALL YOU NEED"  
+**Focus:** Ultimate hockey trivia gaming experience
 
-### Implementation Patterns
-- [Content Library Table Pattern](./collections/implementation/CONTENT-LIBRARY-TABLE-PATTERN.md) - Database pattern
-- [Content Library API Pattern](./collections/implementation/CONTENT-LIBRARY-API-PATTERN.md) - API pattern
-- [Developer Handoff Summary](./system/guides/DEVELOPER-HANDOFF-SUMMARY.md) - Complete developer guide
+## 🔗 Key Links
 
-### Current Status
-- [Current Status](./CURRENT_STATUS.md) - Current project status
-- [Memory Notes](./MEMORY_NOTES.md) - Important notes and decisions
+- **Production:** https://onlyhockey.com
+- **Supabase:** [Project Dashboard](https://supabase.com/dashboard)
+- **Vercel:** [Deployment Dashboard](https://vercel.com/dashboard)
 
-## 💡 How to Use
+---
 
-**For AI-assisted development:**
-- Point to a domain folder (e.g., `docs/trivia/`) for complete context
-- Each domain folder contains all related documentation in one place
-
-**For human developers:**
-- Navigate to the domain folder for the feature you're working on
-- Read the domain README.md for overview and quick links
-- Explore subfolders (api/, implementation/, guides/) as needed
-
-## 🔍 Finding Documents
-
-- **By Feature**: Navigate to the domain folder
-- **By Type**: Check `*/api/`, `*/implementation/`, `*/guides/` subfolders
-- **Historical**: Check `*/history/` subfolders or `archive/` folder
-- **Search**: Use [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md) for search tips
+**Need Help?** Check the specific documentation files or contact the development team.

@@ -4,33 +4,22 @@ import {
 } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-/**
- * Creates and returns a Supabase client for use in Server Components/Actions/API Routes.
- *
- * This client securely manages the user's session via cookies on the server.
- *
- * @returns {Promise<ReturnType<typeof createSupabaseServerClient>>} The secure server-side Supabase client.
- */
 export async function createServerClient(): Promise<
   ReturnType<typeof createSupabaseServerClient>
 > {
-  // Check environment variables
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // 1. Sanitize the URL (remove invisible spaces)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
+  // 2. Strict validation
   if (!supabaseUrl || !supabaseKey) {
-    const missing = [];
-    if (!supabaseUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
-    if (!supabaseKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-
-    console.error(
-      "❌ Missing Supabase environment variables:",
-      missing.join(", "),
-    );
-    throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}`,
-    );
+    console.error("❌ Missing Supabase environment variables");
+    throw new Error("Missing required environment variables");
   }
+
+  // 3. Optional: Debugging log (Remove this after it works)
+  // This will show up in Vercel logs so you can see EXACTLY what it's trying to use
+  console.log(`[Supabase Init] Connecting to: '${supabaseUrl}'`);
 
   const cookieStore = await cookies();
 
@@ -40,10 +29,18 @@ export async function createServerClient(): Promise<
         return cookieStore.get(name)?.value;
       },
       set(name: string, value: string, options: CookieOptions): void {
-        cookieStore.set({ name, value, ...options });
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch (error) {
+          // Handle the case where setting cookies fails (e.g. Server Actions)
+        }
       },
       remove(name: string, options: CookieOptions): void {
-        cookieStore.set({ name, value: "", ...options });
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch (error) {
+          // Handle cookie deletion errors
+        }
       },
     },
   });
