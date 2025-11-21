@@ -169,7 +169,10 @@ export const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"] as const;
  * Type guard: Check if value is valid difficulty
  */
 export function isValidDifficulty(value: unknown): value is DifficultyLevel {
-  return DIFFICULTY_LEVELS.includes(value);
+  return (
+    typeof value === "string" &&
+    (DIFFICULTY_LEVELS as readonly string[]).includes(value)
+  );
 }
 
 /**

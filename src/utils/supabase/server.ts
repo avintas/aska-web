@@ -1,4 +1,3 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import {
   createServerClient as createSupabaseServerClient,
   type CookieOptions,
@@ -10,9 +9,11 @@ import { cookies } from "next/headers";
  *
  * This client securely manages the user's session via cookies on the server.
  *
- * @returns {Promise<SupabaseClient>} The secure server-side Supabase client.
+ * @returns {Promise<ReturnType<typeof createSupabaseServerClient>>} The secure server-side Supabase client.
  */
-export async function createServerClient(): Promise<SupabaseClient> {
+export async function createServerClient(): Promise<
+  ReturnType<typeof createSupabaseServerClient>
+> {
   const cookieStore = await cookies();
 
   return createSupabaseServerClient(
@@ -26,7 +27,7 @@ export async function createServerClient(): Promise<SupabaseClient> {
         set(name: string, value: string, options: CookieOptions): void {
           cookieStore.set({ name, value, ...options });
         },
-        remove(name: string, value: string, options: CookieOptions): void {
+        remove(name: string, options: CookieOptions): void {
           cookieStore.set({ name, value: "", ...options });
         },
       },
