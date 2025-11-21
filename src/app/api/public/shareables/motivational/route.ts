@@ -36,20 +36,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // MODE: Single Set (Latest or by ID)
-    let query = supabase
+    const baseQuery = supabase
       .from("pub_shareables_motivational")
       .select("id, items, created_at")
       .eq("status", "published");
 
-    if (id) {
-      // Fetch specific set by ID
-      query = query.eq("id", id).single();
-    } else {
-      // Fetch latest
-      query = query.order("created_at", { ascending: false }).limit(1).single();
-    }
-
-    const { data, error } = await query;
+    const { data, error } = id
+      ? await baseQuery.eq("id", id).single()
+      : await baseQuery
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
 
     if (error) {
       console.error("Error fetching published motivational shareables:", error);

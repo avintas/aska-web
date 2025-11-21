@@ -1,1 +1,6 @@
+# Run pattern-based type check (fast, catches common issues)
+echo "🔍 Running type pattern checks..."
+npm run type-check:patterns || exit 1
+
+# Run lint-staged for formatting and linting
 npx lint-staged
