@@ -23,6 +23,18 @@ export default function Home(): JSX.Element {
       case 1:
         config = {
           id,
+          href: "/did-you-know",
+          label: (
+            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
+              Did you know?
+            </span>
+          ),
+          isHighlighted: true,
+        };
+        break;
+      case 3:
+        config = {
+          id,
           href: "/trivia-arena",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
@@ -35,25 +47,13 @@ export default function Home(): JSX.Element {
           // imageSrc: '/images/trivia-thumb.jpg' // Placeholder for future use
         };
         break;
-      case 3:
-        config = {
-          id,
-          href: "/ethos",
-          label: (
-            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Ethos
-            </span>
-          ),
-          isHighlighted: true,
-        };
-        break;
       case 5:
         config = {
           id,
-          href: "/did-you-know",
+          href: "/the-code",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Did you know?
+              The Code
             </span>
           ),
           isHighlighted: true,
@@ -75,23 +75,26 @@ export default function Home(): JSX.Element {
       case 9:
         config = {
           id,
-          href: "/the-code",
+          href: "/game-plan",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              The Code
+              Game Plan
             </span>
           ),
           isHighlighted: true,
         };
         break;
-      case 13: // Cell 13 is highlighted but currently empty/placeholder in original code
+      case 13:
         config = {
           id,
-          href: "#",
+          href: "/shop",
           label: (
-            <span className="text-xs text-white z-10 relative">Cell 13</span>
+            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
+              Shop
+            </span>
           ),
           isHighlighted: true,
+          // imageSrc: '/images/shop-thumb.jpg'
         };
         break;
       default:
