@@ -24,16 +24,24 @@ interface ArchiveItem {
   status: string;
 }
 
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  hasMore: boolean;
+}
+
 interface ApiResponse {
   success: boolean;
   data?: FactRecord | ArchiveItem[];
+  pagination?: PaginationInfo;
   error?: string;
 }
 
-// Graph/Chart icon component for facts
-const FactIcon = (): JSX.Element => (
+// Small icon component for facts (responsive)
+const FactIconSmall = (): JSX.Element => (
   <svg
-    className="w-10 h-10 text-orange-500 dark:text-orange-400"
+    className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-500 dark:text-orange-400"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -47,36 +55,190 @@ const FactIcon = (): JSX.Element => (
   </svg>
 );
 
+// Modal Component
+interface ModalProps {
+  fact: FactItem;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const FactModal = ({ fact, isOpen, onClose }: ModalProps): JSX.Element => {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return <></>;
+
+  const categoryLabel = fact.fact_category
+    ? fact.fact_category
+        .split("_")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
+        .join(" ")
+    : "Hockey Fact";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-colors"
+          aria-label="Close modal"
+        >
+          <svg
+            className="w-5 h-5 text-gray-700 dark:text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        {/* Icon */}
+        <div className="mb-6">
+          <FactIconSmall />
+        </div>
+
+        {/* Category/Title */}
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          {categoryLabel}
+        </h2>
+
+        {/* Fact Text */}
+        <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+          {fact.fact_text}
+        </p>
+
+        {/* Year badge if available */}
+        {fact.year && (
+          <div className="inline-block bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded mb-6">
+            {fact.year}
+          </div>
+        )}
+
+        {/* Share Button */}
+        <button
+          className="w-full px-6 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold transition-colors flex items-center justify-center gap-2"
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({
+                title: "Hockey Fact",
+                text: fact.fact_text,
+              });
+            } else {
+              navigator.clipboard.writeText(fact.fact_text);
+              alert("Fact copied to clipboard!");
+            }
+          }}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+            />
+          </svg>
+          Share Fact
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default function DidYouKnowPage(): JSX.Element {
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [facts, setFacts] = useState<FactItem[]>([]);
   const [currentSetId, setCurrentSetId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
   const [loadingArchive, setLoadingArchive] = useState(true);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [selectedFact, setSelectedFact] = useState<FactItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    async function fetchData(): Promise<void> {
-      try {
-        const response = await fetch("/api/did-you-know");
-        const result: ApiResponse = await response.json();
-
-        if (result.success && result.data && !Array.isArray(result.data)) {
-          const record = result.data as FactRecord;
-          // Ensure items is an array
-          const items = Array.isArray(record.items) ? record.items : [];
-          setFacts(items);
-          setCurrentSetId(record.id);
-        } else {
-          setError(result.error || "Failed to fetch facts");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
+  const fetchData = async (
+    setId: number | null = null,
+    page = 1,
+  ): Promise<void> => {
+    const isInitialLoad = page === 1;
+    if (isInitialLoad) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
     }
 
+    try {
+      const url = setId
+        ? `/api/did-you-know?id=${setId}&page=${page}&limit=80`
+        : `/api/did-you-know?page=${page}&limit=80`;
+      const response = await fetch(url);
+      const result: ApiResponse = await response.json();
+
+      if (result.success && result.data && !Array.isArray(result.data)) {
+        const record = result.data as FactRecord;
+        const items = Array.isArray(record.items) ? record.items : [];
+
+        if (isInitialLoad) {
+          setFacts(items);
+        } else {
+          setFacts((prev) => [...prev, ...items]);
+        }
+
+        setCurrentSetId(record.id);
+        setPagination(result.pagination || null);
+        setCurrentPage(page);
+      } else {
+        setError(result.error || "Failed to fetch facts");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     async function fetchArchiveList(): Promise<void> {
       try {
         const response = await fetch("/api/did-you-know?mode=archive");
@@ -92,29 +254,29 @@ export default function DidYouKnowPage(): JSX.Element {
       }
     }
 
-    fetchData();
     fetchArchiveList();
   }, []);
 
   const loadSet = async (setId: number): Promise<void> => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/did-you-know?id=${setId}`);
-      const result: ApiResponse = await response.json();
+    setCurrentPage(1);
+    await fetchData(setId, 1);
+  };
 
-      if (result.success && result.data && !Array.isArray(result.data)) {
-        const record = result.data as FactRecord;
-        const items = Array.isArray(record.items) ? record.items : [];
-        setFacts(items);
-        setCurrentSetId(record.id);
-      } else {
-        setError(result.error || "Failed to load set");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
+  const loadMore = async (): Promise<void> => {
+    if (pagination?.hasMore && !loadingMore) {
+      const nextPage = currentPage + 1;
+      await fetchData(currentSetId, nextPage);
     }
+  };
+
+  const openModal = (fact: FactItem): void => {
+    setSelectedFact(fact);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = (): void => {
+    setIsModalOpen(false);
+    setSelectedFact(null);
   };
 
   return (
@@ -152,77 +314,56 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
 
-        {/* Facts Grid */}
+        {/* Icons Grid */}
         {!loading && !error && facts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {facts.map((fact, index) => (
-              <div
-                key={fact.id || index}
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 relative"
-              >
-                {/* Icon */}
-                <div className="mb-4">
-                  <FactIcon />
-                </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  {fact.fact_category
-                    ? fact.fact_category
-                        .split("_")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() +
-                            word.slice(1).toLowerCase(),
-                        )
-                        .join(" ")
-                    : `Fact ${index + 1}`}
-                </h3>
-
-                {/* Description */}
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-                  {fact.fact_text}
-                </p>
-
-                {/* Year badge if available */}
-                {fact.year && (
-                  <div className="inline-block bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-semibold px-2 py-1 rounded mb-4">
-                    {fact.year}
-                  </div>
-                )}
-
-                {/* Share Button */}
-                <button
-                  className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 flex items-center justify-center transition-colors"
-                  aria-label="Share fact"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: "Hockey Fact",
-                        text: fact.fact_text,
-                      });
-                    } else {
-                      navigator.clipboard.writeText(fact.fact_text);
-                    }
-                  }}
-                >
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+          <>
+            <div className="flex justify-center mb-8">
+              <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-9 gap-2">
+                {facts.map((fact, index) => (
+                  <button
+                    key={fact.id || index}
+                    onClick={() => openModal(fact)}
+                    className="relative w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 flex items-center justify-center cursor-pointer group"
+                    aria-label={`View fact ${index + 1}`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                    />
-                  </svg>
+                    <FactIconSmall />
+                    {fact.year && (
+                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        {fact.year.toString().slice(-2)}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Load More Button */}
+            {pagination?.hasMore && (
+              <div className="text-center mb-8">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-8 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingMore ? (
+                    <span className="flex items-center gap-2">
+                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Loading...
+                    </span>
+                  ) : (
+                    `Load More (${pagination.total - facts.length} remaining)`
+                  )}
                 </button>
               </div>
-            ))}
-          </div>
+            )}
+
+            {/* Pagination Info */}
+            {pagination && (
+              <div className="text-center text-sm text-gray-500 dark:text-gray-400 mb-8">
+                Showing {facts.length} of {pagination.total} facts
+              </div>
+            )}
+          </>
         )}
 
         {/* Empty State */}
@@ -261,6 +402,15 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
       </div>
+
+      {/* Modal */}
+      {selectedFact && (
+        <FactModal
+          fact={selectedFact}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 }

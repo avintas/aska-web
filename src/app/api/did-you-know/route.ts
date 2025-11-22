@@ -52,7 +52,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Handle specific set ID request
+    // Handle specific set ID request with pagination
     if (setId) {
       const parsedSetId = parseInt(setId, 10);
       if (isNaN(parsedSetId)) {
@@ -62,7 +62,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         );
       }
 
-      console.log(`📋 [Did You Know API] Fetching set ID: ${parsedSetId}`);
+      // Get pagination parameters
+      const page = parseInt(searchParams.get("page") || "1", 10);
+      const limit = parseInt(searchParams.get("limit") || "80", 10);
+      const offset = (page - 1) * limit;
+
+      console.log(
+        `📋 [Did You Know API] Fetching set ID: ${parsedSetId}, page: ${page}, limit: ${limit}`,
+      );
       const { data, error } = (await supabase
         .from("pub_shareables_facts")
         .select("*")
@@ -100,15 +107,35 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         );
       }
 
+      // Parse items array and apply pagination
+      const allItems = Array.isArray(data.items) ? data.items : [];
+      const total = allItems.length;
+      const paginatedItems = allItems.slice(offset, offset + limit);
+      const hasMore = offset + limit < total;
+
       return NextResponse.json({
         success: true,
-        data,
+        data: {
+          ...data,
+          items: paginatedItems,
+        },
+        pagination: {
+          page,
+          limit,
+          total,
+          hasMore,
+        },
       });
     }
 
-    // Default: Query latest published facts from pub_shareables_facts
+    // Default: Query latest published facts from pub_shareables_facts with pagination
+    // Get pagination parameters
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "80", 10);
+    const offset = (page - 1) * limit;
+
     console.log(
-      "📊 [Did You Know API] Querying latest pub_shareables_facts...",
+      `📊 [Did You Know API] Querying latest pub_shareables_facts..., page: ${page}, limit: ${limit}`,
     );
 
     const { data, error, status, statusText } = (await supabase
@@ -167,14 +194,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Parse items array and apply pagination
+    const allItems = Array.isArray(data.items) ? data.items : [];
+    const total = allItems.length;
+    const paginatedItems = allItems.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
     console.log(
-      "✅ [Did You Know API] Successfully retrieved record:",
-      (data as FactRecord).id,
+      `✅ [Did You Know API] Successfully retrieved record: ${(data as FactRecord).id}, paginated: ${paginatedItems.length}/${total}`,
     );
 
     return NextResponse.json({
       success: true,
-      data,
+      data: {
+        ...data,
+        items: paginatedItems,
+      },
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore,
+      },
       debug: {
         status,
         statusText,
