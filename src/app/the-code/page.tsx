@@ -184,10 +184,7 @@ export default function TheCodePage(): JSX.Element {
 
         {/* Past Collections Section */}
         {!loading && !error && archiveList.length > 0 && (
-          <div className="mt-12 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">
-              Past Collections
-            </h2>
+          <div className="mt-20 mb-6">
             {loadingArchive ? (
               <div className="text-center py-4">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
