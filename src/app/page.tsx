@@ -26,7 +26,11 @@ export default function Home(): JSX.Element {
           href: "/did-you-know",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Did You Know
+              Did
+              <br />
+              You
+              <br />
+              Know?
             </span>
           ),
           isHighlighted: true,
@@ -50,10 +54,12 @@ export default function Home(): JSX.Element {
       case 5:
         config = {
           id,
-          href: "/the-code",
+          href: "/locker-room",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              The Code
+              Locker
+              <br />
+              Room
             </span>
           ),
           isHighlighted: true,
@@ -62,10 +68,10 @@ export default function Home(): JSX.Element {
       case 7:
         config = {
           id,
-          href: "/coaches-corner",
+          href: "/pbp",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Coach&apos;s Corner
+              P.B.P.
             </span>
           ),
           isHighlighted: true,

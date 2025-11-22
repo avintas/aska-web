@@ -131,6 +131,7 @@ export default function DidYouKnowPage(): JSX.Element {
           <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
             Discover fascinating hockey facts, records, and stories that
             showcase the rich history and culture of the greatest game on ice.
+            These facts will help you prepare for trivia games.
           </p>
         </div>
 
