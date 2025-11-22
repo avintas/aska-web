@@ -22,15 +22,17 @@ export default function LockerRoomPage(): JSX.Element {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Game Plan Card */}
+          {/* Motivational Card */}
           <Link
             href="/game-plan"
             className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 group"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-4xl">📋</span>
+            <div className="text-center mb-4">
+              <div className="mb-2">
+                <span className="text-4xl">💪</span>
+              </div>
               <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
-                Game Plan
+                Motivational
               </h2>
             </div>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -38,7 +40,7 @@ export default function LockerRoomPage(): JSX.Element {
               coaches to inspire your game.
             </p>
             <div className="mt-6 text-orange-500 dark:text-orange-400 font-semibold group-hover:translate-x-2 transition-transform inline-flex items-center gap-2">
-              View Game Plan
+              View Motivational
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -55,23 +57,93 @@ export default function LockerRoomPage(): JSX.Element {
             </div>
           </Link>
 
-          {/* Pre-Game / PBP Card */}
+          {/* Penalty Box Philosopher Card */}
           <Link
             href="/pbp"
             className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 group"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-4xl">💭</span>
+            <div className="text-center mb-4">
+              <div className="mb-2">
+                <span className="text-4xl">💭</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
+                Penalty Box Philosopher
+              </h2>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              Wisdom and insights from the game of hockey. Also known as the
+              Wisdom Table.
+            </p>
+            <div className="mt-6 text-orange-500 dark:text-orange-400 font-semibold group-hover:translate-x-2 transition-transform inline-flex items-center gap-2">
+              View Penalty Box Philosopher
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </Link>
+
+          {/* Pre-Game Card */}
+          <Link
+            href="/pre-game"
+            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 group"
+          >
+            <div className="text-center mb-4">
+              <div className="mb-2">
+                <span className="text-4xl">⏰</span>
+              </div>
               <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                 Pre-Game
               </h2>
             </div>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Penalty Box Philosopher — Wisdom and insights from the game of
-              hockey. Also known as the Wisdom Table.
+              Your pre-game preparation and warm-up content.
             </p>
             <div className="mt-6 text-orange-500 dark:text-orange-400 font-semibold group-hover:translate-x-2 transition-transform inline-flex items-center gap-2">
               View Pre-Game
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </Link>
+
+          {/* Game Plan Card */}
+          <Link
+            href="/game-plan-strategy"
+            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 group"
+          >
+            <div className="text-center mb-4">
+              <div className="mb-2">
+                <span className="text-4xl">📋</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
+                Game Plan
+              </h2>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              Strategic game plans and tactical insights.
+            </p>
+            <div className="mt-6 text-orange-500 dark:text-orange-400 font-semibold group-hover:translate-x-2 transition-transform inline-flex items-center gap-2">
+              View Game Plan
               <svg
                 className="w-5 h-5"
                 fill="none"

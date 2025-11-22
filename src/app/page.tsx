@@ -68,10 +68,12 @@ export default function Home(): JSX.Element {
       case 7:
         config = {
           id,
-          href: "/pbp",
+          href: "/game-day",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              P.B.P.
+              Game
+              <br />
+              Day
             </span>
           ),
           isHighlighted: true,
@@ -80,10 +82,12 @@ export default function Home(): JSX.Element {
       case 9:
         config = {
           id,
-          href: "/game-plan",
+          href: "/game-plan-strategy",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Game Plan
+              Game
+              <br />
+              Plan
             </span>
           ),
           isHighlighted: true,
