@@ -1,5 +1,24 @@
 "use client";
 
+// Share Icon Component
+const ShareIcon = (): JSX.Element => (
+  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-md">
+    <svg
+      className="w-5 h-5 text-white"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      strokeWidth={2}
+    >
+      <circle cx="6" cy="6" r="2" stroke="currentColor" fill="none" />
+      <circle cx="6" cy="18" r="2" stroke="currentColor" fill="none" />
+      <circle cx="18" cy="12" r="2" stroke="currentColor" fill="none" />
+      <line x1="8" y1="6" x2="16" y2="12" stroke="currentColor" />
+      <line x1="8" y1="18" x2="16" y2="12" stroke="currentColor" />
+    </svg>
+  </div>
+);
+
 export default function GameDayPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
@@ -13,14 +32,20 @@ export default function GameDayPage(): JSX.Element {
             </h1>
           </div>
           <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-            Messages and support for every moment of your game day journey.
+            The game starts before the puck drops. Whether you need a pre-game
+            boost or a post-game high five, we&apos;ve got the perfect message
+            ready to text. Find the words, make them yours, and send the ❤️
+            love.
           </p>
         </div>
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Good Luck Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 cursor-pointer relative">
+            <div className="absolute top-4 right-4">
+              <ShareIcon />
+            </div>
             <div className="text-center mb-4">
               <div className="mb-2">
                 <span className="text-4xl">🍀</span>
@@ -41,7 +66,10 @@ export default function GameDayPage(): JSX.Element {
           </div>
 
           {/* I'm Proud Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 cursor-pointer relative">
+            <div className="absolute top-4 right-4">
+              <ShareIcon />
+            </div>
             <div className="text-center mb-4">
               <div className="mb-2">
                 <span className="text-4xl">❤️</span>
@@ -61,7 +89,10 @@ export default function GameDayPage(): JSX.Element {
           </div>
 
           {/* Bounce Back Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 cursor-pointer relative">
+            <div className="absolute top-4 right-4">
+              <ShareIcon />
+            </div>
             <div className="text-center mb-4">
               <div className="mb-2">
                 <span className="text-4xl">💪</span>
@@ -82,7 +113,10 @@ export default function GameDayPage(): JSX.Element {
           </div>
 
           {/* Celebration Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 cursor-pointer relative">
+            <div className="absolute top-4 right-4">
+              <ShareIcon />
+            </div>
             <div className="text-center mb-4">
               <div className="mb-2">
                 <span className="text-4xl">🎉</span>
