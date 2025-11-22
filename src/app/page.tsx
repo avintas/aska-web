@@ -75,7 +75,7 @@ export default function Home(): JSX.Element {
       case 9:
         config = {
           id,
-          href: "/game-plan",
+          href: "/ethos",
           label: (
             <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
               Game Plan
