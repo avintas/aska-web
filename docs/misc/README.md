@@ -61,6 +61,7 @@ src/
 - **[API Documentation](./API.md)** - API endpoints and usage
 - **[Brand Guidelines](./BRAND.md)** - Brand messaging and design
 - **[Deployment](./DEPLOYMENT.md)** - Production deployment guide
+- **[Next.js Best Practices](./NEXTJS_BEST_PRACTICES.md)** - Known gotchas and best practices
 
 ## 🎨 Brand Identity
 
