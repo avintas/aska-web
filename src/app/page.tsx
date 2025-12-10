@@ -20,22 +20,7 @@ export default function Home(): JSX.Element {
 
     // Configure specific cells
     switch (id) {
-      case 1:
-        config = {
-          id,
-          href: "/did-you-know",
-          label: (
-            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Did
-              <br />
-              You
-              <br />
-              Know?
-            </span>
-          ),
-          isHighlighted: true,
-        };
-        break;
+      // Row 1: Top of Pyramid (1 item)
       case 3:
         config = {
           id,
@@ -51,20 +36,8 @@ export default function Home(): JSX.Element {
           // imageSrc: '/images/trivia-thumb.jpg' // Placeholder for future use
         };
         break;
-      case 5:
-        config = {
-          id,
-          href: "/locker-room",
-          label: (
-            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
-              Locker
-              <br />
-              Room
-            </span>
-          ),
-          isHighlighted: true,
-        };
-        break;
+
+      // Row 2: Middle of Pyramid (2 items)
       case 7:
         config = {
           id,
@@ -93,6 +66,24 @@ export default function Home(): JSX.Element {
           isHighlighted: true,
         };
         break;
+
+      // Row 3: Bottom of Pyramid (3 items)
+      case 11:
+        config = {
+          id,
+          href: "/did-you-know",
+          label: (
+            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
+              Did
+              <br />
+              You
+              <br />
+              Know?
+            </span>
+          ),
+          isHighlighted: true,
+        };
+        break;
       case 13:
         config = {
           id,
@@ -106,6 +97,21 @@ export default function Home(): JSX.Element {
           // imageSrc: '/images/shop-thumb.jpg'
         };
         break;
+      case 15:
+        config = {
+          id,
+          href: "/locker-room",
+          label: (
+            <span className="text-sm md:text-base font-bold text-white text-center z-10 relative">
+              Locker
+              <br />
+              Room
+            </span>
+          ),
+          isHighlighted: true,
+        };
+        break;
+
       default:
         // Standard numbered cells
         config = { id };

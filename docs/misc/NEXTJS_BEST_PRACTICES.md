@@ -242,3 +242,6 @@ When creating new pages or components, verify:
 - [Next.js App Router](https://nextjs.org/docs/app)
 - [Tailwind CSS with Next.js](https://tailwindcss.com/docs/guides/nextjs)
 
+
+
+
