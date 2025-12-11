@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 // Cell display type: A = icon-only, B = icon + micro-label, C = icon + badge
 type CellDisplayType = "A" | "B" | "C";
@@ -21,6 +22,7 @@ interface CellConfig {
 }
 
 export default function Home(): JSX.Element {
+  const router = useRouter();
   const [previewCell, setPreviewCell] = useState<CellConfig | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -157,7 +159,7 @@ export default function Home(): JSX.Element {
     // Check if this is the second click (preview already shown)
     if (showPreview && previewCell?.id === cell.id) {
       // Navigate to the page
-      window.location.href = cell.href;
+      router.push(cell.href);
       return;
     }
 
@@ -173,7 +175,7 @@ export default function Home(): JSX.Element {
   };
 
   const handleNavigate = (href: string): void => {
-    window.location.href = href;
+    router.push(href);
   };
 
   return (
