@@ -141,12 +141,12 @@ export default function Home(): JSX.Element {
           {/* Description */}
           <p className="text-base md:text-md text-gray-700 dark:text-gray-300 leading-relaxed text-center">
             We launched OnlyHockey as a tribute to the great Game of Hockey.
-            Challenge yourself and your friends to a hockey trivia game, find
-            motivational quotes from legendary players and epic coaches. Learn
-            interesting facts, anecdotes, curiosities of hockey culture. We hope
-            you will discover what makes our hockey community so special.
-            Whether you are here for the ethos or the pure joy of the game, you
-            belong here. 🏠✨
+            Here, you can immerse yourself in the curiosities of hockey culture
+            and interesting facts from the sport&apos;s past and present.
+            Challenge yourself and your friends to engaging hockey trivia and
+            get a motivational boost from legendary coaches and iconic players.
+            We hope you will discover what makes our hockey community so
+            special. 🏠✨
           </p>
         </div>
 
