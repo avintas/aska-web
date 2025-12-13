@@ -54,6 +54,7 @@ export default function Home(): JSX.Element {
           description:
             "Play hockey trivia games and challenge yourself with multiple choice and true/false questions. Test your knowledge and compete with friends!",
           displayType: "C",
+          microLabel: "Trivia Arena",
           badge: "FREE",
           badgeColor: "bg-green-500",
           isHighlighted: true,
@@ -65,56 +66,9 @@ export default function Home(): JSX.Element {
       case 7:
         config = {
           id,
-          href: "/game-day",
-          icon: "💬", // Message icon - replace with custom hockey message icon
-          iconAlt: "Shareable Motivators",
-          title: "Shareable Motivators",
-          description:
-            "Find motivational messages ready to text - pre-game boost, post-game celebration, or encouragement during tough times. Perfect for game day!",
-          displayType: "B",
-          microLabel: "Messages",
-          isHighlighted: true,
-        };
-        break;
-      // Option A: Icon-only
-      case 9:
-        config = {
-          id,
-          href: "/game-plan-strategy",
-          icon: "📋", // Clipboard icon - replace with custom coach clipboard icon
-          iconAlt: "Game Plan",
-          title: "Game Plan",
-          description:
-            "Learn from legendary coaches and iconic players - strategic insights and hockey wisdom. Master the game with proven strategies.",
-          displayType: "A",
-          isHighlighted: true,
-        };
-        break;
-
-      // Row 3: Bottom of Pyramid (3 items)
-      // Option C: Icon + Badge
-      case 11:
-        config = {
-          id,
-          href: "/did-you-know",
-          icon: "💡", // Lightbulb icon - replace with custom fact icon
-          iconAlt: "Did You Know",
-          title: "Did You Know?",
-          description:
-            "Discover interesting facts and curiosities from hockey&apos;s past and present. Expand your hockey knowledge with fascinating trivia!",
-          displayType: "C",
-          badge: "FACTS",
-          badgeColor: "bg-blue-500",
-          isHighlighted: true,
-        };
-        break;
-      // Option B: Icon + Micro-label
-      case 13:
-        config = {
-          id,
           href: "/shop",
-          icon: "🛍️", // Shopping bag icon - replace with custom hockey gear icon
-          iconAlt: "Shop",
+          icon: "🛍️", // Store
+          iconAlt: "Shop (Store)",
           title: "Shop",
           description:
             "Browse our collection of hockey merchandise and gear. Show your love for the game with official OnlyHockey products!",
@@ -124,16 +78,66 @@ export default function Home(): JSX.Element {
         };
         break;
       // Option A: Icon-only
+      case 9:
+        config = {
+          id,
+          href: "/did-you-know",
+          icon: "💡", // Did You Know
+          iconAlt: "Did You Know",
+          title: "Did You Know?",
+          description:
+            "Discover interesting facts and curiosities from hockey&apos;s past and present. Expand your hockey knowledge with fascinating trivia!",
+          displayType: "C",
+          microLabel: "Academy",
+          badge: "FACTS",
+          badgeColor: "bg-blue-500",
+          isHighlighted: true,
+        };
+        break;
+
+      // Row 3: Bottom of Pyramid (3 items)
+      // Option C: Icon + Badge
+      case 11:
+        config = {
+          id,
+          href: "/game-day",
+          icon: "💙", // Captain Heart
+          iconAlt: "Captain Heart (Blue Heart)",
+          title: "Captain Heart",
+          description:
+            "Daily motivation messages from your Captain Heart. Quick, uplifting notes you can read or share anytime you need a boost.",
+          displayType: "B",
+          microLabel: "Captain Heart",
+          isHighlighted: true,
+        };
+        break;
+      // Option B: Icon + Micro-label
+      case 13:
+        config = {
+          id,
+          href: "/game-plan-strategy",
+          icon: "💪", // Bench Boss
+          iconAlt: "Bench Boss (Bicep)",
+          title: "Bench Boss",
+          description:
+            "Daily motivation messages from your Bench Boss. Strong, no-nonsense reminders to stay focused, train hard, and lead the shift.",
+          displayType: "B",
+          microLabel: "Bench Boss",
+          isHighlighted: true,
+        };
+        break;
+      // Option A: Icon-only
       case 15:
         config = {
           id,
           href: "/locker-room",
-          icon: "👥", // People icon - replace with custom locker room icon
-          iconAlt: "Locker Room",
-          title: "Locker Room",
+          icon: "🎓", // Penalty Box Philosopher (graduation cap)
+          iconAlt: "Penalty Box Philosopher (Graduation Cap)",
+          title: "Penalty Box Philosopher",
           description:
-            "Connect with the OnlyHockey community - share stories, achievements, and connect with fellow fans. Join the conversation!",
-          displayType: "A",
+            "Wisdom and mindset lessons from the Penalty Box Philosopher. Thoughtful takes to reset, refocus, and level up your game.",
+          displayType: "B",
+          microLabel: "Philosopher",
           isHighlighted: true,
         };
         break;
@@ -258,7 +262,7 @@ export default function Home(): JSX.Element {
 
                   {/* Option C: Icon + Badge */}
                   {cell.displayType === "C" && (
-                    <div className="flex flex-col items-center justify-center z-10 relative">
+                    <div className="flex flex-col items-center justify-center z-10 relative gap-1">
                       <span
                         className="text-5xl md:text-6xl"
                         role="img"
@@ -266,6 +270,11 @@ export default function Home(): JSX.Element {
                       >
                         {cell.icon}
                       </span>
+                      {cell.microLabel && (
+                        <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide">
+                          {cell.microLabel}
+                        </span>
+                      )}
                       {cell.badge && (
                         <span
                           className={`absolute -top-1 -right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight`}

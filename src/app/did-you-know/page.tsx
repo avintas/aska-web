@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getEmojiForFact, formatCategoryLabel } from "@/utils/factEmojis";
 
 interface FactItem {
   id?: number;
@@ -24,38 +25,13 @@ interface ArchiveItem {
   status: string;
 }
 
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  hasMore: boolean;
-}
-
 interface ApiResponse {
   success: boolean;
   data?: FactRecord | ArchiveItem[];
-  pagination?: PaginationInfo;
   error?: string;
 }
 
-// Small icon component for facts (responsive)
-const FactIconSmall = (): JSX.Element => (
-  <svg
-    className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-500 dark:text-orange-400"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-    />
-  </svg>
-);
-
-// Modal Component
+// Modal Component (Game Day Pattern)
 interface ModalProps {
   fact: FactItem;
   isOpen: boolean;
@@ -83,97 +59,122 @@ const FactModal = ({ fact, isOpen, onClose }: ModalProps): JSX.Element => {
 
   if (!isOpen) return <></>;
 
-  const categoryLabel = fact.fact_category
-    ? fact.fact_category
-        .split("_")
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(" ")
-    : "Hockey Fact";
+  const emoji = getEmojiForFact(fact);
+  const categoryLabel = formatCategoryLabel(fact.fact_category);
+
+  const handleShare = (): void => {
+    const shareText = fact.fact_text;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Hockey Fact",
+          text: shareText,
+        })
+        .catch((err) => {
+          console.error("Error sharing:", err);
+        });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard
+        .writeText(shareText)
+        .then(() => {
+          alert("Fact copied to clipboard!");
+        })
+        .catch((err) => {
+          console.error("Error copying to clipboard:", err);
+        });
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-xl"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-colors"
-          aria-label="Close modal"
-        >
-          <svg
-            className="w-5 h-5 text-gray-700 dark:text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Modal Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{emoji}</span>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Hockey Fact
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+            aria-label="Close modal"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-
-        {/* Icon */}
-        <div className="mb-6">
-          <FactIconSmall />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
-        {/* Category/Title */}
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          {categoryLabel}
-        </h2>
-
-        {/* Fact Text */}
-        <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-          {fact.fact_text}
-        </p>
-
-        {/* Year badge if available */}
-        {fact.year && (
-          <div className="inline-block bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded mb-6">
-            {fact.year}
+        {/* Modal Content */}
+        <div className="p-6">
+          {/* Fact Text */}
+          <div className="mb-6">
+            <p className="text-xl md:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+              &ldquo;{fact.fact_text}&rdquo;
+            </p>
           </div>
-        )}
 
-        {/* Share Button */}
-        <button
-          className="w-full px-6 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold transition-colors flex items-center justify-center gap-2"
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: "Hockey Fact",
-                text: fact.fact_text,
-              });
-            } else {
-              navigator.clipboard.writeText(fact.fact_text);
-              alert("Fact copied to clipboard!");
-            }
-          }}
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-            />
-          </svg>
-          Share Fact
-        </button>
+          {/* Category Badge */}
+          {fact.fact_category && (
+            <div className="mb-4">
+              <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
+                {categoryLabel}
+              </span>
+            </div>
+          )}
+
+          {/* Year Badge */}
+          {fact.year && (
+            <div className="mb-6">
+              <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
+                {fact.year}
+              </span>
+            </div>
+          )}
+
+          {/* Share Button */}
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={handleShare}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                />
+              </svg>
+              Share
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -181,32 +182,23 @@ const FactModal = ({ fact, isOpen, onClose }: ModalProps): JSX.Element => {
 
 export default function DidYouKnowPage(): JSX.Element {
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [facts, setFacts] = useState<FactItem[]>([]);
   const [currentSetId, setCurrentSetId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [archiveList, setArchiveList] = useState<ArchiveItem[]>([]);
   const [loadingArchive, setLoadingArchive] = useState(true);
-  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [selectedFact, setSelectedFact] = useState<FactItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchData = async (
-    setId: number | null = null,
-    page = 1,
-  ): Promise<void> => {
-    const isInitialLoad = page === 1;
-    if (isInitialLoad) {
-      setLoading(true);
-    } else {
-      setLoadingMore(true);
-    }
+  const fetchData = async (setId: number | null = null): Promise<void> => {
+    setLoading(true);
+    setError(null);
 
     try {
+      // Load full set without pagination (limit to 20 for display)
       const url = setId
-        ? `/api/did-you-know?id=${setId}&page=${page}&limit=80`
-        : `/api/did-you-know?page=${page}&limit=80`;
+        ? `/api/did-you-know?id=${setId}&limit=20`
+        : `/api/did-you-know?limit=20`;
       const response = await fetch(url);
       const result: ApiResponse = await response.json();
 
@@ -214,15 +206,11 @@ export default function DidYouKnowPage(): JSX.Element {
         const record = result.data as FactRecord;
         const items = Array.isArray(record.items) ? record.items : [];
 
-        if (isInitialLoad) {
-          setFacts(items);
-        } else {
-          setFacts((prev) => [...prev, ...items]);
-        }
+        // Limit to 20 facts for 4×5 grid
+        const displayItems = items.slice(0, 20);
 
+        setFacts(displayItems);
         setCurrentSetId(record.id);
-        setPagination(result.pagination || null);
-        setCurrentPage(page);
       } else {
         setError(result.error || "Failed to fetch facts");
       }
@@ -230,7 +218,6 @@ export default function DidYouKnowPage(): JSX.Element {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
@@ -258,15 +245,7 @@ export default function DidYouKnowPage(): JSX.Element {
   }, []);
 
   const loadSet = async (setId: number): Promise<void> => {
-    setCurrentPage(1);
-    await fetchData(setId, 1);
-  };
-
-  const loadMore = async (): Promise<void> => {
-    if (pagination?.hasMore && !loadingMore) {
-      const nextPage = currentPage + 1;
-      await fetchData(currentSetId, nextPage);
-    }
+    await fetchData(setId);
   };
 
   const openModal = (fact: FactItem): void => {
@@ -297,6 +276,17 @@ export default function DidYouKnowPage(): JSX.Element {
           </p>
         </div>
 
+        {/* Breadcrumbs - Show current setId */}
+        {!loading && !error && currentSetId && (
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Set #{currentSetId}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Loading State */}
         {loading && (
           <div className="text-center py-20">
@@ -314,56 +304,25 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
 
-        {/* Icons Grid */}
+        {/* 4×5 Grid (20 facts) */}
         {!loading && !error && facts.length > 0 && (
-          <>
-            <div className="flex justify-center mb-8">
-              <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-9 gap-2">
-                {facts.map((fact, index) => (
-                  <button
+          <div className="flex justify-center mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {facts.map((fact, index) => {
+                const emoji = getEmojiForFact(fact);
+                return (
+                  <div
                     key={fact.id || index}
                     onClick={() => openModal(fact)}
-                    className="relative w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/20 flex items-center justify-center cursor-pointer group"
+                    className="w-[100px] h-[100px] md:w-[150px] md:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-4xl md:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer"
                     aria-label={`View fact ${index + 1}`}
                   >
-                    <FactIconSmall />
-                    {fact.year && (
-                      <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                        {fact.year.toString().slice(-2)}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
+                    {emoji}
+                  </div>
+                );
+              })}
             </div>
-
-            {/* Load More Button */}
-            {pagination?.hasMore && (
-              <div className="text-center mb-8">
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="px-8 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingMore ? (
-                    <span className="flex items-center gap-2">
-                      <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Loading...
-                    </span>
-                  ) : (
-                    `Load More (${pagination.total - facts.length} remaining)`
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Pagination Info */}
-            {pagination && (
-              <div className="text-center text-sm text-gray-500 dark:text-gray-400 mb-8">
-                Showing {facts.length} of {pagination.total} facts
-              </div>
-            )}
-          </>
+          </div>
         )}
 
         {/* Empty State */}
@@ -375,28 +334,33 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
 
-        {/* Past Collections Section */}
+        {/* Archive Section */}
         {!loading && !error && (
-          <div className="mt-20 mb-6">
+          <div className="mt-12 mb-6">
             {loadingArchive ? (
               <div className="text-center py-4">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500"></div>
               </div>
             ) : archiveList.length > 0 ? (
-              <div className="flex flex-wrap justify-center gap-3">
-                {archiveList.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => loadSet(item.id)}
-                    className={`px-6 py-2 rounded-full font-semibold transition-colors ${
-                      currentSetId === item.id
-                        ? "bg-orange-500 dark:bg-orange-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    Set #{item.id}
-                  </button>
-                ))}
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                  Past Sets
+                </h3>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {archiveList.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => loadSet(item.id)}
+                      className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+                        currentSetId === item.id
+                          ? "bg-orange-500 dark:bg-orange-500 text-white"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      Set #{item.id}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
