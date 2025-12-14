@@ -100,7 +100,7 @@ export default function Home(): JSX.Element {
       case 11:
         config = {
           id,
-          href: "/game-day",
+          href: "/captain-heart",
           icon: "💙", // Captain Heart
           iconAlt: "Captain Heart (Blue Heart)",
           title: "Captain Heart",
@@ -115,7 +115,7 @@ export default function Home(): JSX.Element {
       case 13:
         config = {
           id,
-          href: "/game-plan-strategy",
+          href: "/bench-boss",
           icon: "💪", // Bench Boss
           iconAlt: "Bench Boss (Bicep)",
           title: "Bench Boss",
@@ -130,7 +130,7 @@ export default function Home(): JSX.Element {
       case 15:
         config = {
           id,
-          href: "/locker-room",
+          href: "/penalty-box-philosopher",
           icon: "🎓", // Penalty Box Philosopher (graduation cap)
           iconAlt: "Penalty Box Philosopher (Graduation Cap)",
           title: "Penalty Box Philosopher",
