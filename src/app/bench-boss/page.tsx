@@ -4,7 +4,13 @@ export default function BenchBossPage(): JSX.Element {
   return (
     <MotivatorPersonaPage
       title="Bench Boss"
-      subtitle="Daily motivators. Placeholder content for grid testing."
+      subtitle={
+        <>
+          The game starts before the puck drops. Whether you need a pre-game
+          boost or a post-game high five, we&apos;ve got the perfect message
+          ready to text. Find the words, make them yours, and send the ❤️ love.
+        </>
+      }
       headerEmoji="💪"
       dailyEmoji="📋"
       themes={[

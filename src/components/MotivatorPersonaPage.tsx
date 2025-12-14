@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 type ThemeCard = {
   id: string;
@@ -10,7 +11,7 @@ type ThemeCard = {
 
 export function MotivatorPersonaPage(props: {
   title: string;
-  subtitle: string;
+  subtitle: ReactNode;
   headerEmoji: string;
   dailyEmoji: string;
   themes: ThemeCard[];
