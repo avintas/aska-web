@@ -183,11 +183,11 @@ export default function Home(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-4 md:px-6 lg:px-8 py-8 md:py-12">
       {/* Centered Content Container */}
-      <div className="flex flex-col items-center gap-8">
+      <div className="flex flex-col items-center gap-6 md:gap-8 w-full max-w-7xl">
         {/* OnlyHockey Branding - Above the grid */}
-        <div className="flex flex-col items-center gap-4 max-w-4xl px-4">
+        <div className="flex flex-col items-center gap-3 md:gap-4 max-w-4xl w-full">
           {/* Main Title */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight">
             There Is
@@ -212,12 +212,12 @@ export default function Home(): JSX.Element {
           </p>
         </div>
 
-        {/* 5x4 Grid Structure - Centered */}
-        <div className="grid grid-cols-5 gap-0 border border-gray-300 dark:border-gray-700">
+        {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 5 cols desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
           {cells.map((cell) => (
             <div
               key={cell.id}
-              className={`relative w-32 h-32 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden ${
+              className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden touch-manipulation ${
                 cell.isHighlighted
                   ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
                   : "bg-white dark:bg-gray-800"
@@ -303,25 +303,25 @@ export default function Home(): JSX.Element {
         {/* Preview Modal - Mobile-first full screen */}
         {showPreview && previewCell && (
           <div
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
             onClick={handleClosePreview}
           >
             <div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-[95vw] md:max-w-md w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 md:gap-4">
                   <span
-                    className="text-5xl"
+                    className="text-3xl md:text-4xl lg:text-5xl"
                     role="img"
                     aria-label={previewCell.iconAlt}
                   >
                     {previewCell.icon}
                   </span>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                       {previewCell.title}
                     </h2>
                     {previewCell.badge && (
@@ -355,18 +355,18 @@ export default function Home(): JSX.Element {
               </div>
 
               {/* Modal Content */}
-              <div className="p-6">
-                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+              <div className="p-4 md:p-6">
+                <p className="text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                   {previewCell.description}
                 </p>
               </div>
 
               {/* Modal Footer - Navigation Button */}
               {previewCell.href && (
-                <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => handleNavigate(previewCell.href!)}
-                    className="w-full px-6 py-4 bg-blue-600 dark:bg-orange-500 hover:bg-blue-700 dark:hover:bg-orange-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 md:px-6 md:py-4 text-sm md:text-base lg:text-lg bg-blue-600 dark:bg-orange-500 hover:bg-blue-700 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <span>Explore {previewCell.title}</span>
                     <svg

@@ -231,17 +231,17 @@ export default function DidYouKnowPage(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl">💡</span>
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+        <div className="text-center mb-8 md:mb-12 lg:mb-16">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
+            <span className="text-4xl md:text-5xl lg:text-6xl">💡</span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
               Did You Know?
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
             Discover fascinating hockey facts, records, and stories that
             showcase the rich history and culture of the greatest game on ice.
             These facts will help you prepare for trivia games.
@@ -250,9 +250,9 @@ export default function DidYouKnowPage(): JSX.Element {
 
         {/* Set Label */}
         {!loading && !error && (
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 md:mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <span className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {currentLabel}
               </span>
             </div>
@@ -276,23 +276,17 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
 
-        {/* Grid - 2x4 for Daily Set (8 items), 3x4 for Categories (12 items) */}
+        {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
         {!loading && !error && items.length > 0 && (
-          <div className="flex justify-center mb-8">
-            <div
-              className={`grid gap-2 ${
-                items.length === 8
-                  ? "grid-cols-2 md:grid-cols-4"
-                  : "grid-cols-4"
-              }`}
-            >
+          <div className="flex justify-center mb-6 md:mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
               {items.map((item, index) => {
                 const emoji = getEmoji(item);
                 return (
                   <div
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="w-[100px] h-[100px] md:w-[150px] md:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-4xl md:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer"
+                    className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
                     aria-label={`View fact ${index + 1}`}
                   >
                     {emoji}
@@ -314,16 +308,16 @@ export default function DidYouKnowPage(): JSX.Element {
 
         {/* Category Filters Cloud */}
         {!loading && !error && (
-          <div className="mt-12 mb-6">
+          <div className="mt-8 md:mt-12 mb-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
+              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 md:mb-4">
                 Category Filters
               </h3>
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
                 {/* Daily Set Button */}
                 <button
                   onClick={handleDailySetClick}
-                  className="px-6 py-2 rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600"
+                  className="px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600 touch-manipulation"
                 >
                   Daily Set
                 </button>
@@ -333,7 +327,7 @@ export default function DidYouKnowPage(): JSX.Element {
                   <button
                     key={categoryFilter}
                     onClick={() => handleCategoryClick(categoryFilter)}
-                    className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+                    className={`px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors touch-manipulation ${
                       currentLabel === categoryFilter
                         ? "bg-orange-500 dark:bg-orange-500 text-white"
                         : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -349,18 +343,18 @@ export default function DidYouKnowPage(): JSX.Element {
 
         {/* Theme Label Cloud */}
         {!loading && !error && (
-          <div className="mt-12 mb-6">
+          <div className="mt-8 md:mt-12 mb-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
+              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 md:mb-4">
                 Themes
               </h3>
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
                 {/* Theme Buttons */}
                 {THEMES.map((theme) => (
                   <button
                     key={theme}
                     onClick={() => handleThemeClick(theme)}
-                    className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+                    className={`px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors touch-manipulation ${
                       currentLabel === theme
                         ? "bg-orange-500 dark:bg-orange-500 text-white"
                         : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -378,17 +372,19 @@ export default function DidYouKnowPage(): JSX.Element {
       {/* Modal Dialog */}
       {isModalOpen && selectedItem && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 md:p-6"
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[95vw] md:max-w-lg lg:max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <span className="text-4xl">{getEmoji(selectedItem)}</span>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 md:gap-3">
+                <span className="text-3xl md:text-4xl">
+                  {getEmoji(selectedItem)}
+                </span>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                   Hockey Fact
                 </h2>
               </div>
@@ -440,10 +436,10 @@ export default function DidYouKnowPage(): JSX.Element {
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-6 md:mt-8">
                 <button
                   onClick={handleShare}
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
                 >
                   <svg
                     className="w-5 h-5"

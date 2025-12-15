@@ -6,7 +6,16 @@ import { resolve } from "path";
 config({ path: resolve(__dirname, ".env.local") });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  webpack: (webpackConfig, { dev }) => {
+    // Windows can occasionally end up with missing `.pack.gz` cache entries
+    // which cascades into dev-time ENOENT errors. Disabling persistent cache
+    // in dev trades a bit of speed for stability.
+    if (dev) {
+      webpackConfig.cache = false;
+    }
+
+    return webpackConfig;
+  },
 };
 
 export default nextConfig;
