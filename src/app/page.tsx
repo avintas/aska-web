@@ -63,7 +63,7 @@ export default function Home(): JSX.Element {
             "Play hockey trivia games and challenge yourself with multiple choice and true/false questions. Test your knowledge and compete with friends!",
           displayType: "C",
           microLabel: "PLAY\nTRIVIA ARENA",
-          badge: "FREE",
+          badge: "PLAY",
           badgeColor: "bg-green-500",
           isHighlighted: true,
         };
@@ -97,7 +97,7 @@ export default function Home(): JSX.Element {
             "Discover interesting facts and curiosities from hockey past and present. Expand your hockey knowledge with fascinating trivia!",
           displayType: "C",
           microLabel: "Academy",
-          badge: "FACTS",
+          badge: "PRACTICE",
           badgeColor: "bg-blue-500",
           isHighlighted: true,
         };
@@ -114,8 +114,10 @@ export default function Home(): JSX.Element {
           title: "Captain Heart",
           description:
             "Daily motivation messages from your Captain Heart. Quick, uplifting notes you can read or share anytime you need a boost.",
-          displayType: "B",
+          displayType: "C",
           microLabel: "Captain Heart",
+          badge: "SHARE",
+          badgeColor: "bg-purple-500",
           isHighlighted: true,
         };
         break;
@@ -129,8 +131,10 @@ export default function Home(): JSX.Element {
           title: "Bench Boss",
           description:
             "Daily motivation messages from your Bench Boss. Strong, no-nonsense reminders to stay focused, train hard, and lead the shift.",
-          displayType: "B",
+          displayType: "C",
           microLabel: "Bench Boss",
+          badge: "SHARE",
+          badgeColor: "bg-orange-500",
           isHighlighted: true,
         };
         break;
@@ -144,8 +148,10 @@ export default function Home(): JSX.Element {
           title: "Penalty Box Philosopher",
           description:
             "Wisdom and mindset lessons from the Penalty Box Philosopher. Thoughtful takes to reset, refocus, and level up your game.",
-          displayType: "B",
+          displayType: "C",
           microLabel: "Philosopher",
+          badge: "SHARE",
+          badgeColor: "bg-indigo-500",
           isHighlighted: true,
         };
         break;
