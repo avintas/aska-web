@@ -157,6 +157,9 @@ export default function Home(): JSX.Element {
     return config;
   });
 
+  // For mobile: only show highlighted cells
+  const mobileCells = cells.filter((cell) => cell.isHighlighted);
+
   const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
@@ -212,8 +215,88 @@ export default function Home(): JSX.Element {
           </p>
         </div>
 
-        {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 5 cols desktop */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
+        {/* Mobile Grid: 2 cols, highlighted cells only */}
+        <div className="md:hidden grid grid-cols-2 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
+          {mobileCells.map((cell) => (
+            <div
+              key={cell.id}
+              className={`relative w-24 h-24 sm:w-28 sm:h-28 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden touch-manipulation ${
+                cell.isHighlighted
+                  ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
+                  : "bg-white dark:bg-gray-800"
+              }`}
+              onClick={(e) => handleCellClick(cell, e)}
+            >
+              {cell.isHighlighted ? (
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center px-2 relative"
+                  aria-label={cell.description || `Preview ${cell.title}`}
+                >
+                  {/* Option A: Icon-only */}
+                  {cell.displayType === "A" && (
+                    <div className="flex flex-col items-center justify-center z-10">
+                      <span
+                        className="text-4xl mb-1"
+                        role="img"
+                        aria-label={cell.iconAlt}
+                      >
+                        {cell.icon}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Option B: Icon + Micro-label */}
+                  {cell.displayType === "B" && (
+                    <div className="flex flex-col items-center justify-center z-10">
+                      <span
+                        className="text-4xl mb-1"
+                        role="img"
+                        aria-label={cell.iconAlt}
+                      >
+                        {cell.icon}
+                      </span>
+                      {cell.microLabel && (
+                        <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight">
+                          {cell.microLabel}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Option C: Icon + Badge */}
+                  {cell.displayType === "C" && (
+                    <>
+                      <div className="flex flex-col items-center justify-center z-10">
+                        <span
+                          className="text-4xl mb-1"
+                          role="img"
+                          aria-label={cell.iconAlt}
+                        >
+                          {cell.icon}
+                        </span>
+                        {cell.microLabel && (
+                          <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight">
+                            {cell.microLabel}
+                          </span>
+                        )}
+                      </div>
+                      {cell.badge && (
+                        <div
+                          className={`absolute top-1 right-1 ${cell.badgeColor || "bg-red-500"} text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm uppercase z-20`}
+                        >
+                          {cell.badge}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+
+        {/* Tablet/Desktop Grid: 3 cols tablet, 5 cols desktop, full pyramid */}
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
           {cells.map((cell) => (
             <div
               key={cell.id}
