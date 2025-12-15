@@ -4,16 +4,26 @@ import { useState, useEffect } from "react";
 
 interface WisdomItem {
   id: number;
-  quote: string;
-  theme: string | null;
-  category: string | null;
-  attribution: string | null;
-  author?: string | null;
+  title: string;
+  musing: string;
+  from_the_box: string;
+  theme: string;
+  status: string | null;
+  source_content_id: number | null;
+  created_at: string;
+  updated_at: string;
   [key: string]: unknown;
 }
 
-// Wisdom Themes
-const THEMES = ["Chirp code", "flow", "grind", "room"];
+// Wisdom Themes - must match database CHECK constraint values
+const THEMES = [
+  "The Chirp",
+  "The Flow",
+  "The Grind",
+  "The Room",
+  "The Code",
+  "The Stripes",
+];
 
 export default function PenaltyBoxPhilosopherPage(): JSX.Element {
   const [items, setItems] = useState<WisdomItem[]>([]);
@@ -96,12 +106,15 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
   const handleShare = (): void => {
     if (!selectedItem) return;
 
-    const shareText = `${selectedItem.quote}${"author" in selectedItem && selectedItem.author ? ` - ${selectedItem.author}` : ""}`;
+    // Use musing as the main content, with title as context
+    const mainText =
+      selectedItem.musing || selectedItem.from_the_box || selectedItem.title;
+    const shareText = `${mainText}${selectedItem.title ? ` - ${selectedItem.title}` : ""}`;
 
     if (navigator.share) {
       navigator
         .share({
-          title: "Shareable Motivator",
+          title: selectedItem.title || "Wisdom",
           text: shareText,
         })
         .catch((err) => {
@@ -125,24 +138,6 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
     return "🎓";
   };
 
-  const getQuote = (item: WisdomItem): string => {
-    return item.quote;
-  };
-
-  const getAuthor = (item: WisdomItem): string | null => {
-    return item.author || null;
-  };
-
-  const getContext = (item: WisdomItem): string | null => {
-    if (item.theme) {
-      return item.theme;
-    }
-    if (item.category) {
-      return item.category;
-    }
-    return null;
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -155,7 +150,11 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
             </h1>
           </div>
           <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
-            Wisdom and mindset lessons. Placeholder content for grid testing.
+            Sometimes the best lessons come from the penalty box. Deep wisdom,
+            mental toughness insights, and philosophical reflections from the
+            game&apos;s greatest minds. Whether you need perspective on the
+            grind, clarity in the flow, or wisdom from the room, find the words
+            that elevate your mindset and share the 🎓 knowledge.
           </p>
         </div>
 
@@ -265,7 +264,7 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
               <div className="flex items-center gap-2 md:gap-3">
                 <span className="text-3xl md:text-4xl">{getEmoji()}</span>
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  Shareable Motivator
+                  {selectedItem.title || "Wisdom"}
                 </h2>
               </div>
               <button
@@ -290,27 +289,30 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
             </div>
 
             <div className="p-4 md:p-6">
-              {/* Quote */}
-              <div className="mb-4 md:mb-6">
-                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
-                  &ldquo;{getQuote(selectedItem)}&rdquo;
-                </p>
-              </div>
-
-              {/* Author */}
-              {getAuthor(selectedItem) && (
-                <div className="mb-4">
-                  <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                    &mdash; {getAuthor(selectedItem)}
+              {/* Musing */}
+              {selectedItem.musing && (
+                <div className="mb-4 md:mb-6">
+                  <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+                    &ldquo;{selectedItem.musing}&rdquo;
                   </p>
                 </div>
               )}
 
-              {/* Context/Category Tag */}
-              {getContext(selectedItem) && (
+              {/* From the Box */}
+              {selectedItem.from_the_box && (
+                <div className="mb-4 md:mb-6">
+                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <span className="font-semibold">From the Box:</span>{" "}
+                    {selectedItem.from_the_box}
+                  </p>
+                </div>
+              )}
+
+              {/* Theme Tag */}
+              {selectedItem.theme && (
                 <div className="mb-6">
                   <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
-                    {getContext(selectedItem)}
+                    {selectedItem.theme}
                   </span>
                 </div>
               )}

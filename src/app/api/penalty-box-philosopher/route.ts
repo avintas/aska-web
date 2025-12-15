@@ -3,11 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface WisdomItem {
   id: number;
-  quote: string;
-  theme: string | null;
-  category: string | null;
-  attribution: string | null;
-  author?: string | null;
+  title: string;
+  musing: string;
+  from_the_box: string;
+  theme: string;
+  status: string | null;
+  source_content_id: number | null;
+  created_at: string;
+  updated_at: string;
   [key: string]: unknown;
 }
 
