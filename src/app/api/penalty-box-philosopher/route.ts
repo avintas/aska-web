@@ -1,38 +1,41 @@
 import { createServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-interface FactItem {
+interface WisdomItem {
   id: number;
-  fact_text: string;
-  fact_category: string | null;
-  year: number | null;
-  fact_value: string | null;
+  quote: string;
+  theme: string | null;
+  category: string | null;
+  attribution: string | null;
+  author?: string | null;
   [key: string]: unknown;
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = request.nextUrl.searchParams;
-  const category = searchParams.get("category");
   const theme = searchParams.get("theme");
 
   try {
-    console.log("🔍 [Did You Know API] Starting request...");
+    console.log("🔍 [Penalty Box Philosopher API] Starting request...");
 
     const supabase = await createServerClient();
-    console.log("✅ [Did You Know API] Supabase client created");
+    console.log("✅ [Penalty Box Philosopher API] Supabase client created");
 
-    // Handle theme request - fetch from collection_hockey_facts
+    // Handle theme request - fetch from collection_hockey_wisdom
     if (theme) {
-      console.log(`📋 [Did You Know API] Fetching theme: ${theme}`);
+      console.log(`📋 [Penalty Box Philosopher API] Fetching theme: ${theme}`);
 
       const { data, error } = await supabase
-        .from("collection_hockey_facts")
+        .from("collection_hockey_wisdom")
         .select("*")
         .eq("theme", theme)
         .limit(12);
 
       if (error) {
-        console.error("❌ [Did You Know API] Database error:", error);
+        console.error(
+          "❌ [Penalty Box Philosopher API] Database error:",
+          error,
+        );
         const errorMessage =
           error && typeof error === "object" && "message" in error
             ? String(error.message)
@@ -48,56 +51,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       return NextResponse.json({
         success: true,
-        data: (data as FactItem[]) || [],
+        data: (data as WisdomItem[]) || [],
         type: "theme",
       });
     }
 
-    // Handle category request - fetch from collection_hockey_facts
-    if (category) {
-      console.log(`📋 [Did You Know API] Fetching category: ${category}`);
-
-      const { data, error } = await supabase
-        .from("collection_hockey_facts")
-        .select("*")
-        .eq("category", category)
-        .limit(12);
-
-      if (error) {
-        console.error("❌ [Did You Know API] Database error:", error);
-        const errorMessage =
-          error && typeof error === "object" && "message" in error
-            ? String(error.message)
-            : "Database error occurred";
-        return NextResponse.json(
-          {
-            success: false,
-            error: errorMessage,
-          },
-          { status: 500 },
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: (data as FactItem[]) || [],
-        type: "category",
-      });
-    }
-
-    // Default: Query 8 random records from collection_hockey_facts for Daily Set
+    // Default: Query 8 random records from collection_hockey_wisdom for Daily Set
     console.log(
-      "📊 [Did You Know API] Querying random Daily Set from collection_hockey_facts...",
+      "📊 [Penalty Box Philosopher API] Querying random Daily Set from collection_hockey_wisdom...",
     );
 
     // Fetch more records than needed, then randomize and limit to 8
     const { data, error } = await supabase
-      .from("collection_hockey_facts")
+      .from("collection_hockey_wisdom")
       .select("*")
       .limit(100); // Fetch more to ensure good randomization
 
     if (error) {
-      console.error("❌ [Did You Know API] Database error:", error);
+      console.error("❌ [Penalty Box Philosopher API] Database error:", error);
       const errorMessage =
         error && typeof error === "object" && "message" in error
           ? String(error.message)
@@ -116,11 +87,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (!data || data.length === 0) {
-      console.warn("⚠️ [Did You Know API] No data returned");
+      console.warn("⚠️ [Penalty Box Philosopher API] No data returned");
       return NextResponse.json(
         {
           success: false,
-          error: "No facts found",
+          error: "No wisdom items found",
           debug: {
             timestamp: new Date().toISOString(),
           },
@@ -134,7 +105,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const displayItems = shuffled.slice(0, 8);
 
     console.log(
-      `✅ [Did You Know API] Successfully retrieved ${displayItems.length} random facts from ${data.length} total`,
+      `✅ [Penalty Box Philosopher API] Successfully retrieved ${displayItems.length} random wisdom items from ${data.length} total`,
     );
 
     return NextResponse.json({
@@ -148,7 +119,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error("💥 [Did You Know API] Unexpected error:", error);
+    console.error("💥 [Penalty Box Philosopher API] Unexpected error:", error);
     return NextResponse.json(
       {
         success: false,
