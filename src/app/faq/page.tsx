@@ -70,8 +70,7 @@ export default function FAQPage(): JSX.Element {
                 >
                   team@onlyhockey.com
                 </a>{" "}
-                for general inquiries. Our business hours are Monday-Friday, 9
-                AM - 5 PM PST.
+                for general inquiries.
               </p>
             </section>
 

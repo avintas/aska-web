@@ -26,6 +26,14 @@ export default function Home(): JSX.Element {
   const [previewCell, setPreviewCell] = useState<CellConfig | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
+  // Newsletter form state
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   // Create configuration for the 15 cells with mixed display types
   const cells: CellConfig[] = Array.from({ length: 15 }, (_, i) => {
     const id = i + 1;
@@ -54,7 +62,7 @@ export default function Home(): JSX.Element {
           description:
             "Play hockey trivia games and challenge yourself with multiple choice and true/false questions. Test your knowledge and compete with friends!",
           displayType: "C",
-          microLabel: "Trivia Arena",
+          microLabel: "PLAY\nTRIVIA ARENA",
           badge: "FREE",
           badgeColor: "bg-green-500",
           isHighlighted: true,
@@ -86,7 +94,7 @@ export default function Home(): JSX.Element {
           iconAlt: "Did You Know",
           title: "Did You Know?",
           description:
-            "Discover interesting facts and curiosities from hockey&apos;s past and present. Expand your hockey knowledge with fascinating trivia!",
+            "Discover interesting facts and curiosities from hockey past and present. Expand your hockey knowledge with fascinating trivia!",
           displayType: "C",
           microLabel: "Academy",
           badge: "FACTS",
@@ -163,6 +171,12 @@ export default function Home(): JSX.Element {
   const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
+    // Shop navigates directly without modal preview
+    if (cell.id === 7) {
+      router.push(cell.href);
+      return;
+    }
+
     // Check if this is the second click (preview already shown)
     if (showPreview && previewCell?.id === cell.id) {
       // Navigate to the page
@@ -183,6 +197,54 @@ export default function Home(): JSX.Element {
 
   const handleNavigate = (href: string): void => {
     router.push(href);
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+    setMessage(null);
+
+    // Basic client-side validation
+    if (!email.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter your email address",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage({
+          type: "success",
+          text: data.message || "Thanks for subscribing!",
+        });
+        setEmail(""); // Clear the form
+      } else {
+        setMessage({
+          type: "error",
+          text: data.error || "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: "Network error. Please check your connection and try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -216,11 +278,11 @@ export default function Home(): JSX.Element {
         </div>
 
         {/* Mobile Grid: 2 cols, highlighted cells only */}
-        <div className="md:hidden grid grid-cols-2 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
+        <div className="md:hidden grid grid-cols-2 gap-2 max-w-full">
           {mobileCells.map((cell) => (
             <div
               key={cell.id}
-              className={`relative w-24 h-24 sm:w-28 sm:h-28 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden touch-manipulation ${
+              className={`relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center overflow-hidden touch-manipulation rounded-lg ${
                 cell.isHighlighted
                   ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
                   : "bg-white dark:bg-gray-800"
@@ -256,7 +318,7 @@ export default function Home(): JSX.Element {
                         {cell.icon}
                       </span>
                       {cell.microLabel && (
-                        <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight">
+                        <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight whitespace-pre-line">
                           {cell.microLabel}
                         </span>
                       )}
@@ -275,7 +337,7 @@ export default function Home(): JSX.Element {
                           {cell.icon}
                         </span>
                         {cell.microLabel && (
-                          <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight">
+                          <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight whitespace-pre-line">
                             {cell.microLabel}
                           </span>
                         )}
@@ -296,11 +358,11 @@ export default function Home(): JSX.Element {
         </div>
 
         {/* Tablet/Desktop Grid: 3 cols tablet, 5 cols desktop, full pyramid */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-0 border border-gray-300 dark:border-gray-700 max-w-full">
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-full">
           {cells.map((cell) => (
             <div
               key={cell.id}
-              className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden touch-manipulation ${
+              className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center overflow-hidden touch-manipulation rounded-lg ${
                 cell.isHighlighted
                   ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
                   : "bg-white dark:bg-gray-800"
@@ -354,7 +416,7 @@ export default function Home(): JSX.Element {
                         {cell.icon}
                       </span>
                       {cell.microLabel && (
-                        <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide">
+                        <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line">
                           {cell.microLabel}
                         </span>
                       )}
@@ -373,12 +435,7 @@ export default function Home(): JSX.Element {
                     <div className="absolute inset-0 bg-white/20 dark:bg-black/20 z-5 animate-pulse"></div>
                   )}
                 </div>
-              ) : (
-                // Non-highlighted cells just show number
-                <span className="text-xs text-gray-400 dark:text-gray-600">
-                  {cell.id}
-                </span>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
@@ -475,23 +532,70 @@ export default function Home(): JSX.Element {
           </div>
         )}
 
-        {/* Call to Action - Sign Up */}
-        <div className="flex flex-col items-center gap-4 mt-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center">
-            Sign up to PLAY
-          </h2>
-          <p className="text-base text-gray-600 dark:text-gray-400 text-center">
-            Join the OnlyHockey community and start playing today!
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-orange-500"
-            />
-            <button className="px-6 py-3 rounded-lg bg-blue-600 dark:bg-orange-500 text-white font-semibold hover:bg-blue-700 dark:hover:bg-orange-600 transition-colors">
-              Sign Up
-            </button>
+        {/* Call to Action - Play Now */}
+        <div className="flex flex-col items-center gap-6 mt-8">
+          <div className="text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Ready to Play?
+            </h2>
+            <p className="text-base text-gray-600 dark:text-gray-400">
+              Tap any game above to start playing — no sign-up needed!
+            </p>
+          </div>
+
+          {/* Newsletter Sign-Up - Low-key */}
+          <div className="w-full max-w-md pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                Want hockey trivia updates?
+              </p>
+              {/* Live Indicator Badge */}
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wide animate-pulse">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                Live
+              </span>
+            </div>
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex flex-col gap-3"
+            >
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 text-sm rounded-lg bg-gray-700 dark:bg-gray-600 text-white font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Subscribing..." : "Subscribe"}
+                </button>
+              </div>
+
+              {/* Success/Error Messages */}
+              {message && (
+                <div
+                  className={`text-sm text-center px-3 py-2 rounded-lg ${
+                    message.type === "success"
+                      ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                      : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )}
+            </form>
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2">
+              No spam, just hockey. Unsubscribe anytime.
+            </p>
           </div>
         </div>
       </div>
