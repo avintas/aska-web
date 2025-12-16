@@ -6,19 +6,15 @@
 import type { StandardContentFields, ContentStatus } from "./content";
 
 // ========================================================================
-// WISDOM
+// WISDOM (Hockey Culture)
 // ========================================================================
 
 export interface Wisdom extends StandardContentFields {
-  title: string;
-  musing: string;
-  from_the_box: string;
+  quote: string;
 }
 
 export interface WisdomCreateInput {
-  title: string;
-  musing: string;
-  from_the_box: string;
+  quote: string;
   theme?: string;
   category?: string;
   attribution?: string;
@@ -29,9 +25,7 @@ export interface WisdomCreateInput {
 }
 
 export interface WisdomUpdateInput {
-  title?: string;
-  musing?: string;
-  from_the_box?: string;
+  quote?: string;
   theme?: string;
   category?: string;
   attribution?: string;

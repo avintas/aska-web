@@ -11,8 +11,7 @@ export default function PBPPage(): JSX.Element {
             </h1>
           </div>
           <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-            Penalty Box Philosopher — Wisdom and insights from the game of
-            hockey.
+            Rink Philosopher — Wisdom and insights from the game of hockey.
           </p>
           <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mt-2 italic">
             Also known as the Wisdom Table

@@ -115,27 +115,35 @@ export default function CaptainHeartPage(): JSX.Element {
   const handleShare = (): void => {
     if (!selectedItem) return;
 
-    const shareText = `${selectedItem.quote}${"author" in selectedItem && selectedItem.author ? ` - ${selectedItem.author}` : ""}`;
+    const quoteText = selectedItem.quote;
+    const authorText =
+      "author" in selectedItem && selectedItem.author
+        ? ` - ${selectedItem.author}`
+        : "attribution" in selectedItem && selectedItem.attribution
+          ? ` - ${selectedItem.attribution}`
+          : "";
+    const siteUrl = "https://onlyhockey.com/captain-heart";
+    const subject = encodeURIComponent("Captain Heart - OnlyHockey.com");
+    const body = encodeURIComponent(
+      `${quoteText}${authorText}\n\nFrom OnlyHockey.com\n${siteUrl}`,
+    );
+    const shareText = `${quoteText}${authorText}\n\nFrom OnlyHockey.com\n${siteUrl}`;
 
     if (navigator.share) {
       navigator
         .share({
-          title: "Shareable Motivator",
+          title: "Captain Heart - OnlyHockey.com",
           text: shareText,
+          url: siteUrl,
         })
         .catch((err) => {
           console.error("Error sharing:", err);
+          // Fallback to mailto if share fails
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
         });
     } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard
-        .writeText(shareText)
-        .then(() => {
-          alert("Motivator copied to clipboard!");
-        })
-        .catch((err) => {
-          console.error("Error copying to clipboard:", err);
-        });
+      // Fallback: use mailto link with subject line
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
   };
 

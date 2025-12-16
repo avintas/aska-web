@@ -2,20 +2,15 @@
 
 import { useState, useEffect } from "react";
 
-interface WisdomItem {
+interface CollectionItem {
   id: number;
-  title: string;
-  musing: string;
-  from_the_box: string;
-  theme: string;
-  status: string | null;
-  source_content_id: number | null;
-  created_at: string;
-  updated_at: string;
-  [key: string]: unknown;
+  quote: string;
+  theme: string | null;
+  category: string | null;
+  attribution: string | null;
 }
 
-// Wisdom Themes - must match database CHECK constraint values
+// Themes - must match database values
 const THEMES = [
   "The Chirp",
   "The Flow",
@@ -25,12 +20,12 @@ const THEMES = [
   "The Stripes",
 ];
 
-export default function PenaltyBoxPhilosopherPage(): JSX.Element {
-  const [items, setItems] = useState<WisdomItem[]>([]);
+export default function RinkPhilosopherPage(): JSX.Element {
+  const [items, setItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentLabel, setCurrentLabel] = useState<string>("Daily Set");
-  const [selectedItem, setSelectedItem] = useState<WisdomItem | null>(null);
+  const [currentLabel, setCurrentLabel] = useState<string>("Daily Selection");
+  const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchDailySet = async (): Promise<void> => {
@@ -38,18 +33,20 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
     setError(null);
 
     try {
-      const response = await fetch("/api/penalty-box-philosopher");
+      const response = await fetch("/api/rink-philosopher");
       const result = await response.json();
 
       if (result.success && result.data) {
         if (result.type === "daily") {
-          setItems(result.data as WisdomItem[]);
-          setCurrentLabel("Daily Set");
+          // New structure: data is directly an array of CollectionItem
+          const items = Array.isArray(result.data) ? result.data : [];
+          setItems(items.slice(0, 12));
+          setCurrentLabel("Daily Selection");
         } else {
           setItems(result.data || []);
         }
       } else {
-        setError(result.error || "Failed to load Daily Set");
+        setError(result.error || "Failed to load Daily Selection");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -64,12 +61,12 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
 
     try {
       const response = await fetch(
-        `/api/penalty-box-philosopher?theme=${encodeURIComponent(theme)}`,
+        `/api/rink-philosopher?theme=${encodeURIComponent(theme)}`,
       );
       const result = await response.json();
 
       if (result.success && result.data) {
-        setItems((result.data as WisdomItem[]).slice(0, 12));
+        setItems((result.data as CollectionItem[]).slice(0, 12));
         setCurrentLabel(theme);
       } else {
         setError(result.error || `Failed to load ${theme}`);
@@ -93,7 +90,7 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
     fetchDailySet();
   };
 
-  const handleIconClick = (item: WisdomItem): void => {
+  const handleIconClick = (item: CollectionItem): void => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
@@ -106,52 +103,83 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
   const handleShare = (): void => {
     if (!selectedItem) return;
 
-    // Use musing as the main content, with title as context
-    const mainText =
-      selectedItem.musing || selectedItem.from_the_box || selectedItem.title;
-    const shareText = `${mainText}${selectedItem.title ? ` - ${selectedItem.title}` : ""}`;
+    const quoteText = selectedItem.quote;
+    const attributionText = selectedItem.attribution
+      ? ` - ${selectedItem.attribution}`
+      : "";
+    const siteUrl = "https://onlyhockey.com/rink-philosopher";
+    const subject = encodeURIComponent("Rink Philosopher - OnlyHockey.com");
+    const body = encodeURIComponent(
+      `${quoteText}${attributionText}\n\nFrom OnlyHockey.com\n${siteUrl}`,
+    );
+    const shareText = `${quoteText}${attributionText}\n\nFrom OnlyHockey.com\n${siteUrl}`;
 
     if (navigator.share) {
       navigator
         .share({
-          title: selectedItem.title || "Wisdom",
+          title: "Rink Philosopher - OnlyHockey.com",
           text: shareText,
+          url: siteUrl,
         })
         .catch((err) => {
           console.error("Error sharing:", err);
+          // Fallback to mailto if share fails
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
         });
     } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard
-        .writeText(shareText)
-        .then(() => {
-          alert("Motivator copied to clipboard!");
-        })
-        .catch((err) => {
-          console.error("Error copying to clipboard:", err);
-        });
+      // Fallback: use mailto link with subject line
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
   };
 
   const getEmoji = (): string => {
-    // Default emoji for wisdom items
+    // Default emoji for rink philosopher items
     return "🎓";
   };
 
+  const getQuote = (item: CollectionItem): string => {
+    return item.quote;
+  };
+
+  const getAttribution = (item: CollectionItem): string | null => {
+    return item.attribution || null;
+  };
+
+  const getContext = (item: CollectionItem): string | null => {
+    if (item.category) {
+      return item.category;
+    }
+    if (item.theme) {
+      return item.theme;
+    }
+    return null;
+  };
+
+  const getBadgeText = (item: CollectionItem): string => {
+    // For Collection items, use category first, then theme
+    if (item.category) {
+      return item.category;
+    }
+    if (item.theme) {
+      return item.theme;
+    }
+    return "Rink Philosopher";
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 md:pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 md:mb-12 lg:mb-16">
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
-            <span className="text-4xl md:text-5xl lg:text-6xl">🎓</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
-              Penalty Box Philosopher
+        <div className="text-center mb-6 md:mb-8">
+          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
+            <span className="text-3xl md:text-4xl">🎓</span>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+              Rink Philosopher
             </h1>
           </div>
-          <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
-            Sometimes the best lessons come from the penalty box. Deep wisdom,
-            mental toughness insights, and philosophical reflections from the
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5">
+            Sometimes the best lessons come from the rink. Deep wisdom, mental
+            toughness insights, and philosophical reflections from the
             game&apos;s greatest minds. Whether you need perspective on the
             grind, clarity in the flow, or wisdom from the room, find the words
             that elevate your mindset and share the 🎓 knowledge.
@@ -173,31 +201,40 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
         {loading && (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+            <p className="mt-4 text-sm md:text-base text-gray-600 dark:text-gray-400">
+              Loading...
+            </p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6 text-center">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8 text-center">
+            <p className="text-sm md:text-base text-red-700 dark:text-red-300">
+              {error}
+            </p>
           </div>
         )}
 
         {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
         {!loading && !error && items.length > 0 && (
-          <div className="flex justify-center mb-6 md:mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+          <div className="flex justify-center mb-8 md:mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
               {items.map((item, index) => {
                 const emoji = getEmoji();
+                const badgeText = getBadgeText(item);
                 return (
                   <div
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
-                    aria-label={`View wisdom ${index + 1}`}
+                    className="relative w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
+                    aria-label={`View motivator ${index + 1}`}
                   >
                     {emoji}
+                    {/* Badge Overlay */}
+                    <span className="absolute top-1 right-1 bg-orange-500 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight">
+                      {badgeText}
+                    </span>
                   </div>
                 );
               })}
@@ -208,26 +245,26 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
         {/* Empty State */}
         {!loading && !error && items.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
               No items available at this time.
             </p>
           </div>
         )}
 
-        {/* Theme Label Cloud */}
+        {/* Category Label Cloud */}
         {!loading && !error && (
-          <div className="mt-8 md:mt-12 mb-6">
+          <div className="mt-10 md:mt-16 mb-8">
             <div className="text-center">
-              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 md:mb-4">
-                Wisdom Themes
+              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 md:mb-5">
+                Our collection of Shareable Motivators.
               </h3>
               <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                {/* Daily Set Button */}
+                {/* Daily Selection Button */}
                 <button
                   onClick={handleDailySetClick}
                   className="px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600 touch-manipulation"
                 >
-                  Daily Set
+                  Daily Selection
                 </button>
 
                 {/* Theme Buttons */}
@@ -262,9 +299,11 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
           >
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-3xl md:text-4xl">{getEmoji()}</span>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  {selectedItem.title || "Wisdom"}
+                <span className="text-2xl md:text-3xl">{getEmoji()}</span>
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
+                  {getContext(selectedItem) ||
+                    getBadgeText(selectedItem) ||
+                    "Rink Philosopher"}
                 </h2>
               </div>
               <button
@@ -288,37 +327,25 @@ export default function PenaltyBoxPhilosopherPage(): JSX.Element {
               </button>
             </div>
 
-            <div className="p-4 md:p-6">
-              {/* Musing */}
-              {selectedItem.musing && (
-                <div className="mb-4 md:mb-6">
-                  <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
-                    &ldquo;{selectedItem.musing}&rdquo;
-                  </p>
-                </div>
-              )}
+            <div className="p-6 md:p-8">
+              {/* Quote */}
+              <div className="mb-6 md:mb-8">
+                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
+                  &ldquo;{getQuote(selectedItem)}&rdquo;
+                </p>
+              </div>
 
-              {/* From the Box */}
-              {selectedItem.from_the_box && (
-                <div className="mb-4 md:mb-6">
-                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    <span className="font-semibold">From the Box:</span>{" "}
-                    {selectedItem.from_the_box}
+              {/* Attribution */}
+              {getAttribution(selectedItem) && (
+                <div className="mb-8 md:mb-10">
+                  <p className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300">
+                    &mdash; {getAttribution(selectedItem)}
                   </p>
-                </div>
-              )}
-
-              {/* Theme Tag */}
-              {selectedItem.theme && (
-                <div className="mb-6">
-                  <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
-                    {selectedItem.theme}
-                  </span>
                 </div>
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-6 md:mt-8">
+              <div className="flex justify-center mt-8 md:mt-10">
                 <button
                   onClick={handleShare}
                   className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"

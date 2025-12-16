@@ -142,12 +142,12 @@ export default function Home(): JSX.Element {
       case 15:
         config = {
           id,
-          href: "/penalty-box-philosopher",
-          icon: "🎓", // Penalty Box Philosopher (graduation cap)
-          iconAlt: "Penalty Box Philosopher (Graduation Cap)",
-          title: "Penalty Box Philosopher",
+          href: "/rink-philosopher",
+          icon: "🎓", // Rink Philosopher (graduation cap)
+          iconAlt: "Rink Philosopher (Graduation Cap)",
+          title: "Rink Philosopher",
           description:
-            "Wisdom and mindset lessons from the Penalty Box Philosopher. Thoughtful takes to reset, refocus, and level up your game.",
+            "Wisdom and mindset lessons from the Rink Philosopher. Thoughtful takes to reset, refocus, and level up your game.",
           displayType: "C",
           microLabel: "Philosopher",
           badge: "SHARE",
