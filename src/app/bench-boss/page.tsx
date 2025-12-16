@@ -8,6 +8,7 @@ interface MotivationalItem {
   emoji?: string;
   author?: string;
   context?: string;
+  theme?: string;
 }
 
 interface CollectionItem {
@@ -16,14 +17,6 @@ interface CollectionItem {
   theme: string | null;
   category: string | null;
   attribution: string | null;
-}
-
-interface MotivationalRecord {
-  id: number;
-  items: MotivationalItem[];
-  status: string;
-  created_at: string;
-  updated_at: string;
 }
 
 const CATEGORIES = [
@@ -42,7 +35,7 @@ export default function BenchBossPage(): JSX.Element {
   const [items, setItems] = useState<(MotivationalItem | CollectionItem)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentLabel, setCurrentLabel] = useState<string>("Daily Set");
+  const [currentLabel, setCurrentLabel] = useState<string>("Daily Selection");
   const [selectedItem, setSelectedItem] = useState<
     MotivationalItem | CollectionItem | null
   >(null);
@@ -58,15 +51,15 @@ export default function BenchBossPage(): JSX.Element {
 
       if (result.success && result.data) {
         if (result.type === "daily") {
-          const record = result.data as MotivationalRecord;
-          const items = Array.isArray(record.items) ? record.items : [];
+          // New structure: data is directly an array of CollectionItem
+          const items = Array.isArray(result.data) ? result.data : [];
           setItems(items.slice(0, 12));
-          setCurrentLabel("Daily Set");
+          setCurrentLabel("Daily Selection");
         } else {
           setItems(result.data || []);
         }
       } else {
-        setError(result.error || "Failed to load Daily Set");
+        setError(result.error || "Failed to load Daily Selection");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -183,18 +176,34 @@ export default function BenchBossPage(): JSX.Element {
     return null;
   };
 
+  const getBadgeText = (item: MotivationalItem | CollectionItem): string => {
+    // For Daily Selection items (MotivationalItem), use theme
+    if ("theme" in item && item.theme) {
+      return item.theme;
+    }
+    // For Collection items, use category
+    if ("category" in item && item.category) {
+      return item.category;
+    }
+    // Fallback to context if available
+    if ("context" in item && item.context) {
+      return item.context;
+    }
+    return "Bench Boss";
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 md:pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 md:mb-12 lg:mb-16">
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
-            <span className="text-4xl md:text-5xl lg:text-6xl">💪</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
+        <div className="text-center mb-6 md:mb-8">
+          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
+            <span className="text-3xl md:text-4xl">💪</span>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
               Bench Boss
             </h1>
           </div>
-          <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5">
             The voice from the bench that pushes you harder, believes in you
             deeper, and never lets you quit. Whether you&apos;re building
             character through discipline or celebrating the grind, these
@@ -218,31 +227,40 @@ export default function BenchBossPage(): JSX.Element {
         {loading && (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+            <p className="mt-4 text-sm md:text-base text-gray-600 dark:text-gray-400">
+              Loading...
+            </p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6 text-center">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8 text-center">
+            <p className="text-sm md:text-base text-red-700 dark:text-red-300">
+              {error}
+            </p>
           </div>
         )}
 
         {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
         {!loading && !error && items.length > 0 && (
-          <div className="flex justify-center mb-6 md:mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+          <div className="flex justify-center mb-8 md:mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
               {items.map((item, index) => {
                 const emoji = getEmoji(item);
+                const badgeText = getBadgeText(item);
                 return (
                   <div
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
+                    className="relative w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
                     aria-label={`View motivator ${index + 1}`}
                   >
                     {emoji}
+                    {/* Badge Overlay */}
+                    <span className="absolute top-1 right-1 bg-orange-500 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight">
+                      {badgeText}
+                    </span>
                   </div>
                 );
               })}
@@ -253,7 +271,7 @@ export default function BenchBossPage(): JSX.Element {
         {/* Empty State */}
         {!loading && !error && items.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
               No items available at this time.
             </p>
           </div>
@@ -261,18 +279,18 @@ export default function BenchBossPage(): JSX.Element {
 
         {/* Category Label Cloud */}
         {!loading && !error && (
-          <div className="mt-8 md:mt-12 mb-6">
+          <div className="mt-10 md:mt-16 mb-8">
             <div className="text-center">
-              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 md:mb-4">
-                Collection
+              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 md:mb-5">
+                Our collection of Shareable Motivators.
               </h3>
               <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                {/* Daily Set Button */}
+                {/* Daily Selection Button */}
                 <button
                   onClick={handleDailySetClick}
                   className="px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600 touch-manipulation"
                 >
-                  Daily Set
+                  Daily Selection
                 </button>
 
                 {/* Category Buttons */}
@@ -307,11 +325,13 @@ export default function BenchBossPage(): JSX.Element {
           >
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-3xl md:text-4xl">
+                <span className="text-2xl md:text-3xl">
                   {getEmoji(selectedItem)}
                 </span>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  Shareable Motivator
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
+                  {getContext(selectedItem) ||
+                    getBadgeText(selectedItem) ||
+                    "Bench Boss"}
                 </h2>
               </div>
               <button
@@ -335,18 +355,18 @@ export default function BenchBossPage(): JSX.Element {
               </button>
             </div>
 
-            <div className="p-4 md:p-6">
+            <div className="p-6 md:p-8">
               {/* Quote */}
-              <div className="mb-4 md:mb-6">
-                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+              <div className="mb-6 md:mb-8">
+                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
                   &ldquo;{getQuote(selectedItem)}&rdquo;
                 </p>
               </div>
 
               {/* Author */}
               {getAuthor(selectedItem) && (
-                <div className="mb-4">
-                  <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                <div className="mb-5 md:mb-6">
+                  <p className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300">
                     &mdash; {getAuthor(selectedItem)}
                   </p>
                 </div>
@@ -354,15 +374,15 @@ export default function BenchBossPage(): JSX.Element {
 
               {/* Context/Category Tag */}
               {getContext(selectedItem) && (
-                <div className="mb-6">
-                  <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
+                <div className="mb-8">
+                  <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-xs md:text-sm font-semibold px-3 py-1 rounded">
                     {getContext(selectedItem)}
                   </span>
                 </div>
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-6 md:mt-8">
+              <div className="flex justify-center mt-8 md:mt-10">
                 <button
                   onClick={handleShare}
                   className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"

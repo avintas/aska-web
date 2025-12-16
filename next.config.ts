@@ -6,8 +6,13 @@ import { resolve } from "path";
 config({ path: resolve(__dirname, ".env.local") });
 
 const nextConfig: NextConfig = {
-  // Turbopack (--turbo flag) handles all bundling now
-  // No webpack configuration needed
+  webpack: (webpackConfig, { dev }) => {
+    if (dev) {
+      // Disable persistent cache for Windows stability
+      webpackConfig.cache = false;
+    }
+    return webpackConfig;
+  },
 };
 
 export default nextConfig;
