@@ -8,6 +8,7 @@ interface MotivationalItem {
   emoji?: string;
   author?: string;
   context?: string;
+  theme?: string;
 }
 
 interface CollectionItem {
@@ -182,6 +183,22 @@ export default function CaptainHeartPage(): JSX.Element {
     return null;
   };
 
+  const getBadgeText = (item: MotivationalItem | CollectionItem): string => {
+    // For Daily Set items (MotivationalItem), use theme
+    if ("theme" in item && item.theme) {
+      return item.theme;
+    }
+    // For Collection items, use category
+    if ("category" in item && item.category) {
+      return item.category;
+    }
+    // Fallback to context if available
+    if ("context" in item && item.context) {
+      return item.context;
+    }
+    return "Captain Heart";
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -233,14 +250,19 @@ export default function CaptainHeartPage(): JSX.Element {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
               {items.map((item, index) => {
                 const emoji = getEmoji(item);
+                const badgeText = getBadgeText(item);
                 return (
                   <div
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
+                    className="relative w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
                     aria-label={`View motivator ${index + 1}`}
                   >
                     {emoji}
+                    {/* Badge Overlay */}
+                    <span className="absolute top-1 right-1 bg-blue-500 text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight">
+                      {badgeText}
+                    </span>
                   </div>
                 );
               })}
