@@ -46,12 +46,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const supabase = await createServerClient();
     console.log("✅ [Bench Boss API] Supabase client created");
 
-    // Handle category request - fetch from collection_hockey_motivate
+    // Handle category request - fetch from collection_hockey_culture
     if (category) {
       console.log(`📋 [Bench Boss API] Fetching category: ${category}`);
 
       const { data, error } = await supabase
-        .from("collection_hockey_motivate")
+        .from("collection_hockey_culture")
         .select("*")
         .eq("attribution", "Bench Boss")
         .eq("category", category)
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Default: Get daily random set from collection_hockey_motivate
+    // Default: Get daily random set from collection_hockey_culture
     const cacheKey = getTodayKey();
     console.log(
       `📊 [Bench Boss API] Checking cache for today's set: ${cacheKey}`,
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Fetch all Bench Boss items from collection
     const { data, error } = await supabase
-      .from("collection_hockey_motivate")
+      .from("collection_hockey_culture")
       .select("*")
       .eq("attribution", "Bench Boss");
 

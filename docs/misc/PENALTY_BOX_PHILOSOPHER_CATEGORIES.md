@@ -1,28 +1,27 @@
-# Penalty Box Philosopher Categories
+# Rink Philosopher Themes
 
 ## Wisdom Themes
 
-**Penalty Box Philosopher** is separate from Facts. It focuses on Wisdom Hockey content with the following themes:
+**Rink Philosopher** uses themes to organize wisdom content. The following themes are available:
 
-1. Coach Wisdom
-2. Player Quotes
-3. Mental Game
-4. Habits and Routines
-5. Leadership Lessons
-6. Short Stories
-7. Moments
+1. The Chirp
+2. The Flow
+3. The Grind
+4. The Room
+5. The Code
+6. The Stripes
 
-**Total: 7 wisdom themes**
+**Total: 6 wisdom themes**
 
 ---
 
 ## Implementation Notes
 
-- These themes are displayed in the theme cloud on the Penalty Box Philosopher page
-- Clicking a theme filters items from `collection_hockey_motivate` where:
-  - `attribution = "Penalty Box Philosopher"` (or "Philosopher", "Penalty Box")
-  - `category = [selected theme]`
-- Daily Set comes from `pub_shareables_motivational` table (special construct)
+- These themes are displayed in the theme cloud on the Rink Philosopher page
+- Clicking a theme filters items from `collection_hockey_culture` where:
+  - `attribution = "Rink Philosopher"`
+  - `theme = [selected theme]`
+- Daily Selection comes from `collection_hockey_culture` filtered by `attribution = "Rink Philosopher"`
 - Each theme displays first 12 items in a 3×4 grid
 
 ---

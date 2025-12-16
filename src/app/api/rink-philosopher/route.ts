@@ -54,6 +54,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const { data, error } = await supabase
         .from("collection_hockey_culture")
         .select("*")
+        .eq("attribution", "Rink Philosopher")
         .eq("category", category)
         .limit(12);
 
@@ -86,6 +87,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const { data, error } = await supabase
         .from("collection_hockey_culture")
         .select("*")
+        .eq("attribution", "Rink Philosopher")
         .eq("theme", theme)
         .limit(12);
 
@@ -136,10 +138,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       "🔄 [Rink Philosopher API] Cache miss - generating new random daily set...",
     );
 
-    // Fetch all items from collection
+    // Fetch all Rink Philosopher items from collection
     const { data, error } = await supabase
       .from("collection_hockey_culture")
-      .select("*");
+      .select("*")
+      .eq("attribution", "Rink Philosopher");
 
     if (error) {
       console.error("❌ [Rink Philosopher API] Database error:", error);
@@ -157,7 +160,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (!data || data.length === 0) {
-      console.warn("⚠️ [Rink Philosopher API] No items found");
+      console.warn("⚠️ [Rink Philosopher API] No Rink Philosopher items found");
       return NextResponse.json(
         {
           success: false,
