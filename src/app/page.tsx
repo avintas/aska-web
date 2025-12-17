@@ -470,13 +470,14 @@ export default function Home(): JSX.Element {
                     <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                       {previewCell.title}
                     </h2>
-                    {previewCell.badge && (
-                      <span
-                        className={`inline-block mt-1 ${previewCell.badgeColor || "bg-blue-500"} text-white text-xs font-bold px-2 py-1 rounded-full uppercase`}
-                      >
-                        {previewCell.badge}
-                      </span>
-                    )}
+                    {previewCell.badge &&
+                      previewCell.href !== "/trivia-arena" && (
+                        <span
+                          className={`inline-block mt-1 ${previewCell.badgeColor || "bg-blue-500"} text-white text-xs font-bold px-2 py-1 rounded-full uppercase`}
+                        >
+                          {previewCell.badge}
+                        </span>
+                      )}
                   </div>
                 </div>
                 <button
@@ -502,6 +503,26 @@ export default function Home(): JSX.Element {
 
               {/* Modal Content */}
               <div className="p-4 md:p-6">
+                {/* Show Trivia Arena image if this is the Trivia Arena cell */}
+                {previewCell.href === "/trivia-arena" && (
+                  <div className="mb-4 md:mb-6 flex justify-center">
+                    <img
+                      src="/trivia_arena_2.png"
+                      alt="Trivia Arena"
+                      className="w-full max-w-md rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
+                {/* Show Captain Heart image if this is the Captain Heart cell */}
+                {previewCell.href === "/captain-heart" && (
+                  <div className="mb-4 md:mb-6 flex justify-center">
+                    <img
+                      src="/captain_heart_1.webp"
+                      alt="Captain Heart"
+                      className="w-full max-w-md rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
                 <p className="text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                   {previewCell.description}
                 </p>
