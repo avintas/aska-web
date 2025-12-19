@@ -96,6 +96,7 @@ export default function DidYouKnowPage(): JSX.Element {
   const [currentLabel, setCurrentLabel] = useState<string>("Daily Set");
   const [selectedItem, setSelectedItem] = useState<FactItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
   const fetchDailySet = async (): Promise<void> => {
     setLoading(true);
@@ -112,6 +113,7 @@ export default function DidYouKnowPage(): JSX.Element {
         } else {
           setItems(result.data || []);
         }
+        setImageErrors(new Set()); // Reset image errors when loading new set
       } else {
         setError(result.error || "Failed to load Daily Set");
       }
@@ -135,6 +137,7 @@ export default function DidYouKnowPage(): JSX.Element {
       if (result.success && result.data) {
         setItems((result.data as FactItem[]).slice(0, 12));
         setCurrentLabel(category);
+        setImageErrors(new Set()); // Reset image errors when loading new set
       } else {
         setError(result.error || `Failed to load ${category}`);
       }
@@ -158,6 +161,7 @@ export default function DidYouKnowPage(): JSX.Element {
       if (result.success && result.data) {
         setItems((result.data as FactItem[]).slice(0, 12));
         setCurrentLabel(theme);
+        setImageErrors(new Set()); // Reset image errors when loading new set
       } else {
         setError(result.error || `Failed to load ${theme}`);
       }
@@ -230,6 +234,16 @@ export default function DidYouKnowPage(): JSX.Element {
     return getEmojiForFact(factItem);
   };
 
+  const getPlayerImagePath = (index: number): string => {
+    // Cycle through player_1.png through player_12.png
+    const playerNumber = (index % 12) + 1;
+    return `/player_${playerNumber}.png`;
+  };
+
+  const handleImageError = (index: number): void => {
+    setImageErrors((prev) => new Set(prev).add(index));
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-6 md:pb-8 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -244,20 +258,12 @@ export default function DidYouKnowPage(): JSX.Element {
           <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
             Discover fascinating hockey facts, records, and stories that
             showcase the rich history and culture of the greatest game on ice.
-            These facts will help you prepare for trivia games.
+            These facts will help you prepare for trivia games. Get inspired and
+            share the 💡 knowledge.
+            <br />
+            Enjoy our daily selection!
           </p>
         </div>
-
-        {/* Set Label */}
-        {!loading && !error && (
-          <div className="text-center mb-6 md:mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-              <span className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {currentLabel}
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Loading State */}
         {loading && (
@@ -276,21 +282,57 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
         )}
 
-        {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
+        {/* Daily Selections List - Bubble CTAs */}
         {!loading && !error && items.length > 0 && (
-          <div className="flex justify-center mb-6 md:mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
+          <div className="max-w-3xl mx-auto mb-8 md:mb-12">
+            <div className="flex flex-col gap-3 md:gap-4">
               {items.map((item, index) => {
                 const emoji = getEmoji(item);
+                const showEmojiFallback = imageErrors.has(index);
+                const playerImagePath = getPlayerImagePath(index);
+                const factPreview =
+                  item.fact_text.length > 60
+                    ? item.fact_text.substring(0, 60) + "..."
+                    : item.fact_text;
+                const badgeText = item.fact_category
+                  ? formatCategoryLabel(item.fact_category)
+                  : "Fact";
+
                 return (
-                  <div
+                  <button
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
-                    aria-label={`View fact ${index + 1}`}
+                    className="group relative w-full px-4 md:px-6 py-3 md:py-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 cursor-pointer transition-all duration-300 touch-manipulation text-left flex items-center gap-3 md:gap-4"
+                    aria-label={`View ${badgeText} fact`}
                   >
-                    {emoji}
-                  </div>
+                    {/* Avatar - Player image or emoji fallback */}
+                    <div className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                      {showEmojiFallback ? (
+                        <div className="w-full h-full flex items-center justify-center text-xl md:text-2xl">
+                          {emoji}
+                        </div>
+                      ) : (
+                        <img
+                          src={playerImagePath}
+                          alt={`Player ${(index % 12) + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={() => handleImageError(index)}
+                        />
+                      )}
+                    </div>
+
+                    {/* Fact Preview */}
+                    <span className="flex-1 text-sm md:text-base text-gray-900 dark:text-white font-medium line-clamp-1">
+                      {factPreview}
+                    </span>
+
+                    {/* Badge - Subtle design */}
+                    {item.fact_category && (
+                      <span className="bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 text-[10px] md:text-[11px] font-normal px-2 md:px-2.5 py-0.5 md:py-1 rounded-full uppercase tracking-tight flex-shrink-0">
+                        {badgeText}
+                      </span>
+                    )}
+                  </button>
                 );
               })}
             </div>
@@ -379,22 +421,52 @@ export default function DidYouKnowPage(): JSX.Element {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[95vw] md:max-w-lg lg:max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-3xl md:text-4xl">
-                  {getEmoji(selectedItem)}
-                </span>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  Hockey Fact
-                </h2>
+            {/* Modal Header */}
+            <div className="relative flex items-start justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-start gap-3 md:gap-4 flex-1">
+                {/* Avatar - Larger size to show pixel art, positioned top-left */}
+                {(() => {
+                  const itemIndex = items.findIndex(
+                    (i) => i.id === selectedItem.id,
+                  );
+                  const modalIndex = itemIndex >= 0 ? itemIndex : 0;
+                  const showEmojiFallback = imageErrors.has(modalIndex);
+                  const playerImagePath = getPlayerImagePath(modalIndex);
+
+                  return (
+                    <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+                      {showEmojiFallback ? (
+                        <div className="w-full h-full flex items-center justify-center text-4xl md:text-5xl lg:text-6xl">
+                          {getEmoji(selectedItem)}
+                        </div>
+                      ) : (
+                        <img
+                          src={playerImagePath}
+                          alt="Player"
+                          className="w-full h-full object-contain"
+                          onError={() => handleImageError(modalIndex)}
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Practice Trivia Text */}
+                <div className="flex-1 pt-2 md:pt-4">
+                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 italic">
+                    Practice trivia question for upcoming Trivia battles
+                  </p>
+                </div>
               </div>
+
+              {/* Close Button - More prominent */}
               <button
                 onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors shadow-md flex-shrink-0"
                 aria-label="Close modal"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-5 h-5 md:w-6 md:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -409,40 +481,32 @@ export default function DidYouKnowPage(): JSX.Element {
               </button>
             </div>
 
-            <div className="p-6">
+            {/* Modal Content */}
+            <div className="p-6 md:p-8">
               {/* Fact Text */}
-              <div className="mb-6">
-                <p className="text-xl md:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+              <div className="mb-6 md:mb-8">
+                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
                   &ldquo;{selectedItem.fact_text}&rdquo;
                 </p>
               </div>
 
-              {/* Category Badge */}
-              {selectedItem.fact_category && (
-                <div className="mb-4">
-                  <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
-                    {formatCategoryLabel(selectedItem.fact_category)}
-                  </span>
-                </div>
-              )}
-
               {/* Year Badge */}
               {selectedItem.year && (
-                <div className="mb-6">
-                  <span className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm font-semibold px-3 py-1 rounded">
+                <div className="mb-5 md:mb-6">
+                  <span className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-4 py-2 rounded">
                     {selectedItem.year}
                   </span>
                 </div>
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-6 md:mt-8">
+              <div className="flex justify-center mt-8 md:mt-10">
                 <button
                   onClick={handleShare}
-                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
+                  className="px-8 py-4 md:px-10 md:py-4 text-base md:text-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-3 touch-manipulation"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

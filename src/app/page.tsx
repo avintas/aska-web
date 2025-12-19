@@ -34,8 +34,8 @@ export default function Home(): JSX.Element {
     text: string;
   } | null>(null);
 
-  // Create configuration for the 15 cells with mixed display types
-  const cells: CellConfig[] = Array.from({ length: 15 }, (_, i) => {
+  // Create configuration for 25 cells in a 5x5 grid (5 rows, 5 columns)
+  const cells: CellConfig[] = Array.from({ length: 25 }, (_, i) => {
     const id = i + 1;
 
     // Default config
@@ -156,6 +156,105 @@ export default function Home(): JSX.Element {
         };
         break;
 
+      // Row 4: Fourth row of Pyramid (2 items)
+      // Option C: Icon + Badge
+      case 17:
+        config = {
+          id,
+          href: "/hockey-culture",
+          icon: "📜", // Hockey Culture
+          iconAlt: "Hockey Culture",
+          title: "Hockey Culture",
+          description:
+            "Explore the unwritten rules and traditions of hockey culture. Learn about the code that players live by on and off the ice.",
+          displayType: "C",
+          microLabel: "Hockey Culture",
+          badge: "LEARN",
+          badgeColor: "bg-teal-500",
+          isHighlighted: true,
+        };
+        break;
+      // Option C: Icon + Badge
+      case 19:
+        config = {
+          id,
+          href: "/legends",
+          icon: "⭐", // Legends
+          iconAlt: "Legends",
+          title: "Legends",
+          description:
+            "Celebrate the greatest players and moments in hockey history. Discover the stories that shaped the game.",
+          displayType: "C",
+          microLabel: "Legends",
+          badge: "EXPLORE",
+          badgeColor: "bg-yellow-500",
+          isHighlighted: true,
+        };
+        break;
+
+      // Row 5: Fifth row of grid (5 items)
+      // Option A: Icon-only
+      case 21:
+        config = {
+          id,
+          icon: "",
+          iconAlt: "",
+          title: "",
+          description: "",
+          displayType: "A",
+        };
+        break;
+      // Option A: Icon-only
+      case 22:
+        config = {
+          id,
+          icon: "",
+          iconAlt: "",
+          title: "",
+          description: "",
+          displayType: "A",
+        };
+        break;
+      // Option C: Icon + Badge
+      case 23:
+        config = {
+          id,
+          href: "/motivators",
+          icon: "🏒",
+          iconAlt: "Motivators",
+          title: "Motivators!",
+          description:
+            "Get motivated with daily inspiration from hockey legends.",
+          displayType: "C",
+          microLabel: "Motivators!",
+          badge: "SHARE",
+          badgeColor: "bg-blue-500",
+          isHighlighted: true,
+        };
+        break;
+      // Option A: Icon-only
+      case 24:
+        config = {
+          id,
+          icon: "",
+          iconAlt: "",
+          title: "",
+          description: "",
+          displayType: "A",
+        };
+        break;
+      // Option A: Icon-only
+      case 25:
+        config = {
+          id,
+          icon: "",
+          iconAlt: "",
+          title: "",
+          description: "",
+          displayType: "A",
+        };
+        break;
+
       default:
         // Standard numbered cells
         config = {
@@ -171,14 +270,25 @@ export default function Home(): JSX.Element {
     return config;
   });
 
+  // Filter out rows 3 and 4 (cells 11-20) from the main cells array
+  const visibleCells = cells.filter(
+    (cell) => !(cell.id >= 11 && cell.id <= 20),
+  );
+
   // For mobile: only show highlighted cells
-  const mobileCells = cells.filter((cell) => cell.isHighlighted);
+  const mobileCells = visibleCells.filter((cell) => cell.isHighlighted);
 
   const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
-    // Shop navigates directly without modal preview
-    if (cell.id === 7) {
+    // Motivator cells and Shop navigate directly without modal preview
+    const motivatorHrefs = [
+      "/captain-heart",
+      "/bench-boss",
+      "/rink-philosopher",
+      "/motivators",
+    ];
+    if (cell.id === 7 || motivatorHrefs.includes(cell.href)) {
       router.push(cell.href);
       return;
     }
@@ -261,9 +371,7 @@ export default function Home(): JSX.Element {
         <div className="flex flex-col items-center gap-3 md:gap-4 max-w-4xl w-full">
           {/* Main Title */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight">
-            There Is
-            <br />
-            Only Hockey!
+            There Is Only Hockey!
           </h1>
 
           {/* Subtitle */}
@@ -363,9 +471,9 @@ export default function Home(): JSX.Element {
           ))}
         </div>
 
-        {/* Tablet/Desktop Grid: 3 cols tablet, 5 cols desktop, full pyramid */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-full">
-          {cells.map((cell) => (
+        {/* Tablet/Desktop Grid: 5 cols for 4x5 grid */}
+        <div className="hidden md:grid md:grid-cols-5 gap-2 max-w-full">
+          {visibleCells.map((cell) => (
             <div
               key={cell.id}
               className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center overflow-hidden touch-manipulation rounded-lg ${

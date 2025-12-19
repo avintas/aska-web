@@ -38,7 +38,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
 
       if (result.success && result.data) {
         if (result.type === "daily") {
-          // New structure: data is directly an array of CollectionItem
           const items = Array.isArray(result.data) ? result.data : [];
           setItems(items.slice(0, 12));
           setCurrentLabel("Daily Selection");
@@ -123,26 +122,19 @@ export default function RinkPhilosopherPage(): JSX.Element {
         })
         .catch((err) => {
           console.error("Error sharing:", err);
-          // Fallback to mailto if share fails
           window.location.href = `mailto:?subject=${subject}&body=${body}`;
         });
     } else {
-      // Fallback: use mailto link with subject line
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
   };
 
   const getEmoji = (): string => {
-    // Default emoji for rink philosopher items
     return "🎓";
   };
 
   const getQuote = (item: CollectionItem): string => {
     return item.quote;
-  };
-
-  const getAttribution = (item: CollectionItem): string | null => {
-    return item.attribution || null;
   };
 
   const getContext = (item: CollectionItem): string | null => {
@@ -156,7 +148,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
   };
 
   const getBadgeText = (item: CollectionItem): string => {
-    // For Collection items, use category first, then theme
     if (item.category) {
       return item.category;
     }
@@ -182,20 +173,11 @@ export default function RinkPhilosopherPage(): JSX.Element {
             toughness insights, and philosophical reflections from the
             game&apos;s greatest minds. Whether you need perspective on the
             grind, clarity in the flow, or wisdom from the room, find the words
-            that elevate your mindset and share the 🎓 knowledge.
+            that elevate your mindset. Get inspired and share the 🎓 knowledge.
+            <br />
+            Enjoy our daily selection!
           </p>
         </div>
-
-        {/* Set Label */}
-        {!loading && !error && (
-          <div className="text-center mb-6 md:mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-              <span className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {currentLabel}
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Loading State */}
         {loading && (
@@ -216,26 +198,41 @@ export default function RinkPhilosopherPage(): JSX.Element {
           </div>
         )}
 
-        {/* Responsive Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
+        {/* Daily Selections List - Bubble CTAs */}
         {!loading && !error && items.length > 0 && (
-          <div className="flex justify-center mb-8 md:mb-12">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
+          <div className="max-w-3xl mx-auto mb-8 md:mb-12">
+            <div className="flex flex-col gap-3 md:gap-4">
               {items.map((item, index) => {
                 const emoji = getEmoji();
                 const badgeText = getBadgeText(item);
+                const quotePreview = getQuote(item);
+                const previewText =
+                  quotePreview.length > 60
+                    ? quotePreview.substring(0, 60) + "..."
+                    : quotePreview;
+
                 return (
-                  <div
+                  <button
                     key={item.id || index}
                     onClick={() => handleIconClick(item)}
-                    className="relative w-[120px] h-[120px] md:w-[140px] md:h-[140px] lg:w-[150px] lg:h-[150px] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center text-3xl md:text-4xl lg:text-5xl hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition-all cursor-pointer touch-manipulation"
-                    aria-label={`View motivator ${index + 1}`}
+                    className="group relative w-full px-4 md:px-6 py-3 md:py-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 cursor-pointer transition-all duration-300 touch-manipulation text-left flex items-center gap-3 md:gap-4"
+                    aria-label={`View ${badgeText} message`}
                   >
-                    {emoji}
-                    {/* Badge Overlay */}
-                    <span className="absolute top-1 right-1 bg-orange-500 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight">
+                    {/* Avatar - Using emoji as placeholder */}
+                    <div className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xl md:text-2xl">
+                      {emoji}
+                    </div>
+
+                    {/* Quote Preview */}
+                    <span className="flex-1 text-sm md:text-base text-gray-900 dark:text-white font-medium line-clamp-1">
+                      {previewText}
+                    </span>
+
+                    {/* Badge - Subtle design */}
+                    <span className="bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400 text-[10px] md:text-[11px] font-normal px-2 md:px-2.5 py-0.5 md:py-1 rounded-full uppercase tracking-tight flex-shrink-0">
                       {badgeText}
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -297,13 +294,19 @@ export default function RinkPhilosopherPage(): JSX.Element {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[95vw] md:max-w-lg lg:max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 md:gap-3">
-                <span className="text-2xl md:text-3xl">{getEmoji()}</span>
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl md:text-3xl">
+                  {getEmoji()}
+                </div>
                 <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
-                  {getContext(selectedItem) ||
-                    getBadgeText(selectedItem) ||
-                    "Rink Philosopher"}
+                  Rink Philosopher about{" "}
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {getContext(selectedItem) ||
+                      getBadgeText(selectedItem) ||
+                      ""}
+                  </span>
                 </h2>
               </div>
               <button
@@ -327,31 +330,23 @@ export default function RinkPhilosopherPage(): JSX.Element {
               </button>
             </div>
 
+            {/* Modal Content */}
             <div className="p-6 md:p-8">
               {/* Quote */}
               <div className="mb-6 md:mb-8">
-                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
+                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
                   &ldquo;{getQuote(selectedItem)}&rdquo;
                 </p>
               </div>
-
-              {/* Attribution */}
-              {getAttribution(selectedItem) && (
-                <div className="mb-8 md:mb-10">
-                  <p className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300">
-                    &mdash; {getAttribution(selectedItem)}
-                  </p>
-                </div>
-              )}
 
               {/* Share Button */}
               <div className="flex justify-center mt-8 md:mt-10">
                 <button
                   onClick={handleShare}
-                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
+                  className="px-8 py-4 md:px-10 md:py-4 text-base md:text-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-3 touch-manipulation"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
