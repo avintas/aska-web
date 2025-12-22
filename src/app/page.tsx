@@ -70,18 +70,20 @@ export default function Home(): JSX.Element {
         break;
 
       // Row 2: Middle of Pyramid (2 items)
-      // Option B: Icon + Micro-label
+      // Option C: Icon + Badge
       case 7:
         config = {
           id,
-          href: "/shop",
-          icon: "🛍️", // Store
-          iconAlt: "Shop (Store)",
-          title: "Shop",
+          href: "/motivators",
+          icon: "🏒",
+          iconAlt: "Motivators",
+          title: "Motivators!",
           description:
-            "Browse our collection of hockey merchandise and gear. Show your love for the game with official OnlyHockey products!",
-          displayType: "B",
-          microLabel: "Store",
+            "Get motivated with daily inspiration from hockey legends.",
+          displayType: "C",
+          microLabel: "Motivators!",
+          badge: "SHARE",
+          badgeColor: "bg-blue-500",
           isHighlighted: true,
         };
         break;
@@ -219,16 +221,16 @@ export default function Home(): JSX.Element {
       case 23:
         config = {
           id,
-          href: "/motivators",
-          icon: "🏒",
-          iconAlt: "Motivators",
-          title: "Motivators!",
+          href: "/shop",
+          icon: "🛍️", // Store
+          iconAlt: "Shop (Store)",
+          title: "Shop",
           description:
-            "Get motivated with daily inspiration from hockey legends.",
+            "Browse our collection of hockey merchandise and gear. Show your love for the game with official OnlyHockey products!",
           displayType: "C",
-          microLabel: "Motivators!",
-          badge: "SHARE",
-          badgeColor: "bg-blue-500",
+          microLabel: "Store",
+          badge: "COMING SOON",
+          badgeColor: "bg-gray-500",
           isHighlighted: true,
         };
         break;
@@ -668,9 +670,9 @@ export default function Home(): JSX.Element {
         )}
 
         {/* Call to Action - Play Now */}
-        <div className="flex flex-col items-center gap-6 mt-8">
+        <div className="flex flex-col items-center gap-10 mt-12">
           <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Ready to Play?
             </h2>
             <p className="text-base text-gray-600 dark:text-gray-400">
@@ -679,8 +681,8 @@ export default function Home(): JSX.Element {
           </div>
 
           {/* Newsletter Sign-Up - Low-key */}
-          <div className="w-full max-w-md pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-full max-w-md pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center gap-2 mb-5">
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                 Want hockey trivia updates?
               </p>
@@ -695,7 +697,7 @@ export default function Home(): JSX.Element {
             </div>
             <form
               onSubmit={handleNewsletterSubmit}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-4"
             >
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -728,7 +730,7 @@ export default function Home(): JSX.Element {
                 </div>
               )}
             </form>
-            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2">
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-4">
               No spam, just hockey. Unsubscribe anytime.
             </p>
           </div>

@@ -19,53 +19,33 @@ interface CollectionItem {
   attribution: string | null;
 }
 
-const CATEGORIES = [
-  "Bounce Back",
-  "Discipline",
-  "Focus",
-  "Grit",
-  "Hard Work",
-  "Leadership",
-  "Pain",
-  "Team",
-  "Teamwork",
-];
+interface ContentSet {
+  id: number;
+  app_id: number;
+  set_title: string;
+  set_summary: string | null;
+  set_items: Array<{ id: number; quote: string }>;
+  set_type: string[] | null;
+  set_theme: string | null;
+  set_category: string | null;
+  set_difficulty: string | null;
+  set_parent: number | null;
+  set_created_at: string;
+  set_updated_at: string;
+  set_attribution: string | null;
+}
 
 export default function BenchBossPage(): JSX.Element {
   const [items, setItems] = useState<(MotivationalItem | CollectionItem)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentLabel, setCurrentLabel] = useState<string>("Daily Selection");
+  const [currentLabel, setCurrentLabel] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<
     MotivationalItem | CollectionItem | null
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const fetchDailySet = async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/bench-boss");
-      const result = await response.json();
-
-      if (result.success && result.data) {
-        if (result.type === "daily") {
-          const items = Array.isArray(result.data) ? result.data : [];
-          setItems(items.slice(0, 12));
-          setCurrentLabel("Daily Selection");
-        } else {
-          setItems(result.data || []);
-        }
-      } else {
-        setError(result.error || "Failed to load Daily Selection");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [sets, setSets] = useState<ContentSet[]>([]);
+  const [setsLoading, setSetsLoading] = useState(true);
 
   const fetchCategory = async (category: string): Promise<void> => {
     setLoading(true);
@@ -90,17 +70,84 @@ export default function BenchBossPage(): JSX.Element {
     }
   };
 
+  const fetchSets = async (): Promise<void> => {
+    setSetsLoading(true);
+    try {
+      const response = await fetch("/api/bench-boss/sets");
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const fetchedSets = result.data as ContentSet[];
+        setSets(fetchedSets);
+
+        // If no sets available, fallback to fetching categories from collection
+        if (fetchedSets.length === 0) {
+          // Fetch all categories from collection_hockey_culture
+          const categoryResponse = await fetch("/api/bench-boss");
+          const categoryResult = await categoryResponse.json();
+
+          if (categoryResult.success && categoryResult.data) {
+            const allItems = categoryResult.data as CollectionItem[];
+            // Get unique categories
+            const uniqueCategories = Array.from(
+              new Set(allItems.map((item) => item.category).filter(Boolean)),
+            );
+
+            // Load first category by default if available
+            if (uniqueCategories.length > 0) {
+              await fetchCategory(uniqueCategories[0] as string);
+            }
+          }
+        } else {
+          // Load first set by default
+          handleSetClick(fetchedSets[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load sets:", err);
+      // Fallback: try to load from collection
+      try {
+        const categoryResponse = await fetch("/api/bench-boss");
+        const categoryResult = await categoryResponse.json();
+        if (categoryResult.success && categoryResult.data) {
+          const allItems = categoryResult.data as CollectionItem[];
+          const uniqueCategories = Array.from(
+            new Set(allItems.map((item) => item.category).filter(Boolean)),
+          );
+          if (uniqueCategories.length > 0) {
+            await fetchCategory(uniqueCategories[0] as string);
+          }
+        }
+      } catch (fallbackErr) {
+        setError("Failed to load collections");
+      }
+    } finally {
+      setSetsLoading(false);
+    }
+  };
+
+  const handleSetClick = (set: ContentSet): void => {
+    setLoading(true);
+    setError(null);
+
+    // Convert set items to CollectionItem format
+    const convertedItems: CollectionItem[] = set.set_items.map((item) => ({
+      id: item.id,
+      quote: item.quote,
+      theme: set.set_theme,
+      category: set.set_category,
+      attribution: set.set_attribution || "Bench Boss",
+    }));
+
+    setItems(convertedItems);
+    setCurrentLabel(set.set_title);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchDailySet();
+    fetchSets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleCategoryClick = (category: string): void => {
-    fetchCategory(category);
-  };
-
-  const handleDailySetClick = (): void => {
-    fetchDailySet();
-  };
 
   const handleIconClick = (item: MotivationalItem | CollectionItem): void => {
     setSelectedItem(item);
@@ -145,13 +192,6 @@ export default function BenchBossPage(): JSX.Element {
     }
   };
 
-  const getEmoji = (item: MotivationalItem | CollectionItem): string => {
-    if ("emoji" in item && item.emoji) {
-      return item.emoji;
-    }
-    return "💪";
-  };
-
   const getQuote = (item: MotivationalItem | CollectionItem): string => {
     return item.quote;
   };
@@ -191,6 +231,82 @@ export default function BenchBossPage(): JSX.Element {
       return item.context;
     }
     return "Bench Boss";
+  };
+
+  // Get all unique categories from all sets or current items
+  const getAllCategoriesFromSets = (): Array<{
+    category: string;
+    emoji: string;
+  }> => {
+    const categoryMap = new Map<string, string>();
+
+    // If we have sets, use them
+    if (sets.length > 0) {
+      sets.forEach((set) => {
+        if (set.set_category && !categoryMap.has(set.set_category)) {
+          // Map categories to emojis for Bench Boss
+          const emojiMap: Record<string, string> = {
+            "Bounce Back": "🔄",
+            Discipline: "⚡",
+            Focus: "🎯",
+            Grit: "💎",
+            "Hard Work": "🔨",
+            Leadership: "👑",
+            Pain: "💔",
+            Team: "👥",
+            Teamwork: "🤝",
+          };
+          categoryMap.set(set.set_category, emojiMap[set.set_category] || "💪");
+        }
+      });
+    } else {
+      // Fallback: get categories from current items
+      items.forEach((item) => {
+        const category = getBadgeText(item);
+        if (
+          category &&
+          category !== "Bench Boss" &&
+          !categoryMap.has(category)
+        ) {
+          const emojiMap: Record<string, string> = {
+            "Bounce Back": "🔄",
+            Discipline: "⚡",
+            Focus: "🎯",
+            Grit: "💎",
+            "Hard Work": "🔨",
+            Leadership: "👑",
+            Pain: "💔",
+            Team: "👥",
+            Teamwork: "🤝",
+          };
+          categoryMap.set(category, emojiMap[category] || "💪");
+        }
+      });
+    }
+
+    return Array.from(categoryMap.entries()).map(([category, emoji]) => ({
+      category,
+      emoji,
+    }));
+  };
+
+  const handleCategoryCardClick = (category: string): void => {
+    // Find the set that matches this category
+    const matchingSet = sets.find((set) => set.set_category === category);
+
+    if (matchingSet) {
+      // Load the set's items
+      handleSetClick(matchingSet);
+    } else {
+      // Fallback: filter current items by category
+      const filteredItems = items.filter((item) => {
+        const itemCategory = getBadgeText(item);
+        return itemCategory === category;
+      });
+
+      setItems(filteredItems);
+      setCurrentLabel(category);
+    }
   };
 
   return (
@@ -234,12 +350,75 @@ export default function BenchBossPage(): JSX.Element {
           </div>
         )}
 
+        {/* Category Cards - Display all categories from all sets */}
+        {!loading &&
+          !error &&
+          !setsLoading &&
+          ((): JSX.Element | null => {
+            const categories = getAllCategoriesFromSets();
+            if (categories.length === 0) return null;
+
+            return (
+              <div className="max-w-4xl mx-auto mb-8 md:mb-12">
+                {/* Instruction Text */}
+                <div className="text-center mb-4 md:mb-6">
+                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
+                    Hey, click on me.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+                  {categories.map((cat) => {
+                    // Check if this category is currently active
+                    const isActive =
+                      currentLabel === cat.category ||
+                      sets.find(
+                        (s) =>
+                          s.set_title === currentLabel &&
+                          s.set_category === cat.category,
+                      );
+
+                    return (
+                      <button
+                        key={cat.category}
+                        onClick={() => handleCategoryCardClick(cat.category)}
+                        className={`group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex flex-col items-center justify-center overflow-hidden touch-manipulation ${
+                          isActive
+                            ? "ring-2 ring-orange-500 dark:ring-orange-400"
+                            : ""
+                        }`}
+                      >
+                        {/* Badge */}
+                        <div className="absolute top-1 right-1 bg-orange-500 text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20">
+                          SHARE
+                        </div>
+
+                        {/* Emoji */}
+                        <span
+                          className="text-4xl md:text-5xl mb-1 z-10"
+                          role="img"
+                          aria-label={cat.category}
+                        >
+                          {cat.emoji}
+                        </span>
+
+                        {/* Category Name */}
+                        <span className="text-[9px] md:text-[10px] text-white dark:text-gray-900 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10">
+                          {cat.category}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
         {/* Daily Selections List - Bubble CTAs */}
         {!loading && !error && items.length > 0 && (
           <div className="max-w-3xl mx-auto mb-8 md:mb-12">
             <div className="flex flex-col gap-3 md:gap-4">
               {items.map((item, index) => {
-                const emoji = getEmoji(item);
                 const badgeText = getBadgeText(item);
                 const quotePreview = getQuote(item);
                 const previewText =
@@ -254,9 +433,9 @@ export default function BenchBossPage(): JSX.Element {
                     className="group relative w-full px-4 md:px-6 py-3 md:py-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 cursor-pointer transition-all duration-300 touch-manipulation text-left flex items-center gap-3 md:gap-4"
                     aria-label={`View ${badgeText} message`}
                   >
-                    {/* Avatar - Using emoji as placeholder */}
+                    {/* Avatar */}
                     <div className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xl md:text-2xl">
-                      {emoji}
+                      💪
                     </div>
 
                     {/* Quote Preview */}
@@ -283,41 +462,6 @@ export default function BenchBossPage(): JSX.Element {
             </p>
           </div>
         )}
-
-        {/* Category Label Cloud */}
-        {!loading && !error && (
-          <div className="mt-10 md:mt-16 mb-8">
-            <div className="text-center">
-              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 md:mb-5">
-                Our collection of Shareable Motivators.
-              </h3>
-              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                {/* Daily Selection Button */}
-                <button
-                  onClick={handleDailySetClick}
-                  className="px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600 touch-manipulation"
-                >
-                  Daily Selection
-                </button>
-
-                {/* Category Buttons */}
-                {CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryClick(category)}
-                    className={`px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors touch-manipulation ${
-                      currentLabel === category
-                        ? "bg-orange-500 dark:bg-orange-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Modal Dialog */}
@@ -334,7 +478,7 @@ export default function BenchBossPage(): JSX.Element {
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl md:text-3xl">
-                  {getEmoji(selectedItem)}
+                  💪
                 </div>
                 <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
                   Bench Boss about{" "}

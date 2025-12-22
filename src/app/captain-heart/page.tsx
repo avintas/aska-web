@@ -19,88 +19,87 @@ interface CollectionItem {
   attribution: string | null;
 }
 
-const CATEGORIES = [
-  "Celebration",
-  "Glory",
-  "Good Luck",
-  "I'm proud",
-  "Mindset",
-  "Perseverance",
-  "Resilience",
-  "Vision",
-];
+interface ContentSet {
+  id: number;
+  app_id: number;
+  set_title: string;
+  set_summary: string | null;
+  set_items: Array<{ id: number; quote: string }>;
+  set_type: string[] | null;
+  set_theme: string | null;
+  set_category: string | null;
+  set_difficulty: string | null;
+  set_parent: number | null;
+  set_created_at: string;
+  set_updated_at: string;
+  set_attribution: string | null;
+}
 
 export default function CaptainHeartPage(): JSX.Element {
   const [items, setItems] = useState<(MotivationalItem | CollectionItem)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentLabel, setCurrentLabel] = useState<string>("Daily Selection");
+  const [currentLabel, setCurrentLabel] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<
     MotivationalItem | CollectionItem | null
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sets, setSets] = useState<ContentSet[]>([]);
+  const [setsLoading, setSetsLoading] = useState(true);
 
-  const fetchDailySet = async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-
+  const fetchSets = async (): Promise<void> => {
+    setSetsLoading(true);
     try {
-      const response = await fetch("/api/captain-heart");
+      const response = await fetch("/api/captain-heart/sets");
       const result = await response.json();
 
       if (result.success && result.data) {
-        if (result.type === "daily") {
-          // New structure: data is directly an array of CollectionItem
-          const items = Array.isArray(result.data) ? result.data : [];
-          setItems(items.slice(0, 12));
-          setCurrentLabel("Daily Selection");
-        } else {
-          setItems(result.data || []);
+        const fetchedSets = result.data as ContentSet[];
+        setSets(fetchedSets);
+
+        // Find and load "I Am Proud" collection by default
+        const proudSet = fetchedSets.find(
+          (set) =>
+            set.set_title.toLowerCase().includes("proud") ||
+            set.set_category?.toLowerCase().includes("proud") ||
+            set.set_title.toLowerCase().includes("i'm proud") ||
+            set.set_title.toLowerCase().includes("im proud"),
+        );
+
+        if (proudSet) {
+          handleSetClick(proudSet);
         }
-      } else {
-        setError(result.error || "Failed to load Daily Selection");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      console.error("Failed to load sets:", err);
+      setError("Failed to load collections");
     } finally {
-      setLoading(false);
+      setSetsLoading(false);
     }
   };
 
-  const fetchCategory = async (category: string): Promise<void> => {
+  const handleSetClick = (set: ContentSet): void => {
     setLoading(true);
     setError(null);
 
-    try {
-      const response = await fetch(
-        `/api/captain-heart?category=${encodeURIComponent(category)}`,
-      );
-      const result = await response.json();
+    // Convert set items to CollectionItem format
+    const convertedItems: CollectionItem[] = set.set_items.map((item) => ({
+      id: item.id,
+      quote: item.quote,
+      theme: set.set_theme,
+      category: set.set_category,
+      attribution: set.set_attribution || "Captain Heart",
+    }));
 
-      if (result.success && result.data) {
-        setItems((result.data as CollectionItem[]).slice(0, 12));
-        setCurrentLabel(category);
-      } else {
-        setError(result.error || `Failed to load ${category}`);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
+    setItems(convertedItems);
+    setCurrentLabel(set.set_title);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchDailySet();
+    fetchSets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleCategoryClick = (category: string): void => {
-    fetchCategory(category);
-  };
-
-  const handleDailySetClick = (): void => {
-    fetchDailySet();
-  };
 
   const handleIconClick = (item: MotivationalItem | CollectionItem): void => {
     setSelectedItem(item);
@@ -191,6 +190,80 @@ export default function CaptainHeartPage(): JSX.Element {
     return "Captain Heart";
   };
 
+  // Get all unique categories from all sets
+  const getAllCategoriesFromSets = (): Array<{
+    category: string;
+    emoji: string;
+  }> => {
+    const categoryMap = new Map<string, string>();
+
+    sets.forEach((set) => {
+      if (set.set_category && !categoryMap.has(set.set_category)) {
+        // Map categories to emojis
+        const emojiMap: Record<string, string> = {
+          Resilience: "💪",
+          Celebration: "🎉",
+          "Good Luck": "🍀",
+          "Im Proud": "⭐",
+          "I'm Proud": "⭐",
+          "I Am Proud": "⭐",
+          Mindset: "🧠",
+          Perseverance: "🔥",
+          Vision: "👁️",
+          Glory: "🏆",
+        };
+        categoryMap.set(set.set_category, emojiMap[set.set_category] || "💙");
+      }
+    });
+
+    return Array.from(categoryMap.entries()).map(([category, emoji]) => ({
+      category,
+      emoji,
+    }));
+  };
+
+  const handleCategoryCardClick = (category: string): void => {
+    // Find the set that matches this category
+    const matchingSet = sets.find((set) => set.set_category === category);
+
+    if (matchingSet) {
+      // Load the set's items
+      handleSetClick(matchingSet);
+    } else {
+      // Fallback: filter current items by category
+      const filteredItems = items.filter((item) => {
+        const itemCategory = getBadgeText(item);
+        return itemCategory === category;
+      });
+
+      setItems(filteredItems);
+      setCurrentLabel(category);
+    }
+  };
+
+  // Get emoji for currently selected collection/category
+  const getCurrentCollectionEmoji = (): string => {
+    // Check if currentLabel matches a set title
+    const currentSet = sets.find((set) => set.set_title === currentLabel);
+    const category = currentSet?.set_category || currentLabel;
+
+    // Map categories to emojis
+    const emojiMap: Record<string, string> = {
+      Resilience: "💪",
+      Celebration: "🎉",
+      "Good Luck": "🍀",
+      "Im Proud": "⭐",
+      "I'm Proud": "⭐",
+      "I Am Proud": "⭐",
+      Mindset: "🧠",
+      Perseverance: "🔥",
+      Vision: "👁️",
+      Glory: "🏆",
+    };
+
+    return emojiMap[category] || "💙";
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 md:pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -230,6 +303,70 @@ export default function CaptainHeartPage(): JSX.Element {
           </div>
         )}
 
+        {/* Category Cards - Display all categories from all sets */}
+        {!loading &&
+          !error &&
+          !setsLoading &&
+          ((): JSX.Element | null => {
+            const categories = getAllCategoriesFromSets();
+            if (categories.length === 0) return null;
+
+            return (
+              <div className="max-w-4xl mx-auto mb-8 md:mb-12">
+                {/* Instruction Text */}
+                <div className="text-center mb-4 md:mb-6">
+                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
+                    Hey, click on me.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+                  {categories.map((cat) => {
+                    // Check if this category is currently active
+                    const isActive =
+                      currentLabel === cat.category ||
+                      sets.find(
+                        (s) =>
+                          s.set_title === currentLabel &&
+                          s.set_category === cat.category,
+                      );
+
+                    return (
+                      <button
+                        key={cat.category}
+                        onClick={() => handleCategoryCardClick(cat.category)}
+                        className={`group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex flex-col items-center justify-center overflow-hidden touch-manipulation ${
+                          isActive
+                            ? "ring-2 ring-orange-500 dark:ring-orange-400"
+                            : ""
+                        }`}
+                      >
+                        {/* Badge */}
+                        <div className="absolute top-1 right-1 bg-purple-500 text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20">
+                          SHARE
+                        </div>
+
+                        {/* Emoji */}
+                        <span
+                          className="text-4xl md:text-5xl mb-1 z-10"
+                          role="img"
+                          aria-label={cat.category}
+                        >
+                          {cat.emoji}
+                        </span>
+
+                        {/* Category Name */}
+                        <span className="text-[9px] md:text-[10px] text-white dark:text-gray-900 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10">
+                          {cat.category}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
         {/* Daily Selections List - Bubble CTAs */}
         {!loading && !error && items.length > 0 && (
           <div className="max-w-3xl mx-auto mb-8 md:mb-12">
@@ -251,12 +388,10 @@ export default function CaptainHeartPage(): JSX.Element {
                     aria-label={`View ${badgeText} message`}
                   >
                     {/* Avatar */}
-                    <div className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                      <img
-                        src="/captain_heart_1.webp"
-                        alt="Captain Heart"
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <span className="text-xl md:text-2xl">
+                        {getCurrentCollectionEmoji()}
+                      </span>
                     </div>
 
                     {/* Quote Preview */}
@@ -281,41 +416,6 @@ export default function CaptainHeartPage(): JSX.Element {
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
               No items available at this time.
             </p>
-          </div>
-        )}
-
-        {/* Category Label Cloud */}
-        {!loading && !error && (
-          <div className="mt-10 md:mt-16 mb-8">
-            <div className="text-center">
-              <h3 className="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 md:mb-5">
-                Our collection of Shareable Motivators.
-              </h3>
-              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                {/* Daily Selection Button */}
-                <button
-                  onClick={handleDailySetClick}
-                  className="px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors bg-green-500 dark:bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600 touch-manipulation"
-                >
-                  Daily Selection
-                </button>
-
-                {/* Category Buttons */}
-                {CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryClick(category)}
-                    className={`px-4 py-2 md:px-6 md:py-2 text-sm md:text-base rounded-full font-semibold transition-colors touch-manipulation ${
-                      currentLabel === category
-                        ? "bg-orange-500 dark:bg-orange-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </div>
