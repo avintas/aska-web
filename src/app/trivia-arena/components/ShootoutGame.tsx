@@ -29,7 +29,7 @@ export function ShootoutGame(): JSX.Element {
 
   // Fetch questions and initialize session
   useEffect(() => {
-    async function initGame() {
+    async function initGame(): Promise<void> {
       try {
         // 1. Fetch Questions
         const res = await fetch("/api/trivia-arena/questions");

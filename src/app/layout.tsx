@@ -15,6 +15,24 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "OnlyHockey.com",
   description: "OnlyHockey.com - Your ultimate hockey companion",
+  manifest: "/manifest.json",
+  themeColor: "#1e3a8a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "OnlyHockey",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover" as const,
 };
 
 export default function RootLayout({

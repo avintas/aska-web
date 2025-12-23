@@ -3,18 +3,12 @@
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 
 // 3x5 grid (15 cells): Place 6 trivia personas
-// Row 1: [empty, Captain Heart, Bench Boss, Historian, empty]
-// Row 2: [empty, empty, Stats Master, empty, empty]
+// Row 1: [empty, empty, Bench Boss, empty, empty]
+// Row 2: [empty, Captain Heart, Stats Master, Historian, empty]
 // Row 3: [empty, The Ref, empty, Rink Philosopher, empty]
 const GRID_CELLS: (HubCell | null)[] = [
   null, // Row 1, Col 1
-  {
-    id: "captain-heart",
-    name: "Captain Heart",
-    emoji: "💙",
-    href: "/trivia-arena/captain-heart",
-    description: "Trivia challenges from Captain Heart",
-  },
+  null, // Row 1, Col 2 (moved to Row 2, Col 2)
   {
     id: "bench-boss",
     name: "Bench Boss",
@@ -22,16 +16,16 @@ const GRID_CELLS: (HubCell | null)[] = [
     href: "/trivia-arena/bench-boss",
     description: "Trivia challenges from Bench Boss",
   },
-  {
-    id: "historian",
-    name: "Historian",
-    emoji: "📜",
-    href: "/trivia-arena/historian",
-    description: "Historical trivia and facts",
-  },
+  null, // Row 1, Col 4 (moved to Row 2, Col 4)
   null, // Row 1, Col 5
   null, // Row 2, Col 1
-  null, // Row 2, Col 2
+  {
+    id: "captain-heart",
+    name: "Captain Heart",
+    emoji: "💙",
+    href: "/trivia-arena/captain-heart",
+    description: "Trivia challenges from Captain Heart",
+  }, // Row 2, Col 2 (moved from Row 1, Col 2)
   {
     id: "stats-master",
     name: "Stats Master",
@@ -39,7 +33,13 @@ const GRID_CELLS: (HubCell | null)[] = [
     href: "/trivia-arena/stats-master",
     description: "Statistics and records trivia",
   },
-  null, // Row 2, Col 4
+  {
+    id: "historian",
+    name: "Historian",
+    emoji: "📜",
+    href: "/trivia-arena/historian",
+    description: "Historical trivia and facts",
+  }, // Row 2, Col 4 (moved from Row 1, Col 4)
   null, // Row 2, Col 5
   null, // Row 3, Col 1
   {

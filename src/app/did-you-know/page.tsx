@@ -237,7 +237,7 @@ export default function DidYouKnowPage(): JSX.Element {
             <div className="relative flex items-start justify-between p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-start gap-2 md:gap-3 flex-1">
                 {/* Avatar - Smaller size */}
-                {(() => {
+                {((): JSX.Element => {
                   const itemIndex = items.findIndex(
                     (i) => i.id === selectedItem.id,
                   );
