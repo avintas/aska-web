@@ -1,16 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { HubGrid, type HubCell } from "@/components/HubGrid";
 
-interface TriviaPersona {
-  id: string;
-  name: string;
-  emoji: string;
-  href: string;
-  description: string;
-}
-
-const TRIVIA_PERSONAS: TriviaPersona[] = [
+// 3x5 grid (15 cells): Place 6 trivia personas
+// Row 1: [empty, Captain Heart, Bench Boss, Historian, empty]
+// Row 2: [empty, empty, Stats Master, empty, empty]
+// Row 3: [empty, The Ref, empty, Rink Philosopher, empty]
+const GRID_CELLS: (HubCell | null)[] = [
+  null, // Row 1, Col 1
   {
     id: "captain-heart",
     name: "Captain Heart",
@@ -32,20 +29,9 @@ const TRIVIA_PERSONAS: TriviaPersona[] = [
     href: "/trivia-arena/historian",
     description: "Historical trivia and facts",
   },
-  {
-    id: "the-ref",
-    name: "The Ref",
-    emoji: "⚖️",
-    href: "/trivia-arena/the-ref",
-    description: "Rules and regulations trivia",
-  },
-  {
-    id: "rink-philosopher",
-    name: "Rink Philosopher",
-    emoji: "🎓",
-    href: "/trivia-arena/rink-philosopher",
-    description: "Wisdom and knowledge trivia",
-  },
+  null, // Row 1, Col 5
+  null, // Row 2, Col 1
+  null, // Row 2, Col 2
   {
     id: "stats-master",
     name: "Stats Master",
@@ -53,6 +39,25 @@ const TRIVIA_PERSONAS: TriviaPersona[] = [
     href: "/trivia-arena/stats-master",
     description: "Statistics and records trivia",
   },
+  null, // Row 2, Col 4
+  null, // Row 2, Col 5
+  null, // Row 3, Col 1
+  {
+    id: "the-ref",
+    name: "The Ref",
+    emoji: "⚖️",
+    href: "/trivia-arena/the-ref",
+    description: "Rules and regulations trivia",
+  },
+  null, // Row 3, Col 3
+  {
+    id: "rink-philosopher",
+    name: "Rink Philosopher",
+    emoji: "🎓",
+    href: "/trivia-arena/rink-philosopher",
+    description: "Wisdom and knowledge trivia",
+  },
+  null, // Row 3, Col 5
 ];
 
 export default function TriviaArenaPage(): JSX.Element {
@@ -63,12 +68,12 @@ export default function TriviaArenaPage(): JSX.Element {
         <div className="text-center mb-16 md:mb-20">
           <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
             <span className="text-5xl md:text-6xl lg:text-7xl">🎯</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
               Trivia Arena
             </h1>
           </div>
           <div className="max-w-2xl mx-auto">
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
+            <p className="text-lg md:text-xl lg:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
               Welcome to Trivia Arena, your hub for our collection of
               interactive trivia games. Test your knowledge across a variety of
               challenges and compete to see how well you know the game.
@@ -76,35 +81,8 @@ export default function TriviaArenaPage(): JSX.Element {
           </div>
         </div>
 
-        {/* Personas Grid - 2x3 on mobile, 3x2 on desktop */}
-        <div className="flex justify-center mb-8 md:mb-12">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 lg:gap-4 max-w-4xl">
-            {TRIVIA_PERSONAS.map((persona, index) => (
-              <Link
-                key={persona.id}
-                href={persona.href}
-                className="group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex items-center justify-center overflow-hidden touch-manipulation animate-[subtle-shake_8s_ease-in-out_infinite] hover:animate-[pulse-glow_2s_ease-in-out_infinite,subtle-shake_8s_ease-in-out_infinite]"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <div className="w-full h-full flex flex-col items-center justify-center px-2 relative">
-                  {/* Emoji */}
-                  <span
-                    className="text-4xl md:text-5xl lg:text-6xl mb-1 z-10"
-                    role="img"
-                    aria-label={persona.name}
-                  >
-                    {persona.emoji}
-                  </span>
-
-                  {/* Name/Micro-label */}
-                  <span className="text-[9px] md:text-[10px] text-white dark:text-gray-900 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10">
-                    {persona.name}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* 3x5 Hub Grid */}
+        <HubGrid cells={GRID_CELLS} />
 
         {/* Call to Action */}
         <div className="text-center">

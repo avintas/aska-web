@@ -12,7 +12,7 @@ export default function HockeyCulturePage(): JSX.Element {
               Hockey Culture
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
             Explore the unwritten rules and traditions of hockey culture. Learn
             about the code that players live by on and off the ice.
           </p>

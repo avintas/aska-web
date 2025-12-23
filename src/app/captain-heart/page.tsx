@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { HubGrid, type HubCell } from "@/components/HubGrid";
 
 interface MotivationalItem {
   id: number;
@@ -279,8 +280,6 @@ export default function CaptainHeartPage(): JSX.Element {
             The game starts before the puck drops. Whether you need a pre-game
             boost or a post-game high five, we&apos;ve got the perfect message
             ready to text. Get inspired and send the ❤️ love.
-            <br />
-            Enjoy our daily selection!
           </p>
         </div>
 
@@ -303,7 +302,7 @@ export default function CaptainHeartPage(): JSX.Element {
           </div>
         )}
 
-        {/* Category Cards - Display all categories from all sets */}
+        {/* Category Grid - 3x5 Hub Grid */}
         {!loading &&
           !error &&
           !setsLoading &&
@@ -311,66 +310,79 @@ export default function CaptainHeartPage(): JSX.Element {
             const categories = getAllCategoriesFromSets();
             if (categories.length === 0) return null;
 
-            return (
-              <div className="max-w-4xl mx-auto mb-8 md:mb-12">
-                {/* Instruction Text */}
-                <div className="text-center mb-4 md:mb-6">
-                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium">
-                    Hey, click on me.
-                  </p>
-                </div>
+            // Convert categories to HubCell format and create 3x5 grid
+            // Moves applied:
+            // 1. Row 1 cell 1 (index 0) → Row 2 cell 3 (index 8)
+            // 2. Row 1 cell 5 (index 4) → Row 2 cell 4 (index 9)
+            const gridCells: (HubCell | null)[] = Array.from(
+              { length: 15 },
+              (_, i) => {
+                // Check destinations first
 
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                  {categories.map((cat) => {
-                    // Check if this category is currently active
-                    const isActive =
-                      currentLabel === cat.category ||
-                      sets.find(
-                        (s) =>
-                          s.set_title === currentLabel &&
-                          s.set_category === cat.category,
-                      );
+                // Move 1: Row 1 cell 1 (index 0) → Row 2 cell 3 (index 8) - Category[0]
+                if (i === 8) {
+                  return categories[0]
+                    ? {
+                        id: categories[0].category
+                          .toLowerCase()
+                          .replace(/\s+/g, "-"),
+                        name: categories[0].category,
+                        emoji: categories[0].emoji,
+                        description: `View ${categories[0].category} messages`,
+                        badge: "SHARE",
+                        badgeColor: "bg-purple-500",
+                        onClick: () =>
+                          handleCategoryCardClick(categories[0].category),
+                      }
+                    : null;
+                }
 
-                    return (
-                      <button
-                        key={cat.category}
-                        onClick={() => handleCategoryCardClick(cat.category)}
-                        className={`group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex flex-col items-center justify-center overflow-hidden touch-manipulation ${
-                          isActive
-                            ? "ring-2 ring-orange-500 dark:ring-orange-400"
-                            : ""
-                        }`}
-                      >
-                        {/* Badge */}
-                        <div className="absolute top-1 right-1 bg-purple-500 text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20">
-                          SHARE
-                        </div>
+                // Move 2: Row 1 cell 5 (index 4) → Row 2 cell 4 (index 9) - Category[4]
+                if (i === 9) {
+                  return categories[4]
+                    ? {
+                        id: categories[4].category
+                          .toLowerCase()
+                          .replace(/\s+/g, "-"),
+                        name: categories[4].category,
+                        emoji: categories[4].emoji,
+                        description: `View ${categories[4].category} messages`,
+                        badge: "SHARE",
+                        badgeColor: "bg-purple-500",
+                        onClick: () =>
+                          handleCategoryCardClick(categories[4].category),
+                      }
+                    : null;
+                }
 
-                        {/* Emoji */}
-                        <span
-                          className="text-4xl md:text-5xl mb-1 z-10"
-                          role="img"
-                          aria-label={cat.category}
-                        >
-                          {cat.emoji}
-                        </span>
+                // Source positions become empty
+                if (i === 0 || i === 4) {
+                  return null;
+                }
 
-                        {/* Category Name */}
-                        <span className="text-[9px] md:text-[10px] text-white dark:text-gray-900 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10">
-                          {cat.category}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                // Default: use category at this index
+                const category = categories[i];
+                if (!category) return null;
+
+                return {
+                  id: category.category.toLowerCase().replace(/\s+/g, "-"),
+                  name: category.category,
+                  emoji: category.emoji,
+                  description: `View ${category.category} messages`,
+                  badge: "SHARE",
+                  badgeColor: "bg-purple-500",
+                  onClick: () => handleCategoryCardClick(category.category),
+                };
+              },
             );
+
+            return <HubGrid cells={gridCells} />;
           })()}
 
         {/* Daily Selections List - Bubble CTAs */}
         {!loading && !error && items.length > 0 && (
-          <div className="max-w-3xl mx-auto mb-8 md:mb-12">
-            <div className="flex flex-col gap-3 md:gap-4">
+          <div className="flex justify-center mb-8 md:mb-12">
+            <div className="w-[200px] sm:w-[232px] md:w-[672px] flex flex-col gap-3 md:gap-4">
               {items.map((item, index) => {
                 const badgeText = getBadgeText(item);
                 const quotePreview = getQuote(item);
@@ -427,20 +439,20 @@ export default function CaptainHeartPage(): JSX.Element {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[95vw] md:max-w-lg lg:max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[90vw] md:max-w-md lg:max-w-lg w-full max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                   <img
                     src="/captain_heart_1.webp"
                     alt="Captain Heart"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
                   Captain Heart about{" "}
                   <span className="text-gray-600 dark:text-gray-400">
                     {getContext(selectedItem) ||
@@ -451,11 +463,11 @@ export default function CaptainHeartPage(): JSX.Element {
               </div>
               <button
                 onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors shadow-md flex-shrink-0"
                 aria-label="Close modal"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-4 h-4 md:w-5 md:h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -471,31 +483,31 @@ export default function CaptainHeartPage(): JSX.Element {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 md:p-8">
+            <div className="p-4 md:p-5">
               {/* Quote */}
-              <div className="mb-6 md:mb-8">
-                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+              <div className="mb-4 md:mb-5">
+                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
                   &ldquo;{getQuote(selectedItem)}&rdquo;
                 </p>
               </div>
 
               {/* Author */}
               {getAuthor(selectedItem) && (
-                <div className="mb-5 md:mb-6">
-                  <p className="text-sm md:text-base font-semibold text-gray-700 dark:text-gray-300">
+                <div className="mb-4 md:mb-5">
+                  <p className="text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-300">
                     &mdash; {getAuthor(selectedItem)}
                   </p>
                 </div>
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-8 md:mt-10">
+              <div className="flex justify-center mt-6 md:mt-7">
                 <button
                   onClick={handleShare}
-                  className="px-8 py-4 md:px-10 md:py-4 text-base md:text-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-3 touch-manipulation"
+                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
                 >
                   <svg
-                    className="w-6 h-6"
+                    className="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

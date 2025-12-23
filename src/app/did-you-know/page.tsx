@@ -19,8 +19,10 @@ export default function DidYouKnowPage(): JSX.Element {
   const [selectedItem, setSelectedItem] = useState<FactItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
-  const [flippedCells, setFlippedCells] = useState<Set<number>>(new Set());
   const [gridFacts, setGridFacts] = useState<FactItem[]>([]);
+  const [flippedCategoryCells, setFlippedCategoryCells] = useState<Set<number>>(
+    new Set(),
+  );
 
   const fetchDailySet = async (): Promise<void> => {
     setLoading(true);
@@ -49,7 +51,7 @@ export default function DidYouKnowPage(): JSX.Element {
           setGridFacts([]);
         }
         setImageErrors(new Set()); // Reset image errors when loading new set
-        setFlippedCells(new Set()); // Reset flipped cells
+        setFlippedCategoryCells(new Set()); // Reset flipped category grid cells
       } else {
         setError(result.error || "Failed to load Daily Set");
       }
@@ -64,13 +66,15 @@ export default function DidYouKnowPage(): JSX.Element {
     fetchDailySet();
   }, []);
 
-  const handleGridCellClick = (index: number): void => {
+  const handleCategoryGridCellClick = (index: number): void => {
     // Flip the card
-    setFlippedCells((prev) => new Set(prev).add(index));
+    setFlippedCategoryCells((prev) => new Set(prev).add(index));
 
     // Open modal with the fact if available
-    if (gridFacts.length > 0 && gridFacts[index]) {
-      setSelectedItem(gridFacts[index]);
+    // Use the first 30 facts from gridFacts for the category grid
+    if (gridFacts.length > 0) {
+      const factIndex = index % gridFacts.length;
+      setSelectedItem(gridFacts[factIndex]);
       setIsModalOpen(true);
     } else if (items.length > 0) {
       // Fallback: use items array if gridFacts not populated yet
@@ -137,7 +141,7 @@ export default function DidYouKnowPage(): JSX.Element {
         {/* Header */}
         <div className="text-center mb-8 md:mb-12 lg:mb-16">
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
-            <span className="text-4xl md:text-5xl lg:text-6xl">💡</span>
+            <span className="text-2xl md:text-3xl lg:text-4xl">💡</span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
               Did You Know?
             </h1>
@@ -145,50 +149,50 @@ export default function DidYouKnowPage(): JSX.Element {
           <p className="text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0">
             Discover fascinating hockey facts, records, and stories that
             showcase the rich history and culture of the greatest game on ice.
-            These facts will help you prepare for trivia games. Get inspired and
-            share the 💡 knowledge.
-            <br />
-            Enjoy our daily selection!
           </p>
         </div>
 
-        {/* Player Images Grid - 12x12 Puzzle (responsive: 3 cols mobile, 6 cols on all larger screens) */}
-        {!loading && (
-          <div className="flex justify-center mb-8 md:mb-12 lg:mb-16 px-2">
-            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 gap-0.5 sm:gap-1 md:gap-2 max-w-4xl mx-auto w-full">
-              {Array.from({ length: 144 }, (_, index) => {
+        {/* 5x6 Puzzle Grid */}
+        {!loading && !error && (
+          <div className="flex justify-center mb-8 md:mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 max-w-full">
+              {Array.from({ length: 30 }, (_, index) => {
                 // Cycle through player_1.png through player_12.png
                 const playerNumber = (index % 12) + 1;
                 const imagePath = `/player_${playerNumber}.png`;
-                const isFlipped = flippedCells.has(index);
-                const fact = gridFacts.length > 0 ? gridFacts[index] : null;
+                const isFlipped = flippedCategoryCells.has(index);
+                // Use the first 30 facts from gridFacts, cycling if needed
+                const fact =
+                  gridFacts.length > 0
+                    ? gridFacts[index % gridFacts.length]
+                    : null;
                 const emoji = fact ? getEmoji(fact) : "💡";
 
                 return (
                   <button
-                    key={index}
-                    onClick={() => handleGridCellClick(index)}
-                    className={`flip-card aspect-square w-full ${isFlipped ? "flipped" : ""} cursor-pointer touch-manipulation`}
+                    key={`category-grid-${index}`}
+                    onClick={() => handleCategoryGridCellClick(index)}
+                    className={`flip-card w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 ${isFlipped ? "flipped" : ""} cursor-pointer touch-manipulation`}
                     aria-label={`Reveal fact ${index + 1}`}
                   >
                     <div className="flip-card-inner h-full w-full">
                       {/* Front side - Player image */}
-                      <div className="flip-card-front h-full w-full overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-800">
+                      <div className="flip-card-front h-full w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                         <img
                           src={imagePath}
                           alt={`Player ${playerNumber}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover rounded-lg"
                           loading="lazy"
                         />
                       </div>
 
                       {/* Back side - Fact preview */}
-                      <div className="flip-card-back h-full w-full overflow-hidden rounded-sm bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 flex items-center justify-center p-2">
+                      <div className="flip-card-back h-full w-full overflow-hidden rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 flex items-center justify-center p-2">
                         <div className="text-center">
-                          <div className="text-2xl md:text-3xl mb-1">
+                          <div className="text-xl md:text-2xl mb-1">
                             {emoji}
                           </div>
-                          <div className="text-white text-[8px] md:text-[10px] font-semibold uppercase tracking-tight line-clamp-2">
+                          <div className="text-white text-[8px] md:text-[9px] font-semibold uppercase tracking-tight line-clamp-2">
                             {fact?.fact_text.substring(0, 30)}...
                           </div>
                         </div>
@@ -226,13 +230,13 @@ export default function DidYouKnowPage(): JSX.Element {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[95vw] md:max-w-lg lg:max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-[90vw] md:max-w-md lg:max-w-lg w-full max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="relative flex items-start justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-start gap-3 md:gap-4 flex-1">
-                {/* Avatar - Larger size to show pixel art, positioned top-left */}
+            <div className="relative flex items-start justify-between p-3 md:p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-start gap-2 md:gap-3 flex-1">
+                {/* Avatar - Smaller size */}
                 {(() => {
                   const itemIndex = items.findIndex(
                     (i) => i.id === selectedItem.id,
@@ -242,9 +246,9 @@ export default function DidYouKnowPage(): JSX.Element {
                   const playerImagePath = getPlayerImagePath(modalIndex);
 
                   return (
-                    <div className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
                       {showEmojiFallback ? (
-                        <div className="w-full h-full flex items-center justify-center text-4xl md:text-5xl lg:text-6xl">
+                        <div className="w-full h-full flex items-center justify-center text-2xl md:text-3xl">
                           {getEmoji(selectedItem)}
                         </div>
                       ) : (
@@ -260,21 +264,21 @@ export default function DidYouKnowPage(): JSX.Element {
                 })()}
 
                 {/* Practice Trivia Text */}
-                <div className="flex-1 pt-2 md:pt-4">
-                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 italic">
+                <div className="flex-1 pt-1 md:pt-2">
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 italic">
                     Practice trivia question for upcoming Trivia battles
                   </p>
                 </div>
               </div>
 
-              {/* Close Button - More prominent */}
+              {/* Close Button */}
               <button
                 onClick={handleCloseModal}
-                className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors shadow-md flex-shrink-0"
+                className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors shadow-md flex-shrink-0"
                 aria-label="Close modal"
               >
                 <svg
-                  className="w-5 h-5 md:w-6 md:h-6"
+                  className="w-4 h-4 md:w-5 md:h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -290,31 +294,31 @@ export default function DidYouKnowPage(): JSX.Element {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 md:p-8">
+            <div className="p-4 md:p-5">
               {/* Fact Text */}
-              <div className="mb-6 md:mb-8">
-                <p className="text-lg md:text-xl lg:text-2xl text-gray-800 dark:text-gray-200 leading-relaxed italic">
+              <div className="mb-4 md:mb-5">
+                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
                   &ldquo;{selectedItem.fact_text}&rdquo;
                 </p>
               </div>
 
               {/* Year Badge */}
               {selectedItem.year && (
-                <div className="mb-5 md:mb-6">
-                  <span className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-4 py-2 rounded">
+                <div className="mb-4 md:mb-5">
+                  <span className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs md:text-sm font-semibold px-3 py-1.5 rounded">
                     {selectedItem.year}
                   </span>
                 </div>
               )}
 
               {/* Share Button */}
-              <div className="flex justify-center mt-8 md:mt-10">
+              <div className="flex justify-center mt-6 md:mt-7">
                 <button
                   onClick={handleShare}
-                  className="px-8 py-4 md:px-10 md:py-4 text-base md:text-lg bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-3 touch-manipulation"
+                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
                 >
                   <svg
-                    className="w-6 h-6"
+                    className="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

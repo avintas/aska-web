@@ -125,11 +125,11 @@ export default function GamePlanPage(): JSX.Element {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-5xl">📋</span>
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white">
               Game Plan
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
             Motivational quotes and wisdom from legendary players and epic
             coaches to inspire your game.
           </p>

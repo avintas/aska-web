@@ -283,14 +283,15 @@ export default function Home(): JSX.Element {
   const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
-    // Motivator cells and Shop navigate directly without modal preview
-    const motivatorHrefs = [
+    // Motivator cells, Did You Know, and Shop navigate directly without modal preview
+    const directNavHrefs = [
       "/captain-heart",
       "/bench-boss",
       "/rink-philosopher",
       "/motivators",
+      "/did-you-know",
     ];
-    if (cell.id === 7 || motivatorHrefs.includes(cell.href)) {
+    if (cell.id === 7 || directNavHrefs.includes(cell.href)) {
       router.push(cell.href);
       return;
     }
@@ -563,7 +564,7 @@ export default function Home(): JSX.Element {
             onClick={handleClosePreview}
           >
             <div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-[95vw] md:max-w-md w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-[90vw] md:max-w-md lg:max-w-lg w-full max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
