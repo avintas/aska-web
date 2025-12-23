@@ -152,10 +152,10 @@ export default function DidYouKnowPage(): JSX.Element {
           </p>
         </div>
 
-        {/* Player Images Grid - 12x12 Puzzle (responsive: 4 cols mobile, 6 cols small tablet, 8 cols medium, 12 cols desktop) */}
+        {/* Player Images Grid - 12x12 Puzzle (responsive: 3 cols mobile, 6 cols on all larger screens) */}
         {!loading && (
           <div className="flex justify-center mb-8 md:mb-12 lg:mb-16 px-2">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-0.5 sm:gap-1 md:gap-2 max-w-4xl mx-auto w-full">
+            <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 gap-0.5 sm:gap-1 md:gap-2 max-w-4xl mx-auto w-full">
               {Array.from({ length: 144 }, (_, index) => {
                 // Cycle through player_1.png through player_12.png
                 const playerNumber = (index % 12) + 1;
