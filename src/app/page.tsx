@@ -283,13 +283,15 @@ export default function Home(): JSX.Element {
   const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
-    // Motivator cells, Did You Know, and Shop navigate directly without modal preview
+    // Motivator cells, Did You Know, Trivia Arena, and Shop navigate directly without modal preview
     const directNavHrefs = [
       "/captain-heart",
       "/bench-boss",
       "/rink-philosopher",
       "/motivators",
       "/did-you-know",
+      "/trivia-arena",
+      "/shop",
     ];
     if (cell.id === 7 || directNavHrefs.includes(cell.href)) {
       router.push(cell.href);
