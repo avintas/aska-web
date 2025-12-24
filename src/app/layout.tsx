@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: "OnlyHockey.com",
   description: "OnlyHockey.com - Your ultimate hockey companion",
   manifest: "/manifest.json",
-  themeColor: "#1e3a8a",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -33,6 +32,7 @@ export const viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover" as const,
+  themeColor: "#1e3a8a",
 };
 
 export default function RootLayout({

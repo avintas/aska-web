@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LandingCarousel } from "@/components/LandingCarousel";
 
 // Cell display type: A = icon-only, B = icon + micro-label, C = icon + badge
 type CellDisplayType = "A" | "B" | "C";
@@ -34,8 +35,9 @@ export default function Home(): JSX.Element {
     text: string;
   } | null>(null);
 
-  // Create configuration for 25 cells in a 5x5 grid (5 rows, 5 columns)
-  const cells: CellConfig[] = Array.from({ length: 25 }, (_, i) => {
+  // Old grid cells code removed - using carousel now
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _unusedCells: CellConfig[] = Array.from({ length: 25 }, (_, i) => {
     const id = i + 1;
 
     // Default config
@@ -272,15 +274,11 @@ export default function Home(): JSX.Element {
     return config;
   });
 
-  // Filter out rows 3 and 4 (cells 11-20) from the main cells array
-  const visibleCells = cells.filter(
-    (cell) => !(cell.id >= 11 && cell.id <= 20),
-  );
-
-  // For mobile: only show highlighted cells
-  const mobileCells = visibleCells.filter((cell) => cell.isHighlighted);
-
-  const handleCellClick = (cell: CellConfig, e: React.MouseEvent): void => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _unusedHandleCellClick = (
+    cell: CellConfig,
+    e: React.MouseEvent,
+  ): void => {
     if (!cell.isHighlighted || !cell.href) return;
 
     // Motivator cells, Did You Know, Trivia Arena, and Shop navigate directly without modal preview
@@ -396,168 +394,8 @@ export default function Home(): JSX.Element {
           </p>
         </div>
 
-        {/* Mobile Grid: 2 cols, highlighted cells only */}
-        <div className="md:hidden grid grid-cols-2 gap-2 max-w-full">
-          {mobileCells.map((cell) => (
-            <div
-              key={cell.id}
-              className={`relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center overflow-hidden touch-manipulation rounded-lg ${
-                cell.isHighlighted
-                  ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
-                  : "bg-white dark:bg-gray-800"
-              }`}
-              onClick={(e) => handleCellClick(cell, e)}
-            >
-              {cell.isHighlighted ? (
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center px-2 relative"
-                  aria-label={cell.description || `Preview ${cell.title}`}
-                >
-                  {/* Option A: Icon-only */}
-                  {cell.displayType === "A" && (
-                    <div className="flex flex-col items-center justify-center z-10">
-                      <span
-                        className="text-4xl mb-1"
-                        role="img"
-                        aria-label={cell.iconAlt}
-                      >
-                        {cell.icon}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Option B: Icon + Micro-label */}
-                  {cell.displayType === "B" && (
-                    <div className="flex flex-col items-center justify-center z-10">
-                      <span
-                        className="text-4xl mb-1"
-                        role="img"
-                        aria-label={cell.iconAlt}
-                      >
-                        {cell.icon}
-                      </span>
-                      {cell.microLabel && (
-                        <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight whitespace-pre-line">
-                          {cell.microLabel}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Option C: Icon + Badge */}
-                  {cell.displayType === "C" && (
-                    <>
-                      <div className="flex flex-col items-center justify-center z-10">
-                        <span
-                          className="text-4xl mb-1"
-                          role="img"
-                          aria-label={cell.iconAlt}
-                        >
-                          {cell.icon}
-                        </span>
-                        {cell.microLabel && (
-                          <span className="text-[9px] font-bold text-white dark:text-gray-900 uppercase tracking-wide text-center leading-tight whitespace-pre-line">
-                            {cell.microLabel}
-                          </span>
-                        )}
-                      </div>
-                      {cell.badge && (
-                        <div
-                          className={`absolute top-1 right-1 ${cell.badgeColor || "bg-red-500"} text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm uppercase z-20`}
-                        >
-                          {cell.badge}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
-
-        {/* Tablet/Desktop Grid: 5 cols for 4x5 grid */}
-        <div className="hidden md:grid md:grid-cols-5 gap-2 max-w-full">
-          {visibleCells.map((cell) => (
-            <div
-              key={cell.id}
-              className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 flex items-center justify-center overflow-hidden touch-manipulation rounded-lg ${
-                cell.isHighlighted
-                  ? "bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
-                  : "bg-white dark:bg-gray-800"
-              }`}
-              onClick={(e) => handleCellClick(cell, e)}
-            >
-              {cell.isHighlighted ? (
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center px-2 relative"
-                  aria-label={cell.description || `Preview ${cell.title}`}
-                >
-                  {/* Option A: Icon-only */}
-                  {cell.displayType === "A" && (
-                    <div className="flex flex-col items-center justify-center z-10">
-                      <span
-                        className="text-5xl md:text-6xl"
-                        role="img"
-                        aria-label={cell.iconAlt}
-                      >
-                        {cell.icon}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Option B: Icon + Micro-label */}
-                  {cell.displayType === "B" && (
-                    <div className="flex flex-col items-center justify-center z-10 gap-1">
-                      <span
-                        className="text-5xl md:text-6xl"
-                        role="img"
-                        aria-label={cell.iconAlt}
-                      >
-                        {cell.icon}
-                      </span>
-                      {cell.microLabel && (
-                        <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide">
-                          {cell.microLabel}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Option C: Icon + Badge */}
-                  {cell.displayType === "C" && (
-                    <div className="flex flex-col items-center justify-center z-10 relative gap-1">
-                      <span
-                        className="text-5xl md:text-6xl"
-                        role="img"
-                        aria-label={cell.iconAlt}
-                      >
-                        {cell.icon}
-                      </span>
-                      {cell.microLabel && (
-                        <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line">
-                          {cell.microLabel}
-                        </span>
-                      )}
-                      {cell.badge && (
-                        <span
-                          className={`absolute -top-1 -right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight`}
-                        >
-                          {cell.badge}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Tap indicator for mobile */}
-                  {showPreview && previewCell?.id === cell.id && (
-                    <div className="absolute inset-0 bg-white/20 dark:bg-black/20 z-5 animate-pulse"></div>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
+        {/* Landing Carousel - Replaces both mobile and desktop grids */}
+        <LandingCarousel className="w-full" />
 
         {/* Preview Modal - Mobile-first full screen */}
         {showPreview && previewCell && (
