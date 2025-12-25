@@ -2,38 +2,23 @@
 
 import Link from "next/link";
 import type React from "react";
+import { HubCell } from "./HubGrid";
 
-export interface HubCell {
-  id: string;
-  name: string;
-  emoji: string;
-  href?: string;
-  description?: string;
-  badge?: string;
-  badgeColor?: string;
-  onClick?: (e?: React.MouseEvent) => void;
-  inactiveImage?: string; // Path to image for inactive cells
-  isFlipped?: boolean; // For matching game - show description when flipped
-  isMatched?: boolean; // For matching game - card has been matched
-}
-
-interface HubGridProps {
+interface PuzzleGameGridProps {
   cells: (HubCell | null)[];
   emptyCellBg?: string;
-  onShopClick?: () => void;
 }
 
-export function HubGrid({
+export function PuzzleGameGrid({
   cells,
   emptyCellBg = "bg-gray-100 dark:bg-gray-800",
-  onShopClick,
-}: HubGridProps): JSX.Element {
-  // LandingCarousel HubGrid: exactly 15 cells (3 rows × 5 columns)
-  const gridCells = Array.from({ length: 15 }, (_, i) => cells[i] || null);
+}: PuzzleGameGridProps): JSX.Element {
+  // Puzzle Game Grid: 20 cells (4 rows × 5 columns)
+  const gridCells = Array.from({ length: 20 }, (_, i) => cells[i] || null);
 
   return (
-    <div className="flex justify-center mb-8 md:mb-12">
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 max-w-full">
+    <div className="flex justify-center mb-7 md:mb-10">
+      <div className="grid grid-cols-4 md:grid-cols-5 gap-2 max-w-full">
         {gridCells.map((cell, index) => {
           if (!cell) {
             // Empty cell
@@ -46,7 +31,7 @@ export function HubGrid({
             );
           }
 
-          // Inactive cell with image (no href, no onClick) - Landing page Hub Selector
+          // Inactive cell with image (no href, no onClick)
           if (cell.inactiveImage && !cell.href && !cell.onClick) {
             return (
               <div
@@ -57,27 +42,48 @@ export function HubGrid({
                 <img
                   src={cell.inactiveImage}
                   alt=""
-                  className="w-full h-full object-cover opacity-10"
+                  className="w-full h-full object-cover opacity-100"
                 />
               </div>
             );
           }
 
           const cellContent = (
-            <div className="w-full h-full flex flex-col items-center justify-center px-2">
-              {/* Emoji */}
-              <span
-                className="text-5xl md:text-6xl z-10"
-                role="img"
-                aria-label={cell.name}
-              >
-                {cell.emoji}
-              </span>
+            <div className="w-full h-full flex flex-col items-center justify-center px-2 relative">
+              {/* Show fact text when flipped (for matching game) */}
+              {cell.isFlipped && cell.description ? (
+                <div className="w-full h-full flex items-center justify-center p-2 z-10 relative">
+                  <p className="text-[8px] md:text-[9px] text-white/90 dark:text-white/90 font-medium text-center leading-tight line-clamp-4">
+                    {cell.description}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Image if provided (for clickable cells), otherwise emoji */}
+                  {cell.inactiveImage ? (
+                    <img
+                      src={cell.inactiveImage}
+                      alt={cell.name}
+                      className="w-full h-full object-cover opacity-100 absolute inset-0 z-0"
+                    />
+                  ) : cell.emoji ? (
+                    <span
+                      className="text-5xl md:text-6xl z-10"
+                      role="img"
+                      aria-label={cell.name}
+                    >
+                      {cell.emoji}
+                    </span>
+                  ) : null}
 
-              {/* Name/Micro-label */}
-              <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10">
-                {cell.name}
-              </span>
+                  {/* Name/Micro-label - only show if not flipped */}
+                  {cell.name && (
+                    <span className="text-[9px] md:text-[10px] text-white/90 dark:text-white/90 font-medium text-center leading-tight uppercase tracking-wide whitespace-pre-line z-10 relative">
+                      {cell.name}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           );
 
@@ -88,33 +94,10 @@ export function HubGrid({
             return (
               <button
                 key={cell.id}
-                onClick={cell.onClick}
-                className={className}
-                style={{ animationDelay: `${index * 0.2}s` }}
-                aria-label={cell.description || cell.name}
-              >
-                {/* Badge - positioned relative to cell container */}
-                {cell.badge && (
-                  <div
-                    className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
-                  >
-                    {cell.badge}
-                  </div>
-                )}
-                {cellContent}
-              </button>
-            );
-          }
-
-          // If shop link and onShopClick callback provided, use button instead of Link
-          if (cell.href === "/shop" && onShopClick) {
-            return (
-              <button
-                key={cell.id}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  onShopClick();
+                  cell.onClick?.(e);
                 }}
                 className={className}
                 style={{ animationDelay: `${index * 0.2}s` }}

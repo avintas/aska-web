@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { HubGrid } from "./HubGrid";
-import { carouselCards, type CarouselCard } from "@/config/carousel-cards";
+import { PuzzleGameGrid } from "./PuzzleGameGrid";
+import { HubCell } from "./HubGrid";
 
-interface LandingCarouselProps {
+interface DidYouKnowCarouselProps {
+  cells: (HubCell | null)[][]; // Array of arrays, each inner array has 20 cells (4 rows × 5 columns)
   className?: string;
-  onShopClick?: () => void;
 }
 
-export function LandingCarousel({
+export function DidYouKnowCarousel({
+  cells,
   className = "",
-  onShopClick,
-}: LandingCarouselProps): JSX.Element {
+}: DidYouKnowCarouselProps): JSX.Element {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -58,19 +58,23 @@ export function LandingCarousel({
       {/* Carousel Container */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex touch-pan-y">
-          {carouselCards.map((card) => (
-            <CarouselSlide
-              key={card.id}
-              card={card}
-              onShopClick={onShopClick}
-            />
+          {cells.map((slideCells, slideIndex) => (
+            <div
+              key={slideIndex}
+              className="flex-[0_0_100%] min-w-0 px-2 md:px-4"
+            >
+              <div className="flex flex-col items-center">
+                {/* Use PuzzleGameGrid component - separate from LandingCarousel HubGrid */}
+                <PuzzleGameGrid cells={slideCells} />
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Dots Indicator */}
       {scrollSnaps.length > 1 && (
-        <div className="flex justify-center gap-1.5 mt-4.5 md:mt-6">
+        <div className="flex justify-center gap-1.5 mt-5 md:mt-7">
           {scrollSnaps.map((_, index) => (
             <button
               key={index}
@@ -86,29 +90,6 @@ export function LandingCarousel({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-interface CarouselSlideProps {
-  card: CarouselCard;
-  onShopClick?: () => void;
-}
-
-function CarouselSlide({ card, onShopClick }: CarouselSlideProps): JSX.Element {
-  return (
-    <div className="flex-[0_0_100%] min-w-0 px-2 md:px-4">
-      <div className="flex flex-col items-center">
-        {/* Optional Card Title */}
-        {card.title && (
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4.5 md:mb-6">
-            {card.title}
-          </h2>
-        )}
-
-        {/* Grid */}
-        <HubGrid cells={card.cells} onShopClick={onShopClick} />
-      </div>
     </div>
   );
 }

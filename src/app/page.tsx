@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LandingCarousel } from "@/components/LandingCarousel";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { StoreModal } from "@/components/StoreModal";
 
 // Cell display type: A = icon-only, B = icon + micro-label, C = icon + badge
 type CellDisplayType = "A" | "B" | "C";
@@ -26,8 +28,7 @@ export default function Home(): JSX.Element {
   const router = useRouter();
   const [previewCell, setPreviewCell] = useState<CellConfig | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(false);
-  const [showExtraModal, setShowExtraModal] = useState(false);
+  const [showStoreModal, setShowStoreModal] = useState(false);
 
   // Newsletter form state
   const [email, setEmail] = useState("");
@@ -369,149 +370,44 @@ export default function Home(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-20 pb-16 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-14 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* OnlyHockey Branding - Above the grid */}
-        <div className="text-center mb-16 md:mb-20">
+        <div className="text-center mb-12 md:mb-14">
           {/* Title Area */}
-          <div className="flex flex-col items-center gap-3 md:gap-4 max-w-4xl mx-auto mb-6 md:mb-8">
+          <div className="text-center mb-12 md:mb-14">
             {/* Main Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight mb-3 md:mb-4">
               There Is Only Hockey!
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider text-center">
+            <p className="text-lg md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider text-center mb-2.5">
               L❤️VE FOR THE GAME IS ALL YOU NEED
+            </p>
+            <p className="text-sm md:text-xs text-gray-600 dark:text-gray-400 font-semibold text-center italic mb-6 md:mb-8">
+              — Captain Heart
             </p>
           </div>
 
-          {/* Round Navigation Buttons - Game Boy Style */}
-          <div className="flex justify-center gap-4 md:gap-6 mb-6 md:mb-8">
-            <button
-              onClick={() => router.push("/")}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-900 bg-white hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center font-bold text-gray-900 text-sm md:text-base shadow-lg hover:shadow-xl active:shadow-md"
-              aria-label="Home"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => setShowInfoModal(true)}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-900 bg-white hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center font-bold text-gray-900 text-sm md:text-base shadow-lg hover:shadow-xl active:shadow-md"
-              aria-label="Info"
-            >
-              Info
-            </button>
-            <button
-              onClick={() => setShowExtraModal(true)}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-900 bg-white hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center font-bold text-gray-900 text-sm md:text-base shadow-lg hover:shadow-xl active:shadow-md"
-              aria-label="Extras"
-            >
-              Extras
-            </button>
+          {/* Round Navigation Buttons */}
+          <div className="mb-10 md:mb-12">
+            <PageNavigationButtons
+              homeLabel="Home"
+              homeHref="/"
+              infoTitle="Info"
+              infoContent="We launched OnlyHockey as a tribute to the great Game of Hockey. Here, you can immerse yourself in the curiosities of hockey culture and interesting facts from the sport's past and present. Challenge yourself and your friends to engaging hockey trivia and get a motivational boost from legendary coaches and iconic players. We hope you will discover what makes our hockey community so special. 🏠✨"
+              extrasTitle="Extras"
+              extrasContent="Settings and other options coming soon..."
+            />
           </div>
         </div>
 
         {/* Landing Carousel - Replaces both mobile and desktop grids */}
-        <LandingCarousel className="w-full" />
-
-        {/* Info Modal */}
-        {showInfoModal && (
-          <div
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
-            onClick={() => setShowInfoModal(false)}
-          >
-            <div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-4 border-gray-900"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-4 md:p-6 border-b-4 border-gray-900">
-                <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-                  Info
-                </h2>
-                <button
-                  onClick={() => setShowInfoModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-2"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Modal Content */}
-              <div className="p-4 md:p-6">
-                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  We launched OnlyHockey as a tribute to the great Game of
-                  Hockey. Here, you can immerse yourself in the curiosities of
-                  hockey culture and interesting facts from the sport&apos;s
-                  past and present. Challenge yourself and your friends to
-                  engaging hockey trivia and get a motivational boost from
-                  legendary coaches and iconic players. We hope you will
-                  discover what makes our hockey community so special. 🏠✨
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Extra Modal */}
-        {showExtraModal && (
-          <div
-            className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
-            onClick={() => setShowExtraModal(false)}
-          >
-            <div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-4 border-gray-900"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-4 md:p-6 border-b-4 border-gray-900">
-                <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-                  Extras
-                </h2>
-                <button
-                  onClick={() => setShowExtraModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-2"
-                  aria-label="Close"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Modal Content */}
-              <div className="p-4 md:p-6">
-                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Settings and other options coming soon...
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <LandingCarousel
+          className="w-full"
+          onShopClick={() => setShowStoreModal(true)}
+        />
 
         {/* Preview Modal - Mobile-first full screen */}
         {showPreview && previewCell && (
@@ -627,9 +523,9 @@ export default function Home(): JSX.Element {
         )}
 
         {/* Call to Action - Play Now */}
-        <div className="flex flex-col items-center gap-10 mt-12">
+        <div className="flex flex-col items-center gap-8 mt-10">
           <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
               Ready to Play?
             </h2>
             <p className="text-base text-gray-600 dark:text-gray-400">
@@ -638,8 +534,8 @@ export default function Home(): JSX.Element {
           </div>
 
           {/* Newsletter Sign-Up - Low-key */}
-          <div className="w-full max-w-md pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-center gap-2 mb-5">
+          <div className="w-full max-w-md pt-4.5 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center gap-1.5 mb-4">
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                 Want hockey trivia updates?
               </p>
@@ -654,9 +550,9 @@ export default function Home(): JSX.Element {
             </div>
             <form
               onSubmit={handleNewsletterSubmit}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-3"
             >
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-1.5">
                 <input
                   type="email"
                   value={email}
@@ -687,12 +583,18 @@ export default function Home(): JSX.Element {
                 </div>
               )}
             </form>
-            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-4">
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
               No spam, just hockey. Unsubscribe anytime.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Store Modal */}
+      <StoreModal
+        isOpen={showStoreModal}
+        onClose={() => setShowStoreModal(false)}
+      />
     </div>
   );
 }
