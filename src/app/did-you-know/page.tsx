@@ -261,15 +261,13 @@ export default function DidYouKnowPage(): JSX.Element {
                         const isFlipped = flippedCards.has(cardId);
                         const isMatched = matchedCards.has(cardId);
 
-                        // Alternate between player images and HCIP images for visual variety
+                        // Alternate between player images (now hcip-41 to hcip-52) and HCIP images for visual variety
                         const usePlayerImage = cellIndex % 2 === 0;
                         const imageNumber = usePlayerImage
-                          ? (factIndex % 12) + 1 // Player images 1-12
+                          ? (factIndex % 12) + 41 // Player images now hcip-41 through hcip-52
                           : (globalIndex % 40) + 1; // HCIP images 1-40
 
-                        const imagePath = usePlayerImage
-                          ? `/player_${imageNumber}.png`
-                          : `/hcip-${imageNumber}.png`;
+                        const imagePath = `/hcip-${imageNumber}.png`;
 
                         return {
                           id: cardId,
