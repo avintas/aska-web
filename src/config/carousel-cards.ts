@@ -6,6 +6,16 @@ export interface CarouselCard {
   cells: (HubCell | null)[];
 }
 
+// Helper function to create inactive cell with image
+function createInactiveCell(imageNumber: number): HubCell {
+  return {
+    id: `inactive-${imageNumber}`,
+    name: "",
+    emoji: "",
+    inactiveImage: `/HCIP-${imageNumber}.png`, // Adjust extension if needed (.jpg, .webp, etc.)
+  };
+}
+
 /**
  * Carousel Cards Configuration
  *
@@ -18,13 +28,13 @@ export interface CarouselCard {
  * (checkerboard, diamond, 3-in-a-row, etc.)
  */
 export const carouselCards: CarouselCard[] = [
-  // Card 1: Landing Page - Diamond Layout
+  // Card 1: Landing Page - Diamond Layout with inactive cells
   {
     id: 1,
-    title: "Main Menu",
+    title: "Hub Selector",
     cells: [
-      null, // Row 0, Col 0
-      null, // Row 0, Col 1
+      createInactiveCell(1), // Row 0, Col 0
+      createInactiveCell(2), // Row 0, Col 1
       {
         id: "trivia-arena",
         name: "PLAY\nTRIVIA ARENA",
@@ -34,9 +44,9 @@ export const carouselCards: CarouselCard[] = [
         badge: "PLAY",
         badgeColor: "bg-green-500",
       }, // Row 0, Col 2 (top center)
-      null, // Row 0, Col 3
-      null, // Row 0, Col 4
-      null, // Row 1, Col 0 (moved to Row 1, Col 1)
+      createInactiveCell(3), // Row 0, Col 3
+      createInactiveCell(4), // Row 0, Col 4
+      createInactiveCell(5), // Row 1, Col 0
       {
         id: "motivators",
         name: "MOTIVATORS!",
@@ -45,8 +55,8 @@ export const carouselCards: CarouselCard[] = [
         description: "Get motivated with daily inspiration",
         badge: "SHARE",
         badgeColor: "bg-blue-500",
-      }, // Row 1, Col 1 (moved from Row 1, Col 0)
-      null, // Row 1, Col 2
+      }, // Row 1, Col 1
+      createInactiveCell(6), // Row 1, Col 2
       {
         id: "did-you-know",
         name: "DID YOU\nKNOW?",
@@ -55,10 +65,10 @@ export const carouselCards: CarouselCard[] = [
         description: "Discover interesting hockey facts",
         badge: "FACTS",
         badgeColor: "bg-yellow-500",
-      }, // Row 1, Col 3 (moved from Row 1, Col 4)
-      null, // Row 1, Col 4 (moved to Row 1, Col 3)
-      null, // Row 2, Col 0
-      null, // Row 2, Col 1
+      }, // Row 1, Col 3
+      createInactiveCell(7), // Row 1, Col 4
+      createInactiveCell(8), // Row 2, Col 0
+      createInactiveCell(9), // Row 2, Col 1
       {
         id: "shop",
         name: "STORE",
@@ -68,8 +78,8 @@ export const carouselCards: CarouselCard[] = [
         badge: "SHOP",
         badgeColor: "bg-purple-500",
       }, // Row 2, Col 2 (bottom center)
-      null, // Row 2, Col 3
-      null, // Row 2, Col 4
+      createInactiveCell(10), // Row 2, Col 3
+      createInactiveCell(11), // Row 2, Col 4
     ],
   },
 

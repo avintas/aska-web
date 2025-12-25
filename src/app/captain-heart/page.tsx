@@ -376,7 +376,17 @@ export default function CaptainHeartPage(): JSX.Element {
               },
             );
 
-            return <HubGrid cells={gridCells} />;
+            return (
+              <>
+                {/* Hub Title */}
+                <div className="text-center mb-4 md:mb-6">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                    Hub Selector
+                  </h2>
+                </div>
+                <HubGrid cells={gridCells} />
+              </>
+            );
           })()}
 
         {/* Daily Selections List - Bubble CTAs */}

@@ -11,6 +11,7 @@ export interface HubCell {
   badge?: string;
   badgeColor?: string;
   onClick?: () => void;
+  inactiveImage?: string; // Path to image for inactive cells
 }
 
 interface HubGridProps {
@@ -40,17 +41,25 @@ export function HubGrid({
             );
           }
 
-          const cellContent = (
-            <div className="w-full h-full flex flex-col items-center justify-center px-2 relative">
-              {/* Badge */}
-              {cell.badge && (
-                <div
-                  className={`absolute -top-1 -right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
-                >
-                  {cell.badge}
-                </div>
-              )}
+          // Inactive cell with image
+          if (cell.inactiveImage && !cell.href && !cell.onClick) {
+            return (
+              <div
+                key={`inactive-${index}`}
+                className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 ${emptyCellBg} rounded-lg overflow-hidden`}
+                aria-hidden="true"
+              >
+                <img
+                  src={cell.inactiveImage}
+                  alt=""
+                  className="w-full h-full object-cover opacity-10"
+                />
+              </div>
+            );
+          }
 
+          const cellContent = (
+            <div className="w-full h-full flex flex-col items-center justify-center px-2">
               {/* Emoji */}
               <span
                 className="text-5xl md:text-6xl z-10"
@@ -79,6 +88,14 @@ export function HubGrid({
                 style={{ animationDelay: `${index * 0.2}s` }}
                 aria-label={cell.description || cell.name}
               >
+                {/* Badge - positioned relative to cell container */}
+                {cell.badge && (
+                  <div
+                    className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
+                  >
+                    {cell.badge}
+                  </div>
+                )}
                 {cellContent}
               </button>
             );
@@ -92,6 +109,14 @@ export function HubGrid({
               style={{ animationDelay: `${index * 0.2}s` }}
               aria-label={cell.description || cell.name}
             >
+              {/* Badge - positioned relative to cell container */}
+              {cell.badge && (
+                <div
+                  className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
+                >
+                  {cell.badge}
+                </div>
+              )}
               {cellContent}
             </Link>
           );

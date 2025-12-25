@@ -68,17 +68,24 @@ export default function TriviaArenaPage(): JSX.Element {
         <div className="text-center mb-16 md:mb-20">
           <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
             <span className="text-5xl md:text-6xl lg:text-7xl">🎯</span>
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
               Trivia Arena
             </h1>
           </div>
           <div className="max-w-2xl mx-auto">
-            <p className="text-lg md:text-xl lg:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
+            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Welcome to Trivia Arena, your hub for our collection of
               interactive trivia games. Test your knowledge across a variety of
               challenges and compete to see how well you know the game.
             </p>
           </div>
+        </div>
+
+        {/* Hub Title */}
+        <div className="text-center mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+            Hub Selector
+          </h2>
         </div>
 
         {/* 3x5 Hub Grid */}

@@ -73,6 +73,13 @@ export default function MotivatorsPage(): JSX.Element {
           </div>
         </div>
 
+        {/* Hub Title */}
+        <div className="text-center mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+            Hub Selector
+          </h2>
+        </div>
+
         {/* 3x5 Hub Grid */}
         <HubGrid cells={GRID_CELLS} />
 
