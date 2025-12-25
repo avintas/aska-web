@@ -12,7 +12,7 @@ function createInactiveCell(imageNumber: number): HubCell {
     id: `inactive-${imageNumber}`,
     name: "",
     emoji: "",
-    inactiveImage: `/HCIP-${imageNumber}.png`, // Adjust extension if needed (.jpg, .webp, etc.)
+    inactiveImage: `/hcip-${imageNumber}.png`, // Adjust extension if needed (.jpg, .webp, etc.)
   };
 }
 
