@@ -88,8 +88,8 @@ export const carouselCards: CarouselCard[] = [
     id: 2,
     title: "Trivia Arena",
     cells: [
-      null, // Row 0, Col 0
-      null, // Row 0, Col 1
+      createInactiveCell(12), // Row 0, Col 0
+      createInactiveCell(13), // Row 0, Col 1
       {
         id: "bench-boss-trivia",
         name: "Bench Boss",
@@ -97,9 +97,9 @@ export const carouselCards: CarouselCard[] = [
         href: "/trivia-arena/bench-boss",
         description: "Trivia challenges from Bench Boss",
       }, // Row 0, Col 2
-      null, // Row 0, Col 3
-      null, // Row 0, Col 4
-      null, // Row 1, Col 0
+      createInactiveCell(14), // Row 0, Col 3
+      createInactiveCell(15), // Row 0, Col 4
+      createInactiveCell(16), // Row 1, Col 0
       {
         id: "captain-heart-trivia",
         name: "Captain Heart",
@@ -121,8 +121,8 @@ export const carouselCards: CarouselCard[] = [
         href: "/trivia-arena/historian",
         description: "Historical trivia and facts",
       }, // Row 1, Col 3
-      null, // Row 1, Col 4
-      null, // Row 2, Col 0
+      createInactiveCell(17), // Row 1, Col 4
+      createInactiveCell(18), // Row 2, Col 0
       {
         id: "the-ref",
         name: "The Ref",
@@ -130,7 +130,7 @@ export const carouselCards: CarouselCard[] = [
         href: "/trivia-arena/the-ref",
         description: "Rules and regulations trivia",
       }, // Row 2, Col 1
-      null, // Row 2, Col 2
+      createInactiveCell(19), // Row 2, Col 2
       {
         id: "rink-philosopher-trivia",
         name: "Rink Philosopher",
@@ -138,7 +138,7 @@ export const carouselCards: CarouselCard[] = [
         href: "/trivia-arena/rink-philosopher",
         description: "Wisdom and knowledge trivia",
       }, // Row 2, Col 3
-      null, // Row 2, Col 4
+      createInactiveCell(20), // Row 2, Col 4
     ],
   },
 
@@ -147,12 +147,12 @@ export const carouselCards: CarouselCard[] = [
     id: 3,
     title: "Pass Around",
     cells: [
-      null, // Row 0, Col 0
-      null, // Row 0, Col 1
-      null, // Row 0, Col 2
-      null, // Row 0, Col 3
-      null, // Row 0, Col 4
-      null, // Row 1, Col 0
+      createInactiveCell(21), // Row 0, Col 0
+      createInactiveCell(23), // Row 0, Col 1 (skipping 22 as it doesn't exist)
+      createInactiveCell(24), // Row 0, Col 2
+      createInactiveCell(25), // Row 0, Col 3
+      createInactiveCell(26), // Row 0, Col 4
+      createInactiveCell(27), // Row 1, Col 0
       {
         id: "bench-boss-motivators",
         name: "Bench Boss",
@@ -183,12 +183,12 @@ export const carouselCards: CarouselCard[] = [
         badge: "SHARE",
         badgeColor: "bg-indigo-500",
       }, // Row 1, Col 3
-      null, // Row 1, Col 4
-      null, // Row 2, Col 0
-      null, // Row 2, Col 1
-      null, // Row 2, Col 2
-      null, // Row 2, Col 3
-      null, // Row 2, Col 4
+      createInactiveCell(28), // Row 1, Col 4
+      createInactiveCell(29), // Row 2, Col 0
+      createInactiveCell(30), // Row 2, Col 1
+      createInactiveCell(31), // Row 2, Col 2
+      createInactiveCell(32), // Row 2, Col 3
+      createInactiveCell(33), // Row 2, Col 4
     ],
   },
 
@@ -197,13 +197,13 @@ export const carouselCards: CarouselCard[] = [
     id: 4,
     title: "Store",
     cells: [
-      null, // Row 0, Col 0
-      null, // Row 0, Col 1
-      null, // Row 0, Col 2
-      null, // Row 0, Col 3
-      null, // Row 0, Col 4
-      null, // Row 1, Col 0
-      null, // Row 1, Col 1
+      createInactiveCell(34), // Row 0, Col 0
+      createInactiveCell(35), // Row 0, Col 1
+      createInactiveCell(36), // Row 0, Col 2
+      createInactiveCell(37), // Row 0, Col 3
+      createInactiveCell(38), // Row 0, Col 4
+      createInactiveCell(39), // Row 1, Col 0
+      createInactiveCell(40), // Row 1, Col 1
       {
         id: "shop-store",
         name: "STORE",
@@ -214,13 +214,13 @@ export const carouselCards: CarouselCard[] = [
         badge: "COMING SOON",
         badgeColor: "bg-gray-500",
       }, // Row 1, Col 2 (center)
-      null, // Row 1, Col 3
-      null, // Row 1, Col 4
-      null, // Row 2, Col 0
-      null, // Row 2, Col 1
-      null, // Row 2, Col 2
-      null, // Row 2, Col 3
-      null, // Row 2, Col 4
+      createInactiveCell(1), // Row 1, Col 3 (cycling back)
+      createInactiveCell(2), // Row 1, Col 4 (cycling back)
+      createInactiveCell(3), // Row 2, Col 0 (cycling back)
+      createInactiveCell(4), // Row 2, Col 1 (cycling back)
+      createInactiveCell(5), // Row 2, Col 2 (cycling back)
+      createInactiveCell(6), // Row 2, Col 3 (cycling back)
+      createInactiveCell(7), // Row 2, Col 4 (cycling back)
     ],
   },
 ];

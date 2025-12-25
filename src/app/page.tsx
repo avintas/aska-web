@@ -373,19 +373,17 @@ export default function Home(): JSX.Element {
       <div className="max-w-7xl mx-auto">
         {/* OnlyHockey Branding - Above the grid */}
         <div className="text-center mb-16 md:mb-20">
-          {/* Game Boy Green Title Area */}
-          <div className="bg-[#9bbc0f] rounded-lg px-6 py-4 md:px-8 md:py-6 mb-6 md:mb-8 max-w-4xl mx-auto">
-            <div className="flex flex-col items-center gap-3 md:gap-4">
-              {/* Main Title */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 text-center leading-tight">
-                There Is Only Hockey!
-              </h1>
+          {/* Title Area */}
+          <div className="flex flex-col items-center gap-3 md:gap-4 max-w-4xl mx-auto mb-6 md:mb-8">
+            {/* Main Title */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight">
+              There Is Only Hockey!
+            </h1>
 
-              {/* Subtitle */}
-              <p className="text-lg md:text-sm text-yellow-600 font-bold uppercase tracking-wider text-center">
-                L❤️VE FOR THE GAME IS ALL YOU NEED
-              </p>
-            </div>
+            {/* Subtitle */}
+            <p className="text-lg md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider text-center">
+              L❤️VE FOR THE GAME IS ALL YOU NEED
+            </p>
           </div>
 
           {/* Round Navigation Buttons - Game Boy Style */}
@@ -407,9 +405,9 @@ export default function Home(): JSX.Element {
             <button
               onClick={() => setShowExtraModal(true)}
               className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-900 bg-white hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center font-bold text-gray-900 text-sm md:text-base shadow-lg hover:shadow-xl active:shadow-md"
-              aria-label="Extra"
+              aria-label="Extras"
             >
-              Extra
+              Extras
             </button>
           </div>
         </div>
@@ -482,7 +480,7 @@ export default function Home(): JSX.Element {
               {/* Modal Header */}
               <div className="flex items-center justify-between p-4 md:p-6 border-b-4 border-gray-900">
                 <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-                  Extra
+                  Extras
                 </h2>
                 <button
                   onClick={() => setShowExtraModal(false)}
