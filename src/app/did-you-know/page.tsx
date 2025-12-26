@@ -185,27 +185,10 @@ export default function DidYouKnowPage(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-14 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-8 pb-14 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-14 md:mb-16">
-          <div className="flex items-center justify-center gap-1.5 md:gap-2.5 mb-3.5 md:mb-4">
-            <span className="text-2xl md:text-3xl lg:text-4xl">💡</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
-              Did You Know?
-            </h1>
-          </div>
-          <p className="text-lg md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider text-center max-w-3xl mx-auto px-4 md:px-0 mb-2.5">
-            &ldquo;Take pride in being prepared. Every practice, every game,
-            give it everything you&apos;ve got.&rdquo;
-          </p>
-          <p className="text-sm md:text-xs text-gray-600 dark:text-gray-400 font-semibold text-center italic mb-7 md:mb-8">
-            — Bench Boss
-          </p>
-        </div>
-
-        {/* Round Navigation Buttons */}
-        <div className="mb-10 md:mb-14">
+        {/* Hardware Buttons - Above the Screen */}
+        <div className="mb-6 md:mb-8">
           <PageNavigationButtons
             homeLabel="Home"
             homeHref="/"
@@ -216,110 +199,131 @@ export default function DidYouKnowPage(): JSX.Element {
           />
         </div>
 
-        {/* Hub Selector Carousel - Puzzle Game (Prototype) */}
-        {!loading &&
-          !error &&
-          items.length > 0 &&
-          ((): JSX.Element => {
-            // Generate pairs for matching game - need 10 pairs (20 cards total)
-            const factPairs = generateFactPairs(items);
-            const pairsToUse = factPairs.slice(0, 10); // Exactly 10 pairs
-
-            // Create array with pairs duplicated (each fact appears twice)
-            const pairedFacts: FactItem[] = [];
-            pairsToUse.forEach((pair) => {
-              pairedFacts.push(pair.fact);
-              pairedFacts.push(pair.fact); // Add same fact twice for matching
-            });
-
-            return (
-              <div className="mb-10 md:mb-14">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-5 md:mb-7 text-center">
-                  Match the Facts - Puzzle Game
-                </h2>
-                <DidYouKnowCarousel
-                  cells={Array.from({ length: 5 }, (_, slideIndex) => {
-                    // Create 5 slides, each with 20 cells (4 rows × 5 columns)
-                    // Each slide gets a different set of facts
-                    const factsPerSlide = Math.ceil(pairedFacts.length / 5);
-                    const slideStartIndex = slideIndex * factsPerSlide;
-
-                    return Array.from(
-                      { length: 20 },
-                      (_, cellIndex): HubCell | null => {
-                        // Calculate global index across all slides
-                        const globalIndex = slideIndex * 20 + cellIndex;
-
-                        // Every cell is flippable - assign a fact to each cell
-                        const factIndex = slideStartIndex + cellIndex;
-                        const fact =
-                          pairedFacts[factIndex % pairedFacts.length];
-
-                        if (!fact) return null;
-
-                        const cardId = `cell-${slideIndex}-${cellIndex}`;
-                        const isFlipped = flippedCards.has(cardId);
-                        const isMatched = matchedCards.has(cardId);
-
-                        // Alternate between player images (now hcip-41 to hcip-52) and HCIP images for visual variety
-                        const usePlayerImage = cellIndex % 2 === 0;
-                        const imageNumber = usePlayerImage
-                          ? (factIndex % 12) + 41 // Player images now hcip-41 through hcip-52
-                          : (globalIndex % 40) + 1; // HCIP images 1-40
-
-                        const imagePath = `/hcip-${imageNumber}.png`;
-
-                        return {
-                          id: cardId,
-                          name: "", // No category name
-                          emoji: "", // No emoji
-                          inactiveImage: imagePath, // Use player or HCIP image
-                          description: fact.fact_text.substring(0, 80), // Show fact text when flipped
-                          isFlipped: isFlipped || isMatched, // Show fact text when flipped or matched
-                          isMatched: isMatched,
-                          onClick: (e?: React.MouseEvent): void => {
-                            if (e) {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }
-
-                            // Open modal with the fact text
-                            setSelectedItem(fact);
-                            setIsModalOpen(true);
-
-                            // Also handle card flip for matching game (if not matched and not processing)
-                            if (!isMatched && !isProcessing) {
-                              handleCardClick(cardId, fact);
-                            }
-                          },
-                          // Add badge for matched cards
-                          badge: isMatched ? "✓" : undefined,
-                          badgeColor: isMatched ? "bg-green-500" : undefined,
-                        };
-                      },
-                    );
-                  })}
-                />
+        {/* Game Boy Device Container - Screen + Buttons aligned */}
+        <div className="flex flex-col items-center">
+          {/* Game Boy Screen - Title Display Only */}
+          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] border-4 border-gray-800 dark:border-gray-300 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
+            {/* Screen Inner Bezel */}
+            <div className="border-2 border-gray-600 dark:border-gray-500 rounded bg-gradient-to-b from-green-200/80 to-green-100/80 dark:from-green-900/30 dark:to-green-800/20 p-4 md:p-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-2xl md:text-3xl">💡</span>
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight">
+                    Did You Know?
+                  </h1>
+                </div>
+                <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 font-light">
+                  Discover fascinating hockey facts
+                </p>
               </div>
-            );
-          })()}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <p className="mt-3.5 text-gray-600 dark:text-gray-400">
-              Loading facts...
-            </p>
+            </div>
           </div>
-        )}
 
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-5 text-center">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
-          </div>
-        )}
+          {/* Puzzle Game Grid Section (Dial Pad) */}
+          {!loading &&
+            !error &&
+            items.length > 0 &&
+            ((): JSX.Element => {
+              // Generate pairs for matching game - need 10 pairs (20 cards total)
+              const factPairs = generateFactPairs(items);
+              const pairsToUse = factPairs.slice(0, 10); // Exactly 10 pairs
+
+              // Create array with pairs duplicated (each fact appears twice)
+              const pairedFacts: FactItem[] = [];
+              pairsToUse.forEach((pair) => {
+                pairedFacts.push(pair.fact);
+                pairedFacts.push(pair.fact); // Add same fact twice for matching
+              });
+
+              return (
+                <div className="mb-10 md:mb-14">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-5 md:mb-7 text-center">
+                    Play Puzzle Game
+                  </h2>
+                  <DidYouKnowCarousel
+                    cells={Array.from({ length: 5 }, (_, slideIndex) => {
+                      // Create 5 slides, each with 20 cells (4 rows × 5 columns)
+                      // Each slide gets a different set of facts
+                      const factsPerSlide = Math.ceil(pairedFacts.length / 5);
+                      const slideStartIndex = slideIndex * factsPerSlide;
+
+                      return Array.from(
+                        { length: 20 },
+                        (_, cellIndex): HubCell | null => {
+                          // Calculate global index across all slides
+                          const globalIndex = slideIndex * 20 + cellIndex;
+
+                          // Every cell is flippable - assign a fact to each cell
+                          const factIndex = slideStartIndex + cellIndex;
+                          const fact =
+                            pairedFacts[factIndex % pairedFacts.length];
+
+                          if (!fact) return null;
+
+                          const cardId = `cell-${slideIndex}-${cellIndex}`;
+                          const isFlipped = flippedCards.has(cardId);
+                          const isMatched = matchedCards.has(cardId);
+
+                          // Alternate between player images (now hcip-41 to hcip-52) and HCIP images for visual variety
+                          const usePlayerImage = cellIndex % 2 === 0;
+                          const imageNumber = usePlayerImage
+                            ? (factIndex % 12) + 41 // Player images now hcip-41 through hcip-52
+                            : (globalIndex % 40) + 1; // HCIP images 1-40
+
+                          const imagePath = `/hcip-${imageNumber}.png`;
+
+                          return {
+                            id: cardId,
+                            name: "", // No category name
+                            emoji: "", // No emoji
+                            inactiveImage: imagePath, // Use player or HCIP image
+                            description: fact.fact_text.substring(0, 80), // Show fact text when flipped
+                            isFlipped: isFlipped || isMatched, // Show fact text when flipped or matched
+                            isMatched: isMatched,
+                            onClick: (e?: React.MouseEvent): void => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+
+                              // Open modal with the fact text
+                              setSelectedItem(fact);
+                              setIsModalOpen(true);
+
+                              // Also handle card flip for matching game (if not matched and not processing)
+                              if (!isMatched && !isProcessing) {
+                                handleCardClick(cardId, fact);
+                              }
+                            },
+                            // Add badge for matched cards
+                            badge: isMatched ? "✓" : undefined,
+                            badgeColor: isMatched ? "bg-green-500" : undefined,
+                          };
+                        },
+                      );
+                    })}
+                  />
+                </div>
+              );
+            })()}
+
+          {/* Loading State - Spinner below screen */}
+          {loading && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
+              <p className="mt-3 text-gray-600 dark:text-gray-400">
+                Loading facts...
+              </p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center">
+              <p className="text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal Dialog */}

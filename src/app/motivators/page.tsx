@@ -5,6 +5,7 @@ import type React from "react";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 import { MotivatorsCarousel } from "@/components/MotivatorsCarousel";
 import { HubCell } from "@/components/HubGrid";
+import { getImage } from "@/config/image-mappings";
 
 interface MotivatorItem {
   id: number;
@@ -14,53 +15,6 @@ interface MotivatorItem {
   set_attribution: string | null;
   set_category: string | null;
   set_theme: string | null;
-}
-
-// Category to image mapping - MCIP for categories with dedicated images, HCIP for others
-const CATEGORY_MCIP_MAP: Record<string, number> = {
-  "bounce back": 1,
-  celebration: 2,
-  discipline: 3,
-  focus: 4,
-  glory: 5,
-  "good luck": 6,
-  leadership: 7,
-  team: 8,
-};
-
-const CATEGORY_HCIP_MAP: Record<string, number> = {
-  grit: 2,
-  "hard work": 3,
-  "i'm proud": 4,
-  mindset: 5,
-  perseverance: 6,
-  resilience: 7,
-  teamwork: 8,
-  "the code": 9,
-  "the flow": 10,
-  "the grind": 11,
-  "the room": 12,
-};
-
-// Default image for unknown categories
-const DEFAULT_HCIP_IMAGE = 21;
-
-// Get image path based on category
-function getCategoryImage(category: string | null): string {
-  if (!category) {
-    return `/hcip-${DEFAULT_HCIP_IMAGE}.png`;
-  }
-  const normalizedCategory = category.toLowerCase().trim();
-
-  // Check MCIP first (categories with dedicated labeled images)
-  if (normalizedCategory in CATEGORY_MCIP_MAP) {
-    return `/mcip-${CATEGORY_MCIP_MAP[normalizedCategory]}.png`;
-  }
-
-  // Fall back to HCIP for remaining categories
-  const hcipNumber =
-    CATEGORY_HCIP_MAP[normalizedCategory] ?? DEFAULT_HCIP_IMAGE;
-  return `/hcip-${hcipNumber}.png`;
 }
 
 // Fisher-Yates shuffle to randomize items
@@ -185,7 +139,10 @@ export default function MotivatorsPage(): JSX.Element {
             id: cardId,
             name: "",
             emoji: "",
-            inactiveImage: getCategoryImage(item.set_category),
+            inactiveImage: getImage(
+              "motivationalCategories",
+              item.set_category,
+            ),
             description: item.quote.substring(0, 80),
             isFlipped: isFlipped,
             onClick: (e?: React.MouseEvent): void => {
@@ -232,64 +189,68 @@ export default function MotivatorsPage(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-16 pb-14 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-8 pb-14 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-14 md:mb-16">
-          <div className="mb-4 md:mb-6">
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3 md:mb-4">
-              Pass Around
-            </h1>
-            <div className="flex justify-center">
-              <span className="text-5xl md:text-6xl lg:text-7xl">🏒</span>
-            </div>
-          </div>
-          <div className="max-w-2xl mx-auto">
-            <p className="text-lg md:text-xl lg:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
-              Get motivated with daily inspiration from hockey legends. Browse
-              curated motivational quotes and share your favorites.
-            </p>
-          </div>
-        </div>
-
-        {/* Round Navigation Buttons */}
-        <div className="mb-10 md:mb-14">
+        {/* Hardware Buttons - Above the Screen */}
+        <div className="mb-6 md:mb-8">
           <PageNavigationButtons
             homeLabel="Home"
             homeHref="/"
-            infoTitle="Pass Around - Info"
+            infoTitle="The Locker Room - Info"
             infoContent="Browse our collection of motivational quotes from Bench Boss, Captain Heart, and Rink Philosopher. Click any card to flip it and read the full quote. Share your favorites with friends and teammates!"
-            extrasTitle="Pass Around - Extras"
-            extrasContent="Additional features and options for the Pass Around page coming soon..."
+            extrasTitle="The Locker Room - Extras"
+            extrasContent="Additional features and options for The Locker Room page coming soon..."
           />
         </div>
 
-        {/* Motivators Carousel */}
-        {!loading && !error && items.length > 0 && (
-          <div className="mb-10 md:mb-14">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-5 md:mb-7 text-center">
-              Motivational Quotes
-            </h2>
-            <MotivatorsCarousel cells={generateCarouselSlides()} />
+        {/* Game Boy Device Container - Screen + Buttons aligned */}
+        <div className="flex flex-col items-center">
+          {/* Game Boy Screen - Title Display Only */}
+          {/* Width matches grid: 3 cols mobile (19.5rem), 5 cols md (42.5rem) */}
+          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] border-4 border-gray-800 dark:border-gray-300 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
+            {/* Screen Inner Bezel */}
+            <div className="border-2 border-gray-600 dark:border-gray-500 rounded bg-gradient-to-b from-green-200/80 to-green-100/80 dark:from-green-900/30 dark:to-green-800/20 p-4 md:p-6">
+              <div className="text-center">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+                  The Locker Room
+                </h1>
+                <div className="flex justify-center mb-2">
+                  <span className="text-3xl md:text-4xl">🏒</span>
+                </div>
+                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light">
+                  Daily inspiration from hockey legends
+                </p>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <p className="mt-3.5 text-gray-600 dark:text-gray-400">
-              Loading quotes...
-            </p>
-          </div>
-        )}
+          {/* The Table of Motivational Elements - Grid Section (Dial Pad) */}
+          {!loading && !error && items.length > 0 && (
+            <div className="mb-8 md:mb-10">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-5 md:mb-6 text-center">
+                The Table of Motivational Elements
+              </h2>
+              <MotivatorsCarousel cells={generateCarouselSlides()} />
+            </div>
+          )}
 
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-5 text-center">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
-          </div>
-        )}
+          {/* Loading State - Spinner below screen */}
+          {loading && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500"></div>
+              <p className="mt-3 text-gray-600 dark:text-gray-400">
+                Loading quotes...
+              </p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-center">
+              <p className="text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Modal Dialog - Game Boy Style */}
@@ -305,7 +266,7 @@ export default function MotivatorsPage(): JSX.Element {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 md:p-6 border-b-4 border-gray-900 dark:border-gray-100">
               <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-                Pass Around
+                The Locker Room
               </h2>
               <button
                 onClick={handleCloseModal}

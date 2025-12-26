@@ -370,44 +370,48 @@ export default function Home(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-14 pb-12 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-8 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* OnlyHockey Branding - Above the grid */}
-        <div className="text-center mb-12 md:mb-14">
-          {/* Title Area */}
-          <div className="text-center mb-12 md:mb-14">
-            {/* Main Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white text-center leading-tight mb-3 md:mb-4">
-              There Is Only Hockey!
-            </h1>
+        {/* Hardware Buttons - Above the Screen */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="We launched OnlyHockey as a tribute to the great Game of Hockey. Here, you can immerse yourself in the curiosities of hockey culture and interesting facts from the sport's past and present. Challenge yourself and your friends to engaging hockey trivia and get a motivational boost from legendary coaches and iconic players. We hope you will discover what makes our hockey community so special. 🏠✨"
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
 
-            {/* Subtitle */}
-            <p className="text-lg md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider text-center mb-2.5">
-              L❤️VE FOR THE GAME IS ALL YOU NEED
-            </p>
-            <p className="text-sm md:text-xs text-gray-600 dark:text-gray-400 font-semibold text-center italic mb-6 md:mb-8">
-              — Captain Heart
-            </p>
+        {/* Game Boy Device Container - Screen + Buttons aligned */}
+        <div className="flex flex-col items-center">
+          {/* Game Boy Screen - Title Display Only */}
+          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] border-4 border-gray-800 dark:border-gray-300 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
+            {/* Screen Inner Bezel */}
+            <div className="border-2 border-gray-600 dark:border-gray-500 rounded bg-gradient-to-b from-green-200/80 to-green-100/80 dark:from-green-900/30 dark:to-green-800/20 p-4 md:p-6">
+              <div className="text-center">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+                  There Is Only Hockey!
+                </h1>
+                <p className="text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider mb-1">
+                  L❤️VE FOR THE GAME IS ALL YOU NEED
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold italic">
+                  — Captain Heart
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Round Navigation Buttons */}
-          <div className="mb-10 md:mb-12">
-            <PageNavigationButtons
-              homeLabel="Home"
-              homeHref="/"
-              infoTitle="Info"
-              infoContent="We launched OnlyHockey as a tribute to the great Game of Hockey. Here, you can immerse yourself in the curiosities of hockey culture and interesting facts from the sport's past and present. Challenge yourself and your friends to engaging hockey trivia and get a motivational boost from legendary coaches and iconic players. We hope you will discover what makes our hockey community so special. 🏠✨"
-              extrasTitle="Extras"
-              extrasContent="Settings and other options coming soon..."
+          {/* Hub Selector - Grid Section (Dial Pad) */}
+          <div className="mb-8 md:mb-10">
+            <LandingCarousel
+              className="w-full"
+              onShopClick={() => setShowStoreModal(true)}
             />
           </div>
         </div>
-
-        {/* Landing Carousel - Replaces both mobile and desktop grids */}
-        <LandingCarousel
-          className="w-full"
-          onShopClick={() => setShowStoreModal(true)}
-        />
 
         {/* Preview Modal - Mobile-first full screen */}
         {showPreview && previewCell && (
@@ -522,70 +526,73 @@ export default function Home(): JSX.Element {
           </div>
         )}
 
-        {/* Call to Action - Play Now */}
-        <div className="flex flex-col items-center gap-8 mt-10">
-          <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              Ready to Play?
-            </h2>
-            <p className="text-base text-gray-600 dark:text-gray-400">
-              Tap any game above to start playing — no sign-up needed!
-            </p>
-          </div>
-
-          {/* Newsletter Sign-Up - Low-key */}
-          <div className="w-full max-w-md pt-4.5 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-center gap-1.5 mb-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                Want hockey trivia updates?
+        {/* Call to Action - Game Boy Style Card */}
+        <div className="flex justify-center mt-10">
+          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] bg-white dark:bg-gray-800 rounded-2xl shadow-xl border-4 border-gray-900 dark:border-gray-100 overflow-hidden">
+            {/* Header */}
+            <div className="p-4 md:p-6 border-b-4 border-gray-900 dark:border-gray-100 text-center">
+              <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
+                Ready to Play?
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Tap any game above to start playing — no sign-up needed!
               </p>
-              {/* Live Indicator Badge */}
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wide animate-pulse">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                Live
-              </span>
             </div>
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="flex flex-col gap-3"
-            >
-              <div className="flex flex-col sm:flex-row gap-1.5">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 text-sm rounded-lg bg-gray-700 dark:bg-gray-600 text-white font-medium hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "Subscribing..." : "Subscribe"}
-                </button>
-              </div>
 
-              {/* Success/Error Messages */}
-              {message && (
-                <div
-                  className={`text-sm text-center px-3 py-2 rounded-lg ${
-                    message.type === "success"
-                      ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                      : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
-                  }`}
-                >
-                  {message.text}
+            {/* Newsletter Sign-Up */}
+            <div className="p-4 md:p-6">
+              <div className="flex items-center justify-center gap-1.5 mb-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                  Want hockey trivia updates?
+                </p>
+                {/* Live Indicator Badge */}
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wide animate-pulse">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  Live
+                </span>
+              </div>
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="flex flex-col gap-3"
+              >
+                <div className="flex flex-col sm:flex-row gap-1.5">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2 text-sm rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-5 py-2 text-sm rounded-lg bg-gray-800 dark:bg-orange-500 text-white font-bold hover:bg-gray-900 dark:hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "Subscribing..." : "Subscribe"}
+                  </button>
                 </div>
-              )}
-            </form>
-            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
-              No spam, just hockey. Unsubscribe anytime.
-            </p>
+
+                {/* Success/Error Messages */}
+                {message && (
+                  <div
+                    className={`text-sm text-center px-3 py-2 rounded-lg ${
+                      message.type === "success"
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                        : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                    }`}
+                  >
+                    {message.text}
+                  </div>
+                )}
+              </form>
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
+                No spam, just hockey. Unsubscribe anytime.
+              </p>
+            </div>
           </div>
         </div>
       </div>
