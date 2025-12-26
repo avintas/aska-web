@@ -1,62 +1,169 @@
 "use client";
 
-import { HubGrid, type HubCell } from "@/components/HubGrid";
+import { useState, useEffect } from "react";
+import type React from "react";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { MotivatorsCarousel } from "@/components/MotivatorsCarousel";
+import { HubCell } from "@/components/HubGrid";
 
-// 3x5 grid (15 cells): Place personas in strategic positions
-// Row 1: [empty, empty, empty, empty, empty]
-// Row 2: [empty, Bench Boss, Captain Heart, Rink Philosopher, empty]
-// Row 3: [empty, empty, empty, empty, empty]
-const GRID_CELLS: (HubCell | null)[] = [
-  null, // Row 1, Col 1
-  null, // Row 1, Col 2
-  null, // Row 1, Col 3
-  null, // Row 1, Col 4
-  null, // Row 1, Col 5
-  null, // Row 2, Col 1
-  {
-    id: "bench-boss",
-    name: "Bench Boss",
-    emoji: "💪",
-    href: "/bench-boss",
-    description:
-      "Daily motivation messages from your Bench Boss. Strong, no-nonsense reminders to stay focused, train hard, and lead the shift.",
-    badge: "SHARE",
-    badgeColor: "bg-orange-500",
-  },
-  {
-    id: "captain-heart",
-    name: "Captain Heart",
-    emoji: "💙",
-    href: "/captain-heart",
-    description:
-      "Daily motivation messages from your Captain Heart. Quick, uplifting notes you can read or share anytime you need a boost.",
-    badge: "SHARE",
-    badgeColor: "bg-purple-500",
-  },
-  {
-    id: "rink-philosopher",
-    name: "Rink Philosopher",
-    emoji: "🎓",
-    href: "/rink-philosopher",
-    description:
-      "Wisdom and mindset lessons from the Rink Philosopher. Thoughtful takes to reset, refocus, and level up your game.",
-    badge: "SHARE",
-    badgeColor: "bg-indigo-500",
-  },
-  null, // Row 2, Col 5
-  null, // Row 3, Col 1
-  null, // Row 3, Col 2
-  null, // Row 3, Col 3
-  null, // Row 3, Col 4
-  null, // Row 3, Col 5
-];
+interface MotivatorItem {
+  id: number;
+  quote: string;
+  set_id: number;
+  set_title: string;
+  set_attribution: string | null;
+  set_category: string | null;
+  set_theme: string | null;
+}
 
 export default function MotivatorsPage(): JSX.Element {
+  const [items, setItems] = useState<MotivatorItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<MotivatorItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+
+  const fetchMotivators = async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/motivators");
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setItems(result.data as MotivatorItem[]);
+        setFlippedCards(new Set()); // Reset flipped cards
+      } else {
+        setError(result.error || "Failed to load motivators");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMotivators();
+  }, []);
+
+  const handleCloseModal = (): void => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
+  const handleShare = (): void => {
+    if (!selectedItem) return;
+
+    const shareText = selectedItem.quote;
+    const attributionText = selectedItem.set_attribution
+      ? ` - ${selectedItem.set_attribution}`
+      : "";
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Hockey Motivation",
+          text: `${shareText}${attributionText}`,
+        })
+        .catch((err) => {
+          console.error("Error sharing:", err);
+        });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard
+        .writeText(`${shareText}${attributionText}`)
+        .then(() => {
+          alert("Quote copied to clipboard!");
+        })
+        .catch((err) => {
+          console.error("Error copying to clipboard:", err);
+        });
+    }
+  };
+
+  // Generate carousel slides: 15 cells per slide (3×5), reserved cell at index 7
+  const generateCarouselSlides = (): (HubCell | null)[][] => {
+    const slides: (HubCell | null)[][] = [];
+    const itemsPerSlide = 14; // 15 cells - 1 reserved = 14 available
+
+    for (let i = 0; i < items.length; i += itemsPerSlide) {
+      const slideItems = items.slice(i, i + itemsPerSlide);
+      const slideCells: (HubCell | null)[] = Array.from(
+        { length: 15 },
+        (_, cellIndex) => {
+          // Reserved cell at index 7 (Row 2, Cell 3)
+          if (cellIndex === 7) {
+            return null; // Will be handled as reserved cell in MotivatorsGrid
+          }
+
+          // Calculate item index within this slide (skip index 7)
+          const itemIndex = cellIndex < 7 ? cellIndex : cellIndex - 1;
+          const item = slideItems[itemIndex];
+
+          if (!item) {
+            return null; // Empty cell
+          }
+
+          const cardId = `motivator-${i}-${cellIndex}`;
+          const isFlipped = flippedCards.has(cardId);
+          const globalIndex = i + itemIndex;
+          const hcipNumber = (globalIndex % 54) + 1;
+
+          return {
+            id: cardId,
+            name: "",
+            emoji: "",
+            inactiveImage: `/hcip-${hcipNumber}.png`,
+            description: item.quote.substring(0, 80),
+            isFlipped: isFlipped,
+            onClick: (e?: React.MouseEvent): void => {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+
+              // Flip the card
+              setFlippedCards((prev) => {
+                const next = new Set(prev);
+                if (next.has(cardId)) {
+                  next.delete(cardId);
+                } else {
+                  next.add(cardId);
+                }
+                return next;
+              });
+
+              // Open modal with the quote
+              setSelectedItem(item);
+              setIsModalOpen(true);
+            },
+          };
+        },
+      );
+
+      slides.push(slideCells);
+    }
+
+    // If no items, return at least one empty slide
+    if (slides.length === 0) {
+      const emptySlide: (HubCell | null)[] = Array.from(
+        { length: 15 },
+        (_, cellIndex) => (cellIndex === 7 ? null : null),
+      );
+      slides.push(emptySlide);
+    }
+
+    return slides;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-20 pb-16 px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-16 pb-14 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-16 md:mb-20">
+        <div className="text-center mb-14 md:mb-16">
           <div className="mb-4 md:mb-6">
             <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3 md:mb-4">
               Pass Around
@@ -67,31 +174,141 @@ export default function MotivatorsPage(): JSX.Element {
           </div>
           <div className="max-w-2xl mx-auto">
             <p className="text-lg md:text-xl lg:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
-              Get motivated with daily inspiration from hockey legends. Choose
-              your motivational coach and let them guide you to greatness.
+              Get motivated with daily inspiration from hockey legends. Browse
+              curated motivational quotes and share your favorites.
             </p>
           </div>
         </div>
 
-        {/* Hub Title */}
-        <div className="text-center mb-4 md:mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-            Hub Selector
-          </h2>
+        {/* Round Navigation Buttons */}
+        <div className="mb-10 md:mb-14">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Pass Around - Info"
+            infoContent="Browse our collection of motivational quotes from Bench Boss, Captain Heart, and Rink Philosopher. Click any card to flip it and read the full quote. Share your favorites with friends and teammates!"
+            extrasTitle="Pass Around - Extras"
+            extrasContent="Additional features and options for the Pass Around page coming soon..."
+          />
         </div>
 
-        {/* 3x5 Hub Grid */}
-        <HubGrid cells={GRID_CELLS} />
+        {/* Motivators Carousel */}
+        {!loading && !error && items.length > 0 && (
+          <div className="mb-10 md:mb-14">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-5 md:mb-7 text-center">
+              Motivational Quotes
+            </h2>
+            <MotivatorsCarousel cells={generateCarouselSlides()} />
+          </div>
+        )}
 
-        {/* Call to Action */}
-        <div className="text-center">
-          <div className="inline-block px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-light italic">
-              Select a motivator above to start your daily inspiration journey
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <p className="mt-3.5 text-gray-600 dark:text-gray-400">
+              Loading quotes...
             </p>
           </div>
-        </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-5 text-center">
+            <p className="text-red-700 dark:text-red-300">{error}</p>
+          </div>
+        )}
       </div>
+
+      {/* Modal Dialog - Game Boy Style */}
+      {isModalOpen && selectedItem && (
+        <div
+          className="fixed inset-0 bg-black/60 dark:bg-black/80 z-50 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-4 border-gray-900 dark:border-gray-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 md:p-6 border-b-4 border-gray-900 dark:border-gray-100">
+              <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
+                Pass Around
+              </h2>
+              <button
+                onClick={handleCloseModal}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-2"
+                aria-label="Close"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 md:p-6">
+              {/* Quote Text */}
+              <div className="mb-4">
+                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {selectedItem.quote}
+                </p>
+              </div>
+
+              {/* Attribution */}
+              {selectedItem.set_attribution && (
+                <div className="mb-4">
+                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-semibold italic">
+                    — {selectedItem.set_attribution}
+                  </p>
+                </div>
+              )}
+
+              {/* Set Title (optional) */}
+              {selectedItem.set_title && (
+                <div className="mb-4">
+                  <span className="inline-block bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs md:text-sm font-semibold px-3 py-1.5 rounded">
+                    {selectedItem.set_title}
+                  </span>
+                </div>
+              )}
+
+              {/* Share Button */}
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={handleShare}
+                  className="px-6 py-3 md:px-8 md:py-3 text-sm md:text-base bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 touch-manipulation"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                  </svg>
+                  Share
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
