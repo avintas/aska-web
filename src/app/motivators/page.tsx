@@ -16,11 +16,69 @@ interface MotivatorItem {
   set_theme: string | null;
 }
 
+// Category to image mapping - MCIP for categories with dedicated images, HCIP for others
+const CATEGORY_MCIP_MAP: Record<string, number> = {
+  "bounce back": 1,
+  celebration: 2,
+  discipline: 3,
+  focus: 4,
+  glory: 5,
+  "good luck": 6,
+  leadership: 7,
+  team: 8,
+};
+
+const CATEGORY_HCIP_MAP: Record<string, number> = {
+  grit: 2,
+  "hard work": 3,
+  "i'm proud": 4,
+  mindset: 5,
+  perseverance: 6,
+  resilience: 7,
+  teamwork: 8,
+  "the code": 9,
+  "the flow": 10,
+  "the grind": 11,
+  "the room": 12,
+};
+
+// Default image for unknown categories
+const DEFAULT_HCIP_IMAGE = 21;
+
+// Get image path based on category
+function getCategoryImage(category: string | null): string {
+  if (!category) {
+    return `/hcip-${DEFAULT_HCIP_IMAGE}.png`;
+  }
+  const normalizedCategory = category.toLowerCase().trim();
+
+  // Check MCIP first (categories with dedicated labeled images)
+  if (normalizedCategory in CATEGORY_MCIP_MAP) {
+    return `/mcip-${CATEGORY_MCIP_MAP[normalizedCategory]}.png`;
+  }
+
+  // Fall back to HCIP for remaining categories
+  const hcipNumber =
+    CATEGORY_HCIP_MAP[normalizedCategory] ?? DEFAULT_HCIP_IMAGE;
+  return `/hcip-${hcipNumber}.png`;
+}
+
+// Fisher-Yates shuffle to randomize items
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function MotivatorsPage(): JSX.Element {
   const [items, setItems] = useState<MotivatorItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<MotivatorItem | null>(null);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
 
@@ -33,7 +91,7 @@ export default function MotivatorsPage(): JSX.Element {
       const result = await response.json();
 
       if (result.success && result.data) {
-        setItems(result.data as MotivatorItem[]);
+        setItems(shuffleArray(result.data as MotivatorItem[]));
         setFlippedCards(new Set()); // Reset flipped cards
       } else {
         setError(result.error || "Failed to load motivators");
@@ -52,6 +110,19 @@ export default function MotivatorsPage(): JSX.Element {
   const handleCloseModal = (): void => {
     setIsModalOpen(false);
     setSelectedItem(null);
+
+    // Flip the card back after 500ms
+    if (selectedCardId) {
+      const cardIdToFlip = selectedCardId;
+      setTimeout(() => {
+        setFlippedCards((prev) => {
+          const next = new Set(prev);
+          next.delete(cardIdToFlip);
+          return next;
+        });
+      }, 500);
+    }
+    setSelectedCardId(null);
   };
 
   const handleShare = (): void => {
@@ -109,14 +180,12 @@ export default function MotivatorsPage(): JSX.Element {
 
           const cardId = `motivator-${i}-${cellIndex}`;
           const isFlipped = flippedCards.has(cardId);
-          const globalIndex = i + itemIndex;
-          const hcipNumber = (globalIndex % 54) + 1;
 
           return {
             id: cardId,
             name: "",
             emoji: "",
-            inactiveImage: `/hcip-${hcipNumber}.png`,
+            inactiveImage: getCategoryImage(item.set_category),
             description: item.quote.substring(0, 80),
             isFlipped: isFlipped,
             onClick: (e?: React.MouseEvent): void => {
@@ -136,9 +205,12 @@ export default function MotivatorsPage(): JSX.Element {
                 return next;
               });
 
-              // Open modal with the quote
-              setSelectedItem(item);
-              setIsModalOpen(true);
+              // Track which card was clicked and open modal after 500ms delay
+              setSelectedCardId(cardId);
+              setTimeout(() => {
+                setSelectedItem(item);
+                setIsModalOpen(true);
+              }, 500);
             },
           };
         },
