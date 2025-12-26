@@ -25,7 +25,7 @@ export function PuzzleGameGrid({
             return (
               <div
                 key={`empty-${index}`}
-                className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 ${emptyCellBg} rounded-lg`}
+                className={`relative w-[86px] h-[86px] sm:w-[101px] sm:h-[101px] md:w-[115px] md:h-[115px] ${emptyCellBg} rounded-lg`}
                 aria-hidden="true"
               />
             );
@@ -36,7 +36,7 @@ export function PuzzleGameGrid({
             return (
               <div
                 key={`inactive-${index}`}
-                className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 ${emptyCellBg} rounded-lg overflow-hidden`}
+                className={`relative w-[86px] h-[86px] sm:w-[101px] sm:h-[101px] md:w-[115px] md:h-[115px] ${emptyCellBg} rounded-lg overflow-hidden`}
                 aria-hidden="true"
               >
                 <img
@@ -87,7 +87,7 @@ export function PuzzleGameGrid({
             </div>
           );
 
-          const className = `group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex items-center justify-center overflow-hidden touch-manipulation animate-[subtle-shake_8s_ease-in-out_infinite] hover:animate-[pulse-glow_2s_ease-in-out_infinite,subtle-shake_8s_ease-in-out_infinite]`;
+          const className = `group relative w-[86px] h-[86px] sm:w-[101px] sm:h-[101px] md:w-[115px] md:h-[115px] bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex items-center justify-center overflow-hidden touch-manipulation animate-[subtle-shake_8s_ease-in-out_infinite] hover:animate-[pulse-glow_2s_ease-in-out_infinite,subtle-shake_8s_ease-in-out_infinite]`;
 
           // Use button if onClick is provided, otherwise use Link
           if (cell.onClick) {

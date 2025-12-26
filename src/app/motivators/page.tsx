@@ -207,7 +207,7 @@ export default function MotivatorsPage(): JSX.Element {
         <div className="flex flex-col items-center">
           {/* Game Boy Screen - Title Display Only */}
           {/* Width matches grid: 3 cols mobile (19.5rem), 5 cols md (42.5rem) */}
-          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] border-4 border-gray-800 dark:border-gray-300 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
+          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
             {/* Screen Inner Bezel */}
             <div className="border-2 border-gray-600 dark:border-gray-500 rounded bg-gradient-to-b from-green-200/80 to-green-100/80 dark:from-green-900/30 dark:to-green-800/20 p-4 md:p-6">
               <div className="text-center">
