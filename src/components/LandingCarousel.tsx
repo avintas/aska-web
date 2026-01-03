@@ -101,9 +101,21 @@ function CarouselSlide({ card, onShopClick }: CarouselSlideProps): JSX.Element {
       <div className="flex flex-col items-center">
         {/* Optional Card Title */}
         {card.title && (
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4.5 md:mb-6">
-            {card.title}
-          </h2>
+          <div className="mb-4.5 md:mb-6 text-center">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {card.title}
+            </h2>
+            {card.title === "Explore" && (
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Click any tile to explore, or swipe to browse more cards
+              </p>
+            )}
+            {card.title === "Pro Shop" && (
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Shop for hockey-themed greeting cards and digital designs
+              </p>
+            )}
+          </div>
         )}
 
         {/* Grid */}

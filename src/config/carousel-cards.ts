@@ -31,7 +31,7 @@ export const carouselCards: CarouselCard[] = [
   // Card 1: Landing Page - Diamond Layout with inactive cells
   {
     id: 1,
-    title: "Hub Selector",
+    title: "Explore",
     cells: [
       createInactiveCell(1), // Row 0, Col 0
       createInactiveCell(2), // Row 0, Col 1
@@ -195,7 +195,7 @@ export const carouselCards: CarouselCard[] = [
   // Card 4: Store Card
   {
     id: 4,
-    title: "Store",
+    title: "Pro Shop",
     cells: [
       createInactiveCell(34), // Row 0, Col 0
       createInactiveCell(35), // Row 0, Col 1
