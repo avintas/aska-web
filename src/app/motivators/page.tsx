@@ -227,9 +227,15 @@ export default function MotivatorsPage(): JSX.Element {
           {/* The Table of Motivational Elements - Grid Section (Dial Pad) */}
           {!loading && !error && items.length > 0 && (
             <div className="mb-8 md:mb-10">
-              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-5 md:mb-6 text-center">
-                The Table of Motivational Elements
-              </h2>
+              <div className="mb-5 md:mb-6 text-center">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  The Table of Motivational Elements
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Daily inspiration from hockey life and culture. Tap to reveal
+                  a quote, then share it with your friends and family.
+                </p>
+              </div>
               <MotivatorsCarousel cells={generateCarouselSlides()} />
             </div>
           )}
