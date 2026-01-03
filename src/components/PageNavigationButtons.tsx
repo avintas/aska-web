@@ -26,7 +26,10 @@ export function PageNavigationButtons({
 
   const handleHomeClick = (): void => {
     // If already on home page, reload to reset carousel
-    if (window.location.pathname === homeHref) {
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname === homeHref
+    ) {
       window.location.href = homeHref;
     } else {
       router.push(homeHref);
