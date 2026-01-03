@@ -53,6 +53,13 @@ export function LandingCarousel({
     };
   }, [emblaApi, onSelect]);
 
+  // Reset carousel to first card (Explore) when component mounts
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.scrollTo(0, true); // true = instant, no animation
+    }
+  }, [emblaApi]);
+
   return (
     <div className={`w-full ${className}`}>
       {/* Carousel Container */}

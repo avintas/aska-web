@@ -24,12 +24,21 @@ export function PageNavigationButtons({
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showExtraModal, setShowExtraModal] = useState(false);
 
+  const handleHomeClick = (): void => {
+    // If already on home page, reload to reset carousel
+    if (window.location.pathname === homeHref) {
+      window.location.href = homeHref;
+    } else {
+      router.push(homeHref);
+    }
+  };
+
   return (
     <>
       {/* Round Navigation Buttons - Game Boy Style */}
       <div className="flex justify-center gap-4 md:gap-6">
         <button
-          onClick={() => router.push(homeHref)}
+          onClick={handleHomeClick}
           className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-gray-900 dark:border-gray-100 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600 transition-colors flex items-center justify-center font-bold text-gray-900 dark:text-white text-sm md:text-base shadow-lg hover:shadow-xl active:shadow-md"
           aria-label={homeLabel}
         >
