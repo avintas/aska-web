@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { HubGrid } from "./HubGrid";
 import { carouselCards, type CarouselCard } from "@/config/carousel-cards";
-import { useDeviceType } from "@/hooks/useDeviceType";
 
 interface LandingCarouselProps {
   className?: string;
@@ -15,15 +14,12 @@ export function LandingCarousel({
   className = "",
   onShopClick,
 }: LandingCarouselProps): JSX.Element {
-  const deviceInfo = useDeviceType();
-
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
     slidesToScroll: 1,
     skipSnaps: false,
     dragFree: false,
-    containScroll: "trimSnaps",
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -61,16 +57,12 @@ export function LandingCarousel({
     <div className={`w-full ${className}`}>
       {/* Carousel Container */}
       <div className="overflow-hidden" ref={emblaRef}>
-        <div
-          className={`flex touch-pan-y ${deviceInfo.shouldUseCardStyle ? "gap-4 md:gap-6" : ""}`}
-        >
-          {carouselCards.map((card, index) => (
+        <div className="flex touch-pan-y">
+          {carouselCards.map((card) => (
             <CarouselSlide
               key={card.id}
               card={card}
               onShopClick={onShopClick}
-              isActive={index === selectedIndex}
-              shouldUseCardStyle={deviceInfo.shouldUseCardStyle}
             />
           ))}
         </div>
@@ -101,89 +93,21 @@ export function LandingCarousel({
 interface CarouselSlideProps {
   card: CarouselCard;
   onShopClick?: () => void;
-  isActive?: boolean;
-  shouldUseCardStyle?: boolean;
 }
 
-function CarouselSlide({
-  card,
-  onShopClick,
-  isActive = false,
-  shouldUseCardStyle = false,
-}: CarouselSlideProps): JSX.Element {
-  // Mobile portrait: simple layout without card styling
-  if (!shouldUseCardStyle) {
-    return (
-      <div className="flex-[0_0_100%] min-w-0 px-2">
-        <div className="flex flex-col items-center">
-          {/* Optional Card Title */}
-          {card.title && (
-            <div className="mb-4 text-center">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                {card.title}
-              </h2>
-              {card.title === "Explore" && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Click any tile to explore, or swipe to browse more cards
-                </p>
-              )}
-              {card.title === "Pro Shop" && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Shop for hockey-themed greeting cards and digital designs
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Grid */}
-          <HubGrid cells={card.cells} onShopClick={onShopClick} />
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop/Tablet/Mobile Landscape: Switch-style card appearance
+function CarouselSlide({ card, onShopClick }: CarouselSlideProps): JSX.Element {
   return (
     <div className="flex-[0_0_100%] min-w-0 px-2 md:px-4">
-      {/* Card Container - Switch-style card appearance */}
-      <div
-        className={`
-          bg-white dark:bg-gray-800 
-          rounded-2xl md:rounded-3xl
-          shadow-lg md:shadow-xl
-          p-4 md:p-6 lg:p-8
-          transition-all duration-300 ease-out
-          border-2 border-gray-200 dark:border-gray-700
-          ${
-            isActive
-              ? "scale-100 shadow-2xl border-blue-300 dark:border-orange-400"
-              : "scale-[0.95] opacity-90 hover:scale-[0.97] hover:opacity-95"
-          }
-        `}
-      >
-        <div className="flex flex-col items-center">
-          {/* Optional Card Title */}
-          {card.title && (
-            <div className="mb-4 md:mb-6 text-center">
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                {card.title}
-              </h2>
-              {card.title === "Explore" && (
-                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-                  Click any tile to explore, or swipe to browse more cards
-                </p>
-              )}
-              {card.title === "Pro Shop" && (
-                <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
-                  Shop for hockey-themed greeting cards and digital designs
-                </p>
-              )}
-            </div>
-          )}
+      <div className="flex flex-col items-center">
+        {/* Optional Card Title */}
+        {card.title && (
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4.5 md:mb-6">
+            {card.title}
+          </h2>
+        )}
 
-          {/* Grid */}
-          <HubGrid cells={card.cells} onShopClick={onShopClick} />
-        </div>
+        {/* Grid */}
+        <HubGrid cells={card.cells} onShopClick={onShopClick} />
       </div>
     </div>
   );
