@@ -237,9 +237,15 @@ export default function DidYouKnowPage(): JSX.Element {
 
               return (
                 <div className="mb-10 md:mb-14">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-5 md:mb-7 text-center">
-                    Play Puzzle Game
-                  </h2>
+                  <div className="mb-5 md:mb-7 text-center">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                      Hockey Puzzle Game
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Tap cards to match images and reveal fascinating hockey
+                      facts
+                    </p>
+                  </div>
                   <DidYouKnowCarousel
                     cells={Array.from({ length: 5 }, (_, slideIndex) => {
                       // Create 5 slides, each with 20 cells (4 rows × 5 columns)
