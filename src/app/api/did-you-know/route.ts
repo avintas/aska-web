@@ -1,100 +1,70 @@
 import { createServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+// In-memory cache for factoid sets
+// Key: setId
+// Value: { items: FactItem[], setInfo: SetInfo, cachedAt: Date }
+const setCache = new Map<
+  number,
+  {
+    items: FactItem[];
+    setInfo: {
+      id: number;
+      title: string;
+      summary: string | null;
+      theme: string | null;
+      category: string | null;
+    };
+    cachedAt: Date;
+  }
+>();
+
 interface FactItem {
-  id: number;
-  fact_text: string;
-  fact_category: string | null;
-  year: number | null;
-  fact_value: string | null;
+  id?: number;
+  content?: string;
+  fact_text?: string;
+  category?: string | null;
+  fact_category?: string | null;
+  theme?: string | null;
+  year?: number | null;
+  fact_value?: string | null;
   [key: string]: unknown;
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const searchParams = request.nextUrl.searchParams;
-  const category = searchParams.get("category");
-  const theme = searchParams.get("theme");
+interface SourceContentSet {
+  id: number;
+  app_id: number;
+  set_title: string;
+  set_summary: string | null;
+  set_items: FactItem[];
+  set_type: string[] | null;
+  set_theme: string | null;
+  set_category: string | null;
+  set_difficulty: string | null;
+  set_attribution: string | null;
+}
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest): Promise<NextResponse> {
   try {
     console.log("🔍 [Did You Know API] Starting request...");
 
     const supabase = await createServerClient();
     console.log("✅ [Did You Know API] Supabase client created");
 
-    // Handle theme request - fetch from collection_hockey_facts
-    if (theme) {
-      console.log(`📋 [Did You Know API] Fetching theme: ${theme}`);
-
-      const { data, error } = await supabase
-        .from("collection_hockey_facts")
-        .select("*")
-        .eq("theme", theme)
-        .limit(12);
-
-      if (error) {
-        console.error("❌ [Did You Know API] Database error:", error);
-        const errorMessage =
-          error && typeof error === "object" && "message" in error
-            ? String(error.message)
-            : "Database error occurred";
-        return NextResponse.json(
-          {
-            success: false,
-            error: errorMessage,
-          },
-          { status: 500 },
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: (data as FactItem[]) || [],
-        type: "theme",
-      });
-    }
-
-    // Handle category request - fetch from collection_hockey_facts
-    if (category) {
-      console.log(`📋 [Did You Know API] Fetching category: ${category}`);
-
-      const { data, error } = await supabase
-        .from("collection_hockey_facts")
-        .select("*")
-        .eq("category", category)
-        .limit(12);
-
-      if (error) {
-        console.error("❌ [Did You Know API] Database error:", error);
-        const errorMessage =
-          error && typeof error === "object" && "message" in error
-            ? String(error.message)
-            : "Database error occurred";
-        return NextResponse.json(
-          {
-            success: false,
-            error: errorMessage,
-          },
-          { status: 500 },
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: (data as FactItem[]) || [],
-        type: "category",
-      });
-    }
-
-    // Default: Query 8 random records from collection_hockey_facts for Daily Set
+    // Fetch factoid sets from source_content_sets
     console.log(
-      "📊 [Did You Know API] Querying random Daily Set from collection_hockey_facts...",
+      "📊 [Did You Know API] Querying factoid sets from source_content_sets...",
     );
 
-    // Fetch more records than needed, then randomize and limit to 8
     const { data, error } = await supabase
-      .from("collection_hockey_facts")
+      .from("source_content_sets")
       .select("*")
-      .limit(100); // Fetch more to ensure good randomization
+      .eq("app_id", 1)
+      .eq("active", true)
+      .contains("set_type", ["factoid"])
+      .order("set_created_at", { ascending: false })
+      .limit(1); // Get the latest active set
 
     if (error) {
       console.error("❌ [Did You Know API] Database error:", error);
@@ -116,11 +86,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (!data || data.length === 0) {
-      console.warn("⚠️ [Did You Know API] No data returned");
+      console.warn("⚠️ [Did You Know API] No factoid sets found");
       return NextResponse.json(
         {
           success: false,
-          error: "No facts found",
+          error: "No factoid sets found",
           debug: {
             timestamp: new Date().toISOString(),
           },
@@ -129,21 +99,107 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Randomize and limit to 8 records
-    const shuffled = [...data].sort(() => Math.random() - 0.5);
-    const displayItems = shuffled.slice(0, 8);
+    const set = data[0] as SourceContentSet;
+
+    // Check cache first
+    const cached = setCache.get(set.id);
+    if (cached) {
+      console.log(
+        `✅ [Did You Know API] Returning cached set ${set.id} (${cached.items.length} items)`,
+      );
+      return NextResponse.json({
+        success: true,
+        data: cached.items,
+        setInfo: cached.setInfo,
+        type: "set",
+        cached: true,
+        debug: {
+          setId: set.id,
+          totalItems: cached.items.length,
+          cachedAt: cached.cachedAt.toISOString(),
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Cache miss - process set
+    console.log(
+      `🔄 [Did You Know API] Cache miss - processing set ${set.id}...`,
+    );
+
+    const setItems = (set.set_items || []) as FactItem[];
+
+    // Normalize factoid items - handle both 'content' and 'fact_text' fields
+    const normalizedItems: FactItem[] = setItems.map((item) => {
+      // If item has 'content' field (from prompt), use it as 'fact_text'
+      if (item.content && !item.fact_text) {
+        return {
+          ...item,
+          fact_text: item.content,
+          fact_category: item.category || item.fact_category || null,
+        };
+      }
+      return item;
+    });
+
+    // We need exactly 70 factoids (14 per slide × 5 slides)
+    // Take first 70, or pad/cycle if we have fewer
+    const requiredCount = 70;
+    let displayItems: FactItem[] = [];
+
+    if (normalizedItems.length >= requiredCount) {
+      // Take exactly 70 factoids
+      displayItems = normalizedItems.slice(0, requiredCount);
+    } else {
+      // If we have fewer than 70, cycle through them to fill 70 slots
+      displayItems = [];
+      for (let i = 0; i < requiredCount; i++) {
+        displayItems.push(normalizedItems[i % normalizedItems.length]);
+      }
+      console.warn(
+        `⚠️ [Did You Know API] Only ${normalizedItems.length} factoids available, cycling to fill 70 slots`,
+      );
+    }
+
+    const setInfoData = {
+      id: set.id,
+      title: set.set_title,
+      summary: set.set_summary,
+      theme: set.set_theme,
+      category: set.set_category,
+    };
+
+    // Cache the result
+    setCache.set(set.id, {
+      items: displayItems,
+      setInfo: setInfoData,
+      cachedAt: new Date(),
+    });
+
+    // Clean up old cache entries (keep only last 10 sets)
+    if (setCache.size > 10) {
+      const entries = Array.from(setCache.entries());
+      entries.sort((a, b) => a[1].cachedAt.getTime() - b[1].cachedAt.getTime());
+      // Remove oldest entries
+      for (let i = 0; i < entries.length - 10; i++) {
+        setCache.delete(entries[i][0]);
+      }
+    }
 
     console.log(
-      `✅ [Did You Know API] Successfully retrieved ${displayItems.length} random facts from ${data.length} total`,
+      `✅ [Did You Know API] Successfully processed and cached set ${set.id}: ${displayItems.length} factoids (${normalizedItems.length} unique)`,
     );
 
     return NextResponse.json({
       success: true,
       data: displayItems,
-      type: "daily",
+      setInfo: setInfoData,
+      type: "set",
+      cached: false,
       debug: {
-        totalAvailable: data.length,
-        displayed: displayItems.length,
+        setId: set.id,
+        totalItems: displayItems.length,
+        uniqueItems: normalizedItems.length,
         timestamp: new Date().toISOString(),
       },
     });

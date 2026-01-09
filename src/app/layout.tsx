@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { PWARegister } from "@/components/PWARegister";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,11 +19,14 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "OnlyHockey",
   },
   formatDetection: {
     telephone: false,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -32,7 +36,10 @@ export const viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover" as const,
-  themeColor: "#1e3a8a",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1e3a8a" },
+    { media: "(prefers-color-scheme: dark)", color: "#111827" },
+  ],
 };
 
 export default function RootLayout({
@@ -55,6 +62,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </ThemeProvider>
+        <PWARegister />
         <Analytics />
       </body>
     </html>

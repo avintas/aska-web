@@ -1,24 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type React from "react";
 import { HubCell } from "./HubGrid";
 
-interface PuzzleGameGridProps {
+interface FactGridProps {
   cells: (HubCell | null)[];
   emptyCellBg?: string;
 }
 
-export function PuzzleGameGrid({
+export function FactGrid({
   cells,
   emptyCellBg = "bg-gray-100 dark:bg-gray-800",
-}: PuzzleGameGridProps): JSX.Element {
-  // Puzzle Game Grid: 20 cells (4 rows × 5 columns)
-  const gridCells = Array.from({ length: 20 }, (_, i) => cells[i] || null);
+}: FactGridProps): JSX.Element {
+  // Flexible grid: supports any number of cells
+  // For 15 cells: 3 rows × 5 columns
+  const gridCells = cells;
 
   return (
     <div className="flex justify-center mb-7 md:mb-10">
-      <div className="grid grid-cols-4 md:grid-cols-5 gap-2 max-w-full">
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 max-w-full">
         {gridCells.map((cell, index) => {
           if (!cell) {
             // Empty cell
@@ -31,6 +33,38 @@ export function PuzzleGameGrid({
             );
           }
 
+          // Center cell - grayed out, unclickable with image at 25% opacity
+          // Check if this is the center cell by checking for isCenterCell property
+          const cellWithCenterFlag = cell as HubCell & {
+            isCenterCell?: boolean;
+          };
+          if (
+            cellWithCenterFlag.isCenterCell &&
+            cell.inactiveImage &&
+            !cell.onClick &&
+            !cell.href
+          ) {
+            return (
+              <div
+                key={`center-${index}`}
+                className={`relative w-[86px] h-[86px] sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-lg cursor-not-allowed overflow-hidden`}
+                aria-hidden="true"
+              >
+                <Image
+                  src={cell.inactiveImage}
+                  alt=""
+                  fill
+                  className="object-cover opacity-25"
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.src = `/factoids/the-players-1.png`;
+                  }}
+                />
+              </div>
+            );
+          }
+
           // Inactive cell with image (no href, no onClick)
           if (cell.inactiveImage && !cell.href && !cell.onClick) {
             return (
@@ -39,10 +73,11 @@ export function PuzzleGameGrid({
                 className={`relative w-[86px] h-[86px] sm:w-28 sm:h-28 md:w-32 md:h-32 ${emptyCellBg} rounded-lg overflow-hidden`}
                 aria-hidden="true"
               >
-                <img
+                <Image
                   src={cell.inactiveImage}
                   alt=""
-                  className="w-full h-full object-cover opacity-100"
+                  fill
+                  className="object-cover opacity-100"
                 />
               </div>
             );
@@ -50,7 +85,7 @@ export function PuzzleGameGrid({
 
           const cellContent = (
             <div className="w-full h-full flex flex-col items-center justify-center px-2 relative">
-              {/* Show fact text when flipped (for matching game) */}
+              {/* Show fact text when flipped */}
               {cell.isFlipped && cell.description ? (
                 <div className="w-full h-full flex items-center justify-center p-2 z-10 relative">
                   <p className="text-[8px] md:text-[9px] text-white/90 dark:text-white/90 font-medium text-center leading-tight line-clamp-4">
@@ -61,10 +96,33 @@ export function PuzzleGameGrid({
                 <>
                   {/* Image if provided (for clickable cells), otherwise emoji */}
                   {cell.inactiveImage ? (
-                    <img
+                    <Image
                       src={cell.inactiveImage}
-                      alt={cell.name}
-                      className="w-full h-full object-cover opacity-100 absolute inset-0 z-0"
+                      alt={cell.name || "Factoid thumbnail"}
+                      fill
+                      className="object-cover opacity-100 z-0"
+                      onError={(e) => {
+                        // Fallback to default thumbnail if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        const originalSrc = target.src;
+                        console.warn(
+                          "⚠️ Thumbnail failed to load:",
+                          originalSrc,
+                        );
+
+                        // Try fallback to default players thumbnail
+                        if (!target.src.includes("the-players-1.png")) {
+                          target.src = `/factoids/the-players-1.png`;
+                        } else {
+                          // If even fallback fails, hide the image and show background
+                          target.style.display = "none";
+                        }
+                      }}
+                      onLoad={(e) => {
+                        // Ensure image is visible when it loads successfully
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "block";
+                      }}
                     />
                   ) : cell.emoji ? (
                     <span

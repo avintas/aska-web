@@ -7,13 +7,63 @@ import { DidYouKnowCarousel } from "@/components/DidYouKnowCarousel";
 import { HubCell } from "@/components/HubGrid";
 
 interface FactItem {
-  id: number;
+  id?: number;
   fact_text: string;
   fact_category?: string | null;
+  category?: string | null;
+  theme?: string | null;
   year?: number | null;
   fact_value?: string | null;
   [key: string]: unknown;
 }
+
+interface SetInfo {
+  id: number;
+  title: string;
+  summary: string | null;
+  theme: string | null;
+  category: string | null;
+}
+
+// Pre-indexed cell layout: 70 factoid cells across 5 slides
+// Each slide has 15 cells total: 14 factoid cells + 1 center cell
+// Center cell is always at index 7 in each slide
+interface CellIndex {
+  slideIndex: number;
+  cellIndex: number;
+  factoidIndex: number | null; // null for center cells
+}
+
+// Generate cell index map: maps each of 70 factoid positions to slide/cell indices
+function generateCellIndexMap(): CellIndex[] {
+  const cells: CellIndex[] = [];
+  const totalSlides = 5;
+  let factoidCounter = 0;
+
+  for (let slideIndex = 0; slideIndex < totalSlides; slideIndex++) {
+    for (let cellIndex = 0; cellIndex < 15; cellIndex++) {
+      if (cellIndex === 7) {
+        // Center cell - no factoid
+        cells.push({
+          slideIndex,
+          cellIndex,
+          factoidIndex: null,
+        });
+      } else {
+        // Factoid cell - assign factoid index
+        cells.push({
+          slideIndex,
+          cellIndex,
+          factoidIndex: factoidCounter++,
+        });
+      }
+    }
+  }
+
+  return cells;
+}
+
+const CELL_INDEX_MAP = generateCellIndexMap(); // Pre-computed at module load
 
 export default function DidYouKnowPage(): JSX.Element {
   const [items, setItems] = useState<FactItem[]>([]);
@@ -21,19 +71,10 @@ export default function DidYouKnowPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<FactItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [gridFacts, setGridFacts] = useState<FactItem[]>([]);
+  const [setInfo, setSetInfo] = useState<SetInfo | null>(null);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set()); // Track flipped cards
 
-  // Matching game state (prototype - matching logic included but not rigorously tested)
-  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set()); // Card IDs that are currently flipped
-  const [matchedCards, setMatchedCards] = useState<Set<string>>(new Set()); // Card IDs that have been matched
-  const [firstSelectedCard, setFirstSelectedCard] = useState<{
-    cardId: string;
-    fact: FactItem;
-  } | null>(null); // First card clicked for matching
-  const [isProcessing, setIsProcessing] = useState(false); // Prevent clicks during match check
-
-  const fetchDailySet = async (): Promise<void> => {
+  const fetchFactoidSet = async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -42,30 +83,17 @@ export default function DidYouKnowPage(): JSX.Element {
       const result = await response.json();
 
       if (result.success && result.data) {
-        const facts = result.data as FactItem[];
-        if (result.type === "daily") {
-          setItems(facts);
-        } else {
-          setItems(facts || []);
+        const factoids = result.data as FactItem[];
+        setItems(factoids || []);
+
+        if (result.setInfo) {
+          setSetInfo(result.setInfo as SetInfo);
         }
 
-        // Prepare facts for grid (144 cells) - cycle through available facts
-        if (facts && facts.length > 0) {
-          const gridFactsArray: FactItem[] = [];
-          for (let i = 0; i < 144; i++) {
-            gridFactsArray.push(facts[i % facts.length]);
-          }
-          setGridFacts(gridFactsArray);
-        } else {
-          setGridFacts([]);
-        }
-        // Reset matching game state
+        // Reset flipped cards state
         setFlippedCards(new Set());
-        setMatchedCards(new Set());
-        setFirstSelectedCard(null);
-        setIsProcessing(false);
       } else {
-        setError(result.error || "Failed to load Daily Set");
+        setError(result.error || "Failed to load factoid set");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -75,81 +103,96 @@ export default function DidYouKnowPage(): JSX.Element {
   };
 
   useEffect(() => {
-    fetchDailySet();
+    fetchFactoidSet();
   }, []);
 
-  // Generate pairs of facts for matching game (prototype - not rigorously tested)
-  const generateFactPairs = (
-    facts: FactItem[],
-  ): Array<{ fact: FactItem; pairId: string }> => {
-    // Group facts by category
-    const categoryMap = new Map<string, FactItem[]>();
-    facts.forEach((fact) => {
-      const category = fact.fact_category || "Uncategorized";
-      if (!categoryMap.has(category)) {
-        categoryMap.set(category, []);
-      }
-      categoryMap.get(category)!.push(fact);
-    });
+  // Get thumbnail path based on theme from /public/factoids/ folder
+  // Falls back to category mapping if theme is not available
+  const getThumbnailPath = (
+    theme: string | null | undefined,
+    category: string | null | undefined,
+    index: number,
+  ): string => {
+    // Map category to theme (for cases where factoids have category but no theme)
+    const categoryToThemeMap: Record<string, string> = {
+      historical: "the-legacy",
+      milestone: "game-day",
+      record: "the-players",
+      comparison: "the-players",
+      "on-this-day": "game-day",
+      franchise: "the-legacy",
+      quirky: "the-players",
+      geography: "geography-of-hockey",
+      "behind-the-scenes": "the-business",
+      cultural: "the-legacy",
+    };
 
-    // Create pairs (take 1 fact from each category, duplicate it for matching)
-    const pairs: Array<{ fact: FactItem; pairId: string }> = [];
-    categoryMap.forEach((categoryFacts, category) => {
-      // For each category, take the first fact and create a pair
-      if (categoryFacts.length > 0) {
-        pairs.push({
-          fact: categoryFacts[0],
-          pairId: `pair-${category}`,
-        });
-      }
-    });
+    // Determine which value to use: theme first, then mapped category, then category as-is
+    let valueToUse: string | null = null;
 
-    // Shuffle pairs and take exactly 10 pairs
-    const shuffled = [...pairs].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 10); // Return exactly 10 pairs
+    if (theme) {
+      valueToUse = theme;
+    } else if (category) {
+      // Try to map category to theme
+      const categorySlug = category
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      valueToUse = categoryToThemeMap[categorySlug] || category;
+    }
+
+    if (!valueToUse) {
+      // Default thumbnail if no theme or category
+      return `/factoids/the-players-${(index % 14) + 1}.png`;
+    }
+
+    // Convert to kebab-case for file naming
+    const themeSlug = valueToUse
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+    // Map theme to available thumbnails (based on actual files in /public/factoids/)
+    const themeMap: Record<string, number> = {
+      "the-players": 14,
+      "the-wall": 3,
+      "the-system": 2,
+      "the-business": 2,
+      "the-lab": 1,
+      "the-league": 2,
+      "the-legacy": 1,
+      "game-day": 2,
+      "geography-of-hockey": 1,
+    };
+
+    // Check if theme exists in map
+    if (!themeMap[themeSlug]) {
+      // Unknown theme - use default
+      return `/factoids/the-players-${(index % 14) + 1}.png`;
+    }
+
+    const maxCount = themeMap[themeSlug];
+    const thumbnailNumber = (index % maxCount) + 1;
+
+    return `/factoids/${themeSlug}-${thumbnailNumber}.png`;
   };
 
-  // Handle card click for matching game (prototype - if it works, great; if not, that's fine)
-  const handleCardClick = (cardId: string, fact: FactItem | null): void => {
-    if (!fact) return;
-
-    // Don't process if already matched, processing, or already flipped
-    if (matchedCards.has(cardId) || isProcessing || flippedCards.has(cardId)) {
-      return;
-    }
-
-    // If this is the first card selected
-    if (firstSelectedCard === null) {
-      setFirstSelectedCard({ cardId, fact });
-      setFlippedCards((prev) => new Set(prev).add(cardId));
-      return;
-    }
-
-    // Second card selected - check for match
-    setIsProcessing(true);
-    setFlippedCards((prev) => new Set(prev).add(cardId));
-
-    // Check if they match (same category)
-    const match = firstSelectedCard.fact.fact_category === fact.fact_category;
-
-    setTimeout(() => {
-      if (match) {
-        // Match! Keep both cards open
-        setMatchedCards((prev) =>
-          new Set(prev).add(firstSelectedCard.cardId).add(cardId),
-        );
+  // Handle card click - flip card and open modal
+  const handleCardClick = (cardId: string, fact: FactItem): void => {
+    // Toggle flip state
+    setFlippedCards((prev) => {
+      const next = new Set(prev);
+      if (next.has(cardId)) {
+        next.delete(cardId);
       } else {
-        // No match - flip both back
-        setFlippedCards((prev) => {
-          const next = new Set(prev);
-          next.delete(firstSelectedCard.cardId);
-          next.delete(cardId);
-          return next;
-        });
+        next.add(cardId);
       }
-      setFirstSelectedCard(null);
-      setIsProcessing(false);
-    }, 1500); // Wait 1.5 seconds before checking match
+      return next;
+    });
+
+    // Open modal with factoid
+    setSelectedItem(fact);
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = (): void => {
@@ -193,7 +236,7 @@ export default function DidYouKnowPage(): JSX.Element {
             homeLabel="Home"
             homeHref="/"
             infoTitle="Did You Know? - Info"
-            infoContent="Test your memory with our Match the Facts puzzle game! Flip cards to reveal hockey facts and match pairs by category. Each match unlocks fascinating stories about the rich history and culture of the greatest game on ice. Challenge yourself to find all 10 pairs across 5 scrollable game boards. Perfect for practicing trivia knowledge while having fun!"
+            infoContent="Discover fascinating hockey facts! Tap cards to flip and reveal interesting stories about the rich history and culture of the greatest game on ice. Explore 70 factoids across 5 scrollable boards, each featuring unique thumbnails and shareable content. Perfect for expanding your hockey knowledge!"
             extrasTitle="Did You Know? - Extras"
             extrasContent="Additional features and options for the Did You Know page coming soon..."
           />
@@ -219,99 +262,175 @@ export default function DidYouKnowPage(): JSX.Element {
             </div>
           </div>
 
-          {/* Puzzle Game Grid Section (Dial Pad) */}
+          {/* Factoid Cards Grid Section */}
           {!loading &&
             !error &&
             items.length > 0 &&
             ((): JSX.Element => {
-              // Generate pairs for matching game - need 10 pairs (20 cards total)
-              const factPairs = generateFactPairs(items);
-              const pairsToUse = factPairs.slice(0, 10); // Exactly 10 pairs
-
-              // Create array with pairs duplicated (each fact appears twice)
-              const pairedFacts: FactItem[] = [];
-              pairsToUse.forEach((pair) => {
-                pairedFacts.push(pair.fact);
-                pairedFacts.push(pair.fact); // Add same fact twice for matching
-              });
+              // Create 5 slides, each with 15 cells (3 rows × 5 columns)
+              // 14 factoid cells per slide + 1 center cell = 15 cells per slide
+              // Total: 5 slides × 14 factoid cells = 70 unique factoids needed
+              const cellsPerSlide = 15;
+              const totalSlides = 5;
 
               return (
                 <div className="mb-10 md:mb-14">
-                  <div className="mb-5 md:mb-7 text-center">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                      Hockey Puzzle Game
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Tap cards to match images and reveal fascinating hockey
-                      facts
-                    </p>
-                  </div>
+                  {setInfo && (
+                    <div className="mb-5 md:mb-7 text-center">
+                      <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                        {setInfo.title}
+                      </h2>
+                      {setInfo.summary && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {setInfo.summary}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <DidYouKnowCarousel
-                    cells={Array.from({ length: 5 }, (_, slideIndex) => {
-                      // Create 5 slides, each with 20 cells (4 rows × 5 columns)
-                      // Each slide gets a different set of facts
-                      const factsPerSlide = Math.ceil(pairedFacts.length / 5);
-                      const slideStartIndex = slideIndex * factsPerSlide;
+                    cells={Array.from(
+                      { length: totalSlides },
+                      (_, slideIndex) => {
+                        return Array.from(
+                          { length: cellsPerSlide },
+                          (_, cellIndex): HubCell | null => {
+                            // Use pre-indexed cell map to find factoid assignment
+                            const cellMapEntry = CELL_INDEX_MAP.find(
+                              (entry) =>
+                                entry.slideIndex === slideIndex &&
+                                entry.cellIndex === cellIndex,
+                            );
 
-                      return Array.from(
-                        { length: 20 },
-                        (_, cellIndex): HubCell | null => {
-                          // Calculate global index across all slides
-                          const globalIndex = slideIndex * 20 + cellIndex;
+                            if (!cellMapEntry) {
+                              return null;
+                            }
 
-                          // Every cell is flippable - assign a fact to each cell
-                          const factIndex = slideStartIndex + cellIndex;
-                          const fact =
-                            pairedFacts[factIndex % pairedFacts.length];
+                            // Center cell (factoidIndex is null)
+                            if (cellMapEntry.factoidIndex === null) {
+                              const centerImageIndex = slideIndex % 14; // Cycle through the-players images
+                              const centerThumbnailPath = `/factoids/the-players-${centerImageIndex + 1}.png`;
 
-                          if (!fact) return null;
+                              return {
+                                id: `center-${slideIndex}`,
+                                name: "",
+                                emoji: "",
+                                inactiveImage: centerThumbnailPath,
+                                description: "",
+                                isFlipped: false,
+                                // No onClick - makes it unclickable
+                              };
+                            }
 
-                          const cardId = `cell-${slideIndex}-${cellIndex}`;
-                          const isFlipped = flippedCards.has(cardId);
-                          const isMatched = matchedCards.has(cardId);
+                            // Factoid cell - get factoid by pre-indexed position
+                            const fact = items[cellMapEntry.factoidIndex];
 
-                          // Alternate between player images (now hcip-41 to hcip-52) and HCIP images for visual variety
-                          const usePlayerImage = cellIndex % 2 === 0;
-                          const imageNumber = usePlayerImage
-                            ? (factIndex % 12) + 41 // Player images now hcip-41 through hcip-52
-                            : (globalIndex % 40) + 1; // HCIP images 1-40
+                            if (!fact) return null;
 
-                          const imagePath = `/hcip-${imageNumber}.png`;
+                            if (!fact) {
+                              return null;
+                            }
 
-                          return {
-                            id: cardId,
-                            name: "", // No category name
-                            emoji: "", // No emoji
-                            inactiveImage: imagePath, // Use player or HCIP image
-                            description: fact.fact_text.substring(0, 80), // Show fact text when flipped
-                            isFlipped: isFlipped || isMatched, // Show fact text when flipped or matched
-                            isMatched: isMatched,
-                            onClick: (e?: React.MouseEvent): void => {
-                              if (e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }
+                            const cardId = `cell-${slideIndex}-${cellIndex}`;
+                            const isFlipped = flippedCards.has(cardId);
 
-                              // Open modal with the fact text
-                              setSelectedItem(fact);
-                              setIsModalOpen(true);
+                            // Get thumbnail based on theme (prefer theme field, fallback to category)
+                            const theme = fact.theme || setInfo?.theme || null;
+                            const category =
+                              fact.category ||
+                              fact.fact_category ||
+                              setInfo?.category ||
+                              null;
+                            // Use theme if available, otherwise try to map category to theme
+                            const thumbnailPath = getThumbnailPath(
+                              theme,
+                              category,
+                              cellMapEntry.factoidIndex,
+                            );
 
-                              // Also handle card flip for matching game (if not matched and not processing)
-                              if (!isMatched && !isProcessing) {
+                            return {
+                              id: cardId,
+                              name: "",
+                              emoji: "",
+                              inactiveImage: thumbnailPath,
+                              description: fact.fact_text.substring(0, 100),
+                              isFlipped: isFlipped,
+                              onClick: (e?: React.MouseEvent): void => {
+                                if (e) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }
                                 handleCardClick(cardId, fact);
-                              }
-                            },
-                            // Add badge for matched cards
-                            badge: isMatched ? "✓" : undefined,
-                            badgeColor: isMatched ? "bg-green-500" : undefined,
-                          };
-                        },
-                      );
-                    })}
+                              },
+                            };
+                          },
+                        );
+                      },
+                    )}
                   />
                 </div>
               );
             })()}
+
+          {/* Debug Container - Display loaded items */}
+          {!loading && !error && items.length > 0 && (
+            <div className="mt-8 mb-10 md:mb-14 w-full max-w-4xl mx-auto">
+              <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-4 md:p-6">
+                <h3 className="text-sm md:text-base font-bold text-gray-900 dark:text-white mb-3">
+                  Debug: Loaded Items ({items.length} factoids)
+                </h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {items.map((item, index) => (
+                    <div
+                      key={`factoid-${index}`}
+                      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded p-2 md:p-3 text-xs md:text-sm"
+                    >
+                      <div className="flex flex-wrap gap-2 mb-1">
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">
+                          #{index + 1}
+                        </span>
+                        {item.id && (
+                          <span className="text-gray-600 dark:text-gray-400">
+                            ID: {item.id}
+                          </span>
+                        )}
+                        {item.theme && (
+                          <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                            Theme: {item.theme}
+                          </span>
+                        )}
+                        {(item.category || item.fact_category) && (
+                          <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
+                            Category: {item.category || item.fact_category}
+                          </span>
+                        )}
+                        {item.year && (
+                          <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded">
+                            Year: {item.year}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-800 dark:text-gray-200 mt-1 line-clamp-2">
+                        {String(
+                          item.fact_text ||
+                            (item.content as string | undefined) ||
+                            "No text",
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {setInfo && (
+                  <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-700">
+                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                      <strong>Set Info:</strong> {setInfo.title}
+                      {setInfo.theme && ` | Theme: ${setInfo.theme}`}
+                      {setInfo.category && ` | Category: ${setInfo.category}`}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Loading State - Spinner below screen */}
           {loading && (

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { PuzzleGameGrid } from "./PuzzleGameGrid";
+import { FactGrid } from "./FactGrid";
 import { HubCell } from "./HubGrid";
 
 interface DidYouKnowCarouselProps {
@@ -64,8 +64,8 @@ export function DidYouKnowCarousel({
               className="flex-[0_0_100%] min-w-0 px-2 md:px-4"
             >
               <div className="flex flex-col items-center">
-                {/* Use PuzzleGameGrid component - separate from LandingCarousel HubGrid */}
-                <PuzzleGameGrid cells={slideCells} />
+                {/* Use FactGrid component - displays factoid cards in grid layout */}
+                <FactGrid cells={slideCells} />
               </div>
             </div>
           ))}
