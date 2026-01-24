@@ -135,9 +135,6 @@ export function getSequentialImage(
  * Legacy function - kept for backward compatibility
  * @deprecated Use getSequentialImage instead
  */
-export function getImage(
-  _collection: string,
-  _key: string | null,
-): string {
+export function getImage(): string {
   return "/hcip-1.png";
 }

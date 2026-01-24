@@ -1,7 +1,7 @@
 "use client";
 
 import type { TriviaGameSession } from "@/shared/types/trivia-game";
-import { getScorePercentage, getScoreDisplay } from "@/utils/triviaGameSession";
+import { getScoreDisplay } from "@/utils/triviaGameSession";
 
 interface ScoreDisplayProps {
   session: TriviaGameSession;
