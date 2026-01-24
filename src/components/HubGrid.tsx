@@ -3,6 +3,17 @@
 import Link from "next/link";
 import type React from "react";
 
+export interface TriviaQuestionData {
+  question_text: string;
+  correct_answer: string;
+  wrong_answers?: string[];
+  is_true?: boolean;
+  explanation?: string | null;
+  points?: number;
+  difficulty?: string | null;
+  question_type?: string;
+}
+
 export interface HubCell {
   id: string;
   name: string;
@@ -15,6 +26,19 @@ export interface HubCell {
   inactiveImage?: string; // Path to image for inactive cells
   isFlipped?: boolean; // For matching game - show description when flipped
   isMatched?: boolean; // For matching game - card has been matched
+  // Metadata for modal display
+  theme?: string;
+  attribution?: string | null;
+  set_title?: string;
+  // Visual anchor: center tile that serves as visual center, non-clickable, 25% opacity
+  isVisualAnchor?: boolean;
+  // Trivia game fields
+  isAnswered?: boolean;
+  isCorrect?: boolean;
+  pointsGained?: number;
+  questionData?: TriviaQuestionData;
+  // Hub navigation (for Card 0)
+  targetCardIndex?: number; // Target card index to navigate to when clicked
 }
 
 interface HubGridProps {
