@@ -2,83 +2,89 @@
  * IMAGE MAPPINGS CONFIGURATION
  * ============================
  *
- * This file serves as the central registry for all image-to-content mappings
- * used throughout the OnlyHockey application. Each collection defines a set
- * of images associated with a specific display type or component.
+ * This file manages background images for content tiles across all content types.
+ * Each content type has its own collection of theme-based images.
  *
- * PURPOSE:
- * - Centralize all image mappings in one maintainable location
- * - Provide consistent image associations across components
- * - Make it easy to update or swap images without modifying component code
+ * ARCHITECTURE:
+ * - Images are organized by content type (factoids, motivational, supportive, etc.)
+ * - Each theme can have multiple numbered variants (players-1.png, players-2.png, etc.)
+ * - Sequential selection ensures variety within each card (tile 0 uses variant 1, tile 1 uses variant 2, etc.)
  *
  * USAGE:
- * Import the getImage helper function and call it with the collection name
- * and the key you want to look up:
- *
- *   import { getImage } from "@/config/image-mappings";
- *   const imagePath = getImage("motivationalCategories", "grit");
- *
- * ADDING NEW COLLECTIONS:
- * 1. Add a new entry to IMAGE_COLLECTIONS with a descriptive name
- * 2. Add a default fallback image to COLLECTION_DEFAULTS
- * 3. Document the collection's purpose in the comments
+ *   import { getSequentialImage } from "@/config/image-mappings";
+ *   const imagePath = getSequentialImage("motivational", "Players", 0); // First tile
+ *   const imagePath2 = getSequentialImage("motivational", "Players", 1); // Second tile
  */
 
 // =============================================================================
-// IMAGE COLLECTIONS
+// THEME-TO-FOLDER MAPPINGS
 // =============================================================================
+// Maps theme names to image folder paths and available variant counts
 
-export const IMAGE_COLLECTIONS = {
-  // ---------------------------------------------------------------------------
-  // COLLECTION: Motivational Categories
-  // ---------------------------------------------------------------------------
-  // Used by: Motivators page (/motivators)
-  // Component: MotivatorsCarousel, MotivatorsGrid
-  // Purpose: Maps motivational quote categories to their thumbnail images.
-  //          Each category in the pub_shareables_sets table has an associated
-  //          image that displays on the swipeable grid cards.
-  // Image Set: MCIP (Motivational Category Image Pack) - labeled category images
-  // ---------------------------------------------------------------------------
-  motivationalCategories: {
-    // Categories with dedicated MCIP images (labeled graphics)
-    "bounce back": "/mcip-1.png",
-    celebration: "/mcip-2.png",
-    discipline: "/mcip-3.png",
-    focus: "/mcip-4.png",
-    glory: "/mcip-5.png",
-    "good luck": "/mcip-6.png",
-    leadership: "/mcip-7.png",
-    team: "/mcip-8.png",
-    grit: "/mcip-9.png",
+interface ThemeImageConfig {
+  folder: string;        // Base folder path (e.g., "/factoids")
+  prefix: string;        // File prefix (e.g., "the-players")
+  variants: number;      // Number of available variants
+}
 
-    // Categories using HCIP fallback images (hockey player graphics)
-    // TODO: Create dedicated MCIP images for these categories
-    "hard work": "/hcip-3.png",
-    "i'm proud": "/hcip-4.png",
-    mindset: "/hcip-5.png",
-    perseverance: "/hcip-6.png",
-    resilience: "/hcip-7.png",
-    teamwork: "/hcip-8.png",
-    "the code": "/hcip-9.png",
-    "the flow": "/hcip-10.png",
-    "the grind": "/hcip-11.png",
-    "the room": "/hcip-12.png",
-  } as Record<string, string>,
-
-  // ---------------------------------------------------------------------------
-  // COLLECTION: [Future collections will be added here]
-  // ---------------------------------------------------------------------------
-  // Example: hubCells, setAttributions, factCategories, etc.
-  // ---------------------------------------------------------------------------
+// Content type → Theme → Image configuration
+const THEME_IMAGE_MAP: Record<string, Record<string, ThemeImageConfig>> = {
+  factoid: {
+    "Players": { folder: "/factoids", prefix: "the-players", variants: 20 },
+    "Geography": { folder: "/factoids", prefix: "geography-of-hockey", variants: 11 },
+    "History": { folder: "/factoids", prefix: "the-wall", variants: 11 },
+    "Business": { folder: "/factoids", prefix: "the-business", variants: 2 },
+    "League": { folder: "/factoids", prefix: "the-league", variants: 2 },
+    "System": { folder: "/factoids", prefix: "the-system", variants: 2 },
+    "Game Day": { folder: "/factoids", prefix: "game-day", variants: 3 },
+    "Lab": { folder: "/factoids", prefix: "the-lab", variants: 1 },
+    "Legacy": { folder: "/factoids", prefix: "the-legacy", variants: 1 },
+  },
+  motivational: {
+    "Players": { folder: "/motivators", prefix: "grit", variants: 1 },
+    "Focus": { folder: "/motivators", prefix: "focus", variants: 3 },
+    "Bounce Back": { folder: "/motivators", prefix: "bounceback", variants: 2 },
+    "Celebration": { folder: "/motivators", prefix: "celebration", variants: 1 },
+    "Leadership": { folder: "/motivators", prefix: "leadership", variants: 1 },
+    "Good Luck": { folder: "/motivators", prefix: "goodluck", variants: 3 },
+    "Glory": { folder: "/motivators", prefix: "glory", variants: 1 },
+    "Team": { folder: "/motivators", prefix: "team", variants: 1 },
+    "Calm": { folder: "/motivators", prefix: "calm", variants: 1 },
+  },
+  supportive: {
+    // Add your supportive theme mappings here
+    // Example: "Players": { folder: "/supportive", prefix: "players", variants: 5 },
+  },
+  advisory: {
+    // Add your advisory theme mappings here
+    // Example: "Entertainment": { folder: "/advisory", prefix: "entertainment", variants: 3 },
+  },
+  slogans: {
+    // Add your slogans theme mappings here
+    // Example: "Records": { folder: "/slogans", prefix: "records", variants: 4 },
+  },
+  shareables: {
+    // Add your shareables theme mappings here
+    // Example: "History": { folder: "/shareables", prefix: "history", variants: 6 },
+  },
+  "trivia-multiple-choice": {
+    // Add your trivia theme mappings here
+  },
+  "trivia_true_false": {
+    // Add your trivia theme mappings here
+  },
 };
 
-// =============================================================================
-// DEFAULT IMAGES
-// =============================================================================
-// Fallback images used when a key is not found in a collection
-
-export const COLLECTION_DEFAULTS: Record<string, string> = {
-  motivationalCategories: "/hcip-21.png",
+// Default fallback images per content type
+const CONTENT_TYPE_DEFAULTS: Record<string, string> = {
+  factoid: "/hcip-21.png",
+  motivational: "/hcip-22.png",
+  supportive: "/hcip-23.png",
+  advisory: "/hcip-24.png",
+  slogans: "/hcip-25.png",
+  shareables: "/hcip-26.png",
+  "trivia-multiple-choice": "/hcip-27.png",
+  "trivia_true_false": "/hcip-28.png",
 };
 
 // =============================================================================
@@ -86,62 +92,52 @@ export const COLLECTION_DEFAULTS: Record<string, string> = {
 // =============================================================================
 
 /**
- * Get an image path from a specific collection.
- *
- * @param collection - The name of the image collection to search
- * @param key - The key to look up (e.g., category name, set title)
- * @returns The image path, or the collection's default if not found
+ * Get a sequential image for a content tile based on theme and tile index
+ * 
+ * @param contentType - The content type (factoid, motivational, supportive, etc.)
+ * @param theme - The theme name (Players, History, Entertainment, etc.)
+ * @param tileIndex - The position of the tile in the grid (0-14)
+ * @returns The image path for this tile
  *
  * @example
- * getImage("motivationalCategories", "grit") // Returns "/mcip-9.png"
- * getImage("motivationalCategories", "unknown") // Returns "/hcip-21.png" (default)
+ * getSequentialImage("factoid", "Players", 0) // Returns "/factoids/the-players-1.png"
+ * getSequentialImage("factoid", "Players", 1) // Returns "/factoids/the-players-2.png"
+ * getSequentialImage("motivational", "Focus", 5) // Returns "/motivators/focus-3.png" (wraps at 3 variants)
+ */
+export function getSequentialImage(
+  contentType: string,
+  theme: string | null | undefined,
+  tileIndex: number,
+): string {
+  // Fallback if no theme provided
+  if (!theme) {
+    return CONTENT_TYPE_DEFAULTS[contentType] || "/hcip-1.png";
+  }
+
+  // Get theme config for this content type
+  const contentTypeMap = THEME_IMAGE_MAP[contentType];
+  if (!contentTypeMap) {
+    return CONTENT_TYPE_DEFAULTS[contentType] || "/hcip-1.png";
+  }
+
+  const themeConfig = contentTypeMap[theme];
+  if (!themeConfig) {
+    return CONTENT_TYPE_DEFAULTS[contentType] || "/hcip-1.png";
+  }
+
+  // Calculate which variant to use (cycles through available variants)
+  const variantNumber = (tileIndex % themeConfig.variants) + 1;
+  
+  return `${themeConfig.folder}/${themeConfig.prefix}-${variantNumber}.png`;
+}
+
+/**
+ * Legacy function - kept for backward compatibility
+ * @deprecated Use getSequentialImage instead
  */
 export function getImage(
-  collection: keyof typeof IMAGE_COLLECTIONS,
+  collection: string,
   key: string | null,
 ): string {
-  if (!key) {
-    return COLLECTION_DEFAULTS[collection] || "/hcip-1.png";
-  }
-
-  const normalizedKey = key.toLowerCase().trim();
-  const collectionMap = IMAGE_COLLECTIONS[collection];
-
-  if (collectionMap && normalizedKey in collectionMap) {
-    return collectionMap[normalizedKey];
-  }
-
-  return COLLECTION_DEFAULTS[collection] || "/hcip-1.png";
-}
-
-/**
- * Check if a key exists in a collection.
- *
- * @param collection - The name of the image collection to search
- * @param key - The key to check
- * @returns True if the key exists in the collection
- */
-export function hasImage(
-  collection: keyof typeof IMAGE_COLLECTIONS,
-  key: string | null,
-): boolean {
-  if (!key) return false;
-
-  const normalizedKey = key.toLowerCase().trim();
-  const collectionMap = IMAGE_COLLECTIONS[collection];
-
-  return collectionMap ? normalizedKey in collectionMap : false;
-}
-
-/**
- * Get all keys in a collection.
- *
- * @param collection - The name of the image collection
- * @returns Array of all keys in the collection
- */
-export function getCollectionKeys(
-  collection: keyof typeof IMAGE_COLLECTIONS,
-): string[] {
-  const collectionMap = IMAGE_COLLECTIONS[collection];
-  return collectionMap ? Object.keys(collectionMap) : [];
+  return "/hcip-1.png";
 }

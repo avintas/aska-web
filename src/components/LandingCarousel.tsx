@@ -8,12 +8,16 @@ import { carouselCards, type CarouselCard } from "@/config/carousel-cards";
 interface LandingCarouselProps {
   className?: string;
   onShopClick?: () => void;
+  cards?: CarouselCard[]; // Optional: override default carouselCards
 }
 
 export function LandingCarousel({
   className = "",
   onShopClick,
+  cards,
 }: LandingCarouselProps): JSX.Element {
+  // Use provided cards or fall back to default carouselCards
+  const displayCards = cards || carouselCards;
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -65,7 +69,7 @@ export function LandingCarousel({
       {/* Carousel Container */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex touch-pan-y">
-          {carouselCards.map((card) => (
+          {displayCards.map((card) => (
             <CarouselSlide
               key={card.id}
               card={card}
