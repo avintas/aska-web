@@ -40,8 +40,6 @@ export default function BenchBossPage(): JSX.Element {
   const [items, setItems] = useState<(MotivationalItem | CollectionItem)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentLabel, setCurrentLabel] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<
     MotivationalItem | CollectionItem | null
   >(null);
@@ -61,7 +59,6 @@ export default function BenchBossPage(): JSX.Element {
 
       if (result.success && result.data) {
         setItems((result.data as CollectionItem[]).slice(0, 12));
-        setCurrentLabel(category);
       } else {
         setError(result.error || `Failed to load ${category}`);
       }
@@ -142,7 +139,6 @@ export default function BenchBossPage(): JSX.Element {
     }));
 
     setItems(convertedItems);
-    setCurrentLabel(set.set_title);
     setLoading(false);
   };
 
@@ -307,7 +303,6 @@ export default function BenchBossPage(): JSX.Element {
       });
 
       setItems(filteredItems);
-      setCurrentLabel(category);
     }
   };
 

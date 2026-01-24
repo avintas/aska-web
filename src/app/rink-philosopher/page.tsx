@@ -31,8 +31,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentLabel, setCurrentLabel] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sets, setSets] = useState<ContentSet[]>([]);
@@ -50,7 +48,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
 
       if (result.success && result.data) {
         setItems((result.data as CollectionItem[]).slice(0, 12));
-        setCurrentLabel(theme);
       } else {
         setError(result.error || `Failed to load ${theme}`);
       }
@@ -131,7 +128,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
     }));
 
     setItems(convertedItems);
-    setCurrentLabel(set.set_title);
     setLoading(false);
   };
 
@@ -274,7 +270,6 @@ export default function RinkPhilosopherPage(): JSX.Element {
       });
 
       setItems(filteredItems);
-      setCurrentLabel(category);
     }
   };
 

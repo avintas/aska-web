@@ -43,7 +43,12 @@ export function ContentGrid({
           }
 
           // Inactive cell with image (no href, no onClick) - Used for padding
-          if (cell.inactiveImage && !cell.href && !cell.onClick && !cell.description) {
+          if (
+            cell.inactiveImage &&
+            !cell.href &&
+            !cell.onClick &&
+            !cell.description
+          ) {
             return (
               <div
                 key={`inactive-${index}`}
@@ -54,13 +59,36 @@ export function ContentGrid({
                   src={cell.inactiveImage}
                   alt=""
                   className="w-full h-full object-cover opacity-10"
+                  onError={(e) => {
+                    // Fallback to center-tile.webp for factoid, motivator, and trivia images that fail to load
+                    const target = e.target as HTMLImageElement;
+                    if (target.src) {
+                      if (
+                        target.src.includes("/factoids/") &&
+                        !target.src.includes("center-tile.webp")
+                      ) {
+                        target.src = "/factoids/center-tile.webp";
+                      } else if (
+                        target.src.includes("/motivators/") &&
+                        !target.src.includes("center-tile.webp")
+                      ) {
+                        target.src = "/motivators/center-tile.webp";
+                      } else if (
+                        target.src.includes("/trivia-arena/") &&
+                        !target.src.includes("center-tile.webp")
+                      ) {
+                        target.src = "/trivia-arena/center-tile.webp";
+                      }
+                    }
+                  }}
                 />
               </div>
             );
           }
 
           const isFlipped = flippedCards.has(cell.id);
-          const isVisualAnchor = cell.isVisualAnchor || isVisualAnchorIndex(index);
+          const isVisualAnchor =
+            cell.isVisualAnchor || isVisualAnchorIndex(index);
           const isTriviaAnswered = cell.isAnswered === true;
           const isTriviaCorrect = cell.isCorrect === true;
 
@@ -84,16 +112,36 @@ export function ContentGrid({
                         isTriviaCorrect ? "text-green-300" : "text-red-300"
                       }`}
                     >
-                      {cell.pointsGained > 0 ? `+${cell.pointsGained}` : cell.pointsGained}
+                      {cell.pointsGained > 0
+                        ? `+${cell.pointsGained}`
+                        : cell.pointsGained}
                     </div>
                   )}
                 </div>
               ) : isFlipped && cell.description ? (
                 // Show text preview when flipped (for non-trivia content)
                 <div className="w-full h-full flex items-center justify-center p-2 z-10 relative">
-                  <p className="text-[8px] md:text-[9px] text-white/90 dark:text-white/90 font-medium text-center leading-tight line-clamp-4">
-                    {cell.description.substring(0, 100)}...
-                  </p>
+                  {cell.isBonus ? (
+                    // Bonus tile - display "BONUS" and "15 points"
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <p className="text-[12px] md:text-[14px] text-white font-black uppercase tracking-wider mb-1">
+                        BONUS
+                      </p>
+                      <p className="text-[10px] md:text-[12px] text-white/90 font-bold">
+                        15 points
+                      </p>
+                    </div>
+                  ) : cell.isSponsored ? (
+                    // Sponsored tile - display "This is a sponsored ad"
+                    <p className="text-[8px] md:text-[9px] text-white/90 dark:text-white/90 font-medium text-center leading-tight">
+                      This is a sponsored ad
+                    </p>
+                  ) : (
+                    // Regular content preview
+                    <p className="text-[8px] md:text-[9px] text-white/90 dark:text-white/90 font-medium text-center leading-tight line-clamp-4">
+                      {cell.description.substring(0, 100)}...
+                    </p>
+                  )}
                 </div>
               ) : (
                 <>
@@ -102,7 +150,29 @@ export function ContentGrid({
                     <img
                       src={cell.inactiveImage}
                       alt={cell.name}
-                      className={`w-full h-full object-cover absolute inset-0 z-0 ${isVisualAnchor ? 'opacity-25' : 'opacity-100'}`}
+                      className={`w-full h-full object-cover absolute inset-0 z-0 ${isVisualAnchor ? "opacity-25" : "opacity-100"}`}
+                      onError={(e) => {
+                        // Fallback to center-tile.webp for factoid, motivator, and trivia images that fail to load
+                        const target = e.target as HTMLImageElement;
+                        if (target.src) {
+                          if (
+                            target.src.includes("/factoids/") &&
+                            !target.src.includes("center-tile.webp")
+                          ) {
+                            target.src = "/factoids/center-tile.webp";
+                          } else if (
+                            target.src.includes("/motivators/") &&
+                            !target.src.includes("center-tile.webp")
+                          ) {
+                            target.src = "/motivators/center-tile.webp";
+                          } else if (
+                            target.src.includes("/trivia-arena/") &&
+                            !target.src.includes("center-tile.webp")
+                          ) {
+                            target.src = "/trivia-arena/center-tile.webp";
+                          }
+                        }
+                      }}
                     />
                   )}
 
@@ -128,8 +198,8 @@ export function ContentGrid({
             baseClassName = `group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 rounded-lg flex items-center justify-center overflow-hidden opacity-25 pointer-events-none`;
           } else if (isTriviaAnswered) {
             // Answered trivia tiles: colored border based on correctness
-            const borderColor = isTriviaCorrect 
-              ? "border-green-500 dark:border-green-400" 
+            const borderColor = isTriviaCorrect
+              ? "border-green-500 dark:border-green-400"
               : "border-red-500 dark:border-red-400";
             baseClassName = `group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-navy-900 dark:bg-orange-500 cursor-pointer hover:opacity-90 active:scale-95 transition-all rounded-lg flex items-center justify-center overflow-hidden touch-manipulation border-2 ${borderColor}`;
           } else {
@@ -139,11 +209,7 @@ export function ContentGrid({
           // Visual anchor tiles are always non-interactive
           if (isVisualAnchor) {
             return (
-              <div
-                key={cell.id}
-                className={baseClassName}
-                aria-hidden="true"
-              >
+              <div key={cell.id} className={baseClassName} aria-hidden="true">
                 {cellContent}
               </div>
             );
@@ -157,11 +223,11 @@ export function ContentGrid({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  
+
                   if (cell.onClick) {
                     cell.onClick(e);
                   }
-                  
+
                   // Trigger flip and modal
                   if (cell.description) {
                     onCellClick(
@@ -177,14 +243,7 @@ export function ContentGrid({
                 style={{ animationDelay: `${index * 0.2}s` }}
                 aria-label={cell.description || cell.name}
               >
-                {/* Badge - hide for answered trivia tiles */}
-                {cell.badge && !isTriviaAnswered && (
-                  <div
-                    className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
-                  >
-                    {cell.badge}
-                  </div>
-                )}
+                {/* Badge - removed for now, will be used for trivia game bonus content in the future */}
                 {cellContent}
               </button>
             );
@@ -200,14 +259,7 @@ export function ContentGrid({
                 style={{ animationDelay: `${index * 0.2}s` }}
                 aria-label={cell.description || cell.name}
               >
-                {/* Badge - hide for answered trivia tiles */}
-                {cell.badge && !isTriviaAnswered && (
-                  <div
-                    className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
-                  >
-                    {cell.badge}
-                  </div>
-                )}
+                {/* Badge - removed for now, will be used for trivia game bonus content in the future */}
                 {cellContent}
               </Link>
             );
@@ -220,14 +272,7 @@ export function ContentGrid({
               className={baseClassName}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
-              {/* Badge - hide for answered trivia tiles */}
-              {cell.badge && !isTriviaAnswered && (
-                <div
-                  className={`absolute top-1 right-1 ${cell.badgeColor || "bg-blue-500"} text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md uppercase tracking-tight z-20`}
-                >
-                  {cell.badge}
-                </div>
-              )}
+              {/* Badge - removed for now, will be used for trivia game bonus content in the future */}
               {cellContent}
             </div>
           );

@@ -37,7 +37,7 @@ export default function DidYouKnowPage(): JSX.Element {
 
         if (result.success && result.data && result.data.length > 0) {
           const sets = result.data as SourceContentSet[];
-          
+
           // Map sets to carousel cards
           // Each set becomes one card, each set_item becomes one tile
           const cards = mapSetsToCarouselCards(sets);
@@ -45,6 +45,7 @@ export default function DidYouKnowPage(): JSX.Element {
           setCarouselCards(cards);
         } else {
           // If no sets found, create empty card with inactive cells
+          // Use center-tile.webp as fallback for all factoid tiles
           const emptyCard: CarouselCard = {
             id: 3,
             title: "Did You Know?",
@@ -52,14 +53,14 @@ export default function DidYouKnowPage(): JSX.Element {
               id: `inactive-${i}`,
               name: "",
               emoji: "",
-              inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+              inactiveImage: "/factoids/center-tile.webp",
             })),
           };
           setCarouselCards([emptyCard]);
         }
       } catch (error) {
         console.error("Error fetching factoid sets:", error);
-        // On error, create empty card
+        // On error, create empty card with center-tile.webp fallback
         const emptyCard: CarouselCard = {
           id: 3,
           title: "Did You Know?",
@@ -67,7 +68,7 @@ export default function DidYouKnowPage(): JSX.Element {
             id: `inactive-${i}`,
             name: "",
             emoji: "",
-            inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+            inactiveImage: "/factoids/center-tile.webp",
           })),
         };
         setCarouselCards([emptyCard]);
@@ -92,7 +93,8 @@ export default function DidYouKnowPage(): JSX.Element {
           </div>
           <div className="max-w-2xl mx-auto">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Discover fascinating hockey facts! Swipe through different collections and tap any tile to reveal an interesting fact.
+              Discover fascinating hockey facts! Swipe through different
+              collections and tap any tile to reveal an interesting fact.
             </p>
           </div>
         </div>
@@ -100,7 +102,9 @@ export default function DidYouKnowPage(): JSX.Element {
         {/* Factoid Collections Carousel */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">Loading factoid collections...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading factoid collections...
+            </p>
           </div>
         ) : (
           <ContentCarousel cards={carouselCards} />

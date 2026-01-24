@@ -33,14 +33,15 @@ export default function MotivatorsPage(): JSX.Element {
     async function fetchMotivatorSets() {
       try {
         // Fetch all message types
-        const [motivational, supportive, advisory, slogans, shareables] = await Promise.all([
-          fetch("/api/collections/motivational"),
-          fetch("/api/collections/supportive"),
-          fetch("/api/collections/advisory"),
-          fetch("/api/collections/slogans"),
-          fetch("/api/collections/shareables"),
-        ]);
-        
+        const [motivational, supportive, advisory, slogans, shareables] =
+          await Promise.all([
+            fetch("/api/collections/motivational"),
+            fetch("/api/collections/supportive"),
+            fetch("/api/collections/advisory"),
+            fetch("/api/collections/slogans"),
+            fetch("/api/collections/shareables"),
+          ]);
+
         const results = await Promise.all([
           motivational.json(),
           supportive.json(),
@@ -48,12 +49,12 @@ export default function MotivatorsPage(): JSX.Element {
           slogans.json(),
           shareables.json(),
         ]);
-        
+
         // Combine all message sets
         const allSets = results
           .filter((r) => r.success && r.data)
           .flatMap((r) => r.data);
-        
+
         const result = {
           success: allSets.length > 0,
           data: allSets,
@@ -61,7 +62,7 @@ export default function MotivatorsPage(): JSX.Element {
 
         if (result.success && result.data && result.data.length > 0) {
           const sets = result.data as SourceContentSet[];
-          
+
           // Map sets to carousel cards
           // Each set becomes one card, each set_item becomes one tile
           const cards = mapSetsToCarouselCards(sets);
@@ -69,6 +70,7 @@ export default function MotivatorsPage(): JSX.Element {
           setCarouselCards(cards);
         } else {
           // If no sets found, create empty card with inactive cells
+          // Use center-tile.webp as fallback for all motivator tiles
           const emptyCard: CarouselCard = {
             id: 1,
             title: "Motivators",
@@ -76,14 +78,14 @@ export default function MotivatorsPage(): JSX.Element {
               id: `inactive-${i}`,
               name: "",
               emoji: "",
-              inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+              inactiveImage: "/motivators/center-tile.webp",
             })),
           };
           setCarouselCards([emptyCard]);
         }
       } catch (error) {
         console.error("Error fetching motivator sets:", error);
-        // On error, create empty card
+        // On error, create empty card with center-tile.webp fallback
         const emptyCard: CarouselCard = {
           id: 1,
           title: "Motivators",
@@ -91,7 +93,7 @@ export default function MotivatorsPage(): JSX.Element {
             id: `inactive-${i}`,
             name: "",
             emoji: "",
-            inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+            inactiveImage: "/motivators/center-tile.webp",
           })),
         };
         setCarouselCards([emptyCard]);
@@ -102,7 +104,6 @@ export default function MotivatorsPage(): JSX.Element {
 
     fetchMotivatorSets();
   }, []);
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-20 pb-16 px-4 md:px-6 lg:px-8">
@@ -117,7 +118,9 @@ export default function MotivatorsPage(): JSX.Element {
           </div>
           <div className="max-w-2xl mx-auto">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Inspiration from hockey life and culture. Swipe through different collections and tap any tile to reveal a motivational quote you can share.
+              Inspiration from hockey life and culture. Swipe through different
+              collections and tap any tile to reveal a motivational quote you
+              can share.
             </p>
           </div>
         </div>
@@ -125,7 +128,9 @@ export default function MotivatorsPage(): JSX.Element {
         {/* Motivator Collections Carousel */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">Loading motivator collections...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading motivator collections...
+            </p>
           </div>
         ) : (
           <ContentCarousel cards={carouselCards} />

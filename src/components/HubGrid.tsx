@@ -39,6 +39,9 @@ export interface HubCell {
   questionData?: TriviaQuestionData;
   // Hub navigation (for Card 0)
   targetCardIndex?: number; // Target card index to navigate to when clicked
+  // Special tile types
+  isBonus?: boolean; // Bonus tile - shows "BONUS" and "15 points"
+  isSponsored?: boolean; // Sponsored ad tile - shows "This is a sponsored ad"
 }
 
 interface HubGridProps {

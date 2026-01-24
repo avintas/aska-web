@@ -109,54 +109,6 @@ export interface TrueFalseTriviaFetchParams {
 }
 
 // ========================================================================
-// WHO AM I TRIVIA
-// ========================================================================
-
-export interface WhoAmITrivia extends StandardContentFields {
-  question_text: string;
-  correct_answer: string;
-  explanation: string | null;
-  difficulty: DifficultyLevel | null;
-  tags: string[] | null;
-}
-
-export interface WhoAmITriviaCreateInput {
-  question_text: string;
-  correct_answer: string;
-  explanation?: string | null;
-  category?: string | null;
-  theme?: string | null;
-  difficulty?: DifficultyLevel | null;
-  tags?: string[] | null;
-  attribution?: string | null;
-  status?: ContentStatus;
-  source_content_id?: number | null;
-}
-
-export interface WhoAmITriviaUpdateInput {
-  question_text?: string;
-  correct_answer?: string;
-  explanation?: string | null;
-  category?: string | null;
-  theme?: string | null;
-  difficulty?: DifficultyLevel | null;
-  tags?: string[] | null;
-  attribution?: string | null;
-  status?: ContentStatus | null;
-  used_in?: string[] | null;
-  display_order?: number | null;
-}
-
-export interface WhoAmITriviaFetchParams {
-  theme?: string;
-  category?: string;
-  difficulty?: DifficultyLevel;
-  status?: ContentStatus;
-  limit?: number;
-  offset?: number;
-}
-
-// ========================================================================
 // VALIDATION HELPERS
 // ========================================================================
 

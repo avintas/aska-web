@@ -31,7 +31,9 @@ interface SourceContentSet {
 export default function TriviaArenaPage(): JSX.Element {
   const [carouselCards, setCarouselCards] = useState<CarouselCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [gameSession, setGameSession] = useState<TriviaGameSession | null>(null);
+  const [gameSession, setGameSession] = useState<TriviaGameSession | null>(
+    null,
+  );
 
   useEffect(() => {
     async function fetchTriviaSets() {
@@ -41,18 +43,18 @@ export default function TriviaArenaPage(): JSX.Element {
           fetch("/api/collections/trivia-multiple-choice"),
           fetch("/api/collections/trivia-true-false"),
         ]);
-        
+
         const [mcResult, tfResult] = await Promise.all([
           mcResponse.json(),
           tfResponse.json(),
         ]);
-        
+
         // Combine both result sets
         const allSets = [
           ...(mcResult.success && mcResult.data ? mcResult.data : []),
           ...(tfResult.success && tfResult.data ? tfResult.data : []),
         ];
-        
+
         const result = {
           success: allSets.length > 0,
           data: allSets,
@@ -60,7 +62,7 @@ export default function TriviaArenaPage(): JSX.Element {
 
         if (result.success && result.data && result.data.length > 0) {
           const sets = result.data as SourceContentSet[];
-          
+
           // Map sets to carousel cards
           // Each set becomes one card, each set_item becomes one tile
           const collectionCards = mapSetsToCarouselCards(sets);
@@ -68,38 +70,42 @@ export default function TriviaArenaPage(): JSX.Element {
           // Create Card 0 (Hub) - tiles represent collections, clicking navigates to that card
           // Fill sequentially, keeping center tile (index 7) unoccupied
           const CENTER_TILE_INDEX = 7;
-          
+
           // Initialize array with 15 null cells
-          const hubCells: (HubCell | null)[] = Array.from({ length: 15 }, () => null);
-          
+          const hubCells: (HubCell | null)[] = Array.from(
+            { length: 15 },
+            () => null,
+          );
+
           // Fill tiles sequentially, skipping center tile
           let gameIndex = 0; // Track which game we're placing
           for (let i = 0; i < 15; i++) {
             // Skip center tile (index 7)
             if (i === CENTER_TILE_INDEX) {
-              // Center tile remains inactive
+              // Center tile uses trivia-arena center-tile.webp
               hubCells[i] = {
                 id: `hub-inactive-${i}`,
                 name: "",
                 emoji: "",
-                inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+                inactiveImage: "/trivia-arena/center-tile.webp",
               };
               continue;
             }
-            
+
             // Place trivia game if available
             if (gameIndex < collectionCards.length) {
               const card = collectionCards[gameIndex];
               const cardIndex = gameIndex + 1; // Card index will be index + 1 (since Card 0 is index 0)
-              
+
               // Get collection title for display
               const displayTitle = card.title || `Collection ${cardIndex}`;
-              
+
               // Truncate title for tile display (show first 30 chars max)
-              const truncatedTitle = displayTitle.length > 30 
-                ? `${displayTitle.substring(0, 30)}...` 
-                : displayTitle;
-              
+              const truncatedTitle =
+                displayTitle.length > 30
+                  ? `${displayTitle.substring(0, 30)}...`
+                  : displayTitle;
+
               hubCells[i] = {
                 id: `hub-${card.id}`,
                 name: truncatedTitle.toUpperCase(),
@@ -112,16 +118,16 @@ export default function TriviaArenaPage(): JSX.Element {
               };
               gameIndex++;
             } else {
-              // Fill remaining positions with inactive cells
+              // Fill remaining positions with inactive cells using trivia-arena fallback
               hubCells[i] = {
                 id: `hub-inactive-${i}`,
                 name: "",
                 emoji: "",
-                inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+                inactiveImage: "/trivia-arena/center-tile.webp",
               };
             }
           }
-          
+
           const hubCard: CarouselCard = {
             id: 0,
             title: "Trivia Collections",
@@ -134,6 +140,7 @@ export default function TriviaArenaPage(): JSX.Element {
           setCarouselCards(allCards);
         } else {
           // If no sets found, create empty card with inactive cells
+          // Use center-tile.webp as fallback for all trivia tiles
           const emptyCard: CarouselCard = {
             id: 2,
             title: "Trivia Arena",
@@ -141,14 +148,14 @@ export default function TriviaArenaPage(): JSX.Element {
               id: `inactive-${i}`,
               name: "",
               emoji: "",
-              inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+              inactiveImage: "/trivia-arena/center-tile.webp",
             })),
           };
           setCarouselCards([emptyCard]);
         }
       } catch (error) {
         console.error("Error fetching trivia sets:", error);
-        // On error, create empty card
+        // On error, create empty card with center-tile.webp fallback
         const emptyCard: CarouselCard = {
           id: 2,
           title: "Trivia Arena",
@@ -156,7 +163,7 @@ export default function TriviaArenaPage(): JSX.Element {
             id: `inactive-${i}`,
             name: "",
             emoji: "",
-            inactiveImage: `/hcip-${(i % 40) + 1}.png`,
+            inactiveImage: "/trivia-arena/center-tile.webp",
           })),
         };
         setCarouselCards([emptyCard]);
@@ -180,8 +187,9 @@ export default function TriviaArenaPage(): JSX.Element {
           </div>
           <div className="max-w-2xl mx-auto">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Test your hockey knowledge! Each card represents a trivia collection. 
-              Swipe through different themes and tap any tile to play that trivia question.
+              Test your hockey knowledge! Each card represents a trivia
+              collection. Swipe through different themes and tap any tile to
+              play that trivia question.
             </p>
           </div>
         </div>
@@ -189,7 +197,9 @@ export default function TriviaArenaPage(): JSX.Element {
         {/* Trivia Collections Carousel */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">Loading trivia games...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading trivia games...
+            </p>
           </div>
         ) : (
           <ContentCarousel
@@ -201,27 +211,43 @@ export default function TriviaArenaPage(): JSX.Element {
               setGameSession(newSession);
             }}
             onAnswerQuestion={(tileId, answer, questionData) => {
-              if (!gameSession) return { isCorrect: false, pointsGained: 0, correctAnswer: "", explanation: null };
-              
-              const result = answerQuestion(gameSession, tileId, answer, questionData);
-              
+              if (!gameSession)
+                return {
+                  isCorrect: false,
+                  pointsGained: 0,
+                  correctAnswer: "",
+                  explanation: null,
+                };
+
+              const result = answerQuestion(
+                gameSession,
+                tileId,
+                answer,
+                questionData,
+              );
+
               // Update session state (answerQuestion mutates gameSession, so create new object for React)
-              setGameSession({ 
+              setGameSession({
                 ...gameSession,
                 answeredTiles: new Set(gameSession.answeredTiles),
                 totalAnswered: gameSession.totalAnswered,
                 correct: gameSession.correct,
                 score: gameSession.score,
               });
-              
+
               // Check if game is complete
               if (gameSession.totalAnswered >= gameSession.questionCount) {
                 // Game complete - will be handled by ContentCarousel
               }
-              
+
               return result;
             }}
-            onUpdateTileState={(tileId, isAnswered, isCorrect, pointsGained) => {
+            onUpdateTileState={(
+              tileId,
+              isAnswered,
+              isCorrect,
+              pointsGained,
+            ) => {
               // Update the tile in carouselCards
               setCarouselCards((prevCards) =>
                 prevCards.map((card) => ({
@@ -234,9 +260,9 @@ export default function TriviaArenaPage(): JSX.Element {
                           isCorrect,
                           pointsGained,
                         }
-                      : cell
+                      : cell,
                   ),
-                }))
+                })),
               );
             }}
             onResetGame={() => {
@@ -254,9 +280,9 @@ export default function TriviaArenaPage(): JSX.Element {
                           isCorrect: undefined,
                           pointsGained: undefined,
                         }
-                      : cell
+                      : cell,
                   ),
-                }))
+                })),
               );
             }}
           />
