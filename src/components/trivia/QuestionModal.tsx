@@ -9,8 +9,6 @@ interface QuestionModalProps {
   onAnswer: (answer: string) => void;
   onClose: () => void;
   isReviewMode?: boolean; // If true, show correct answer and explanation
-  userAnswer?: string; // User's previous answer (for review mode)
-  isCorrect?: boolean; // Whether the answer was correct (for review mode)
 }
 
 export function QuestionModal({
@@ -19,12 +17,8 @@ export function QuestionModal({
   onAnswer,
   onClose,
   isReviewMode = false,
-  userAnswer,
-  isCorrect,
 }: QuestionModalProps): JSX.Element | null {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-
-  if (!isOpen) return null;
 
   const isMultipleChoice = questionData.question_type === "multiple-choice" || 
     (questionData.wrong_answers && questionData.wrong_answers.length > 0);
@@ -43,7 +37,9 @@ export function QuestionModal({
       return shuffled;
     }
     return ["True", "False"];
-  }, [questionData.question_text, isMultipleChoice]);
+  }, [questionData.question_text, isMultipleChoice, questionData.correct_answer, questionData.wrong_answers]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = (): void => {
     if (selectedAnswer !== null) {

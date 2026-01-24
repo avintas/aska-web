@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { ContentCarousel } from "@/components/ContentCarousel";
 import { mapSetsToCarouselCards } from "@/utils/mapSetsToCarouselCards";
 import type { CarouselCard } from "@/config/carousel-cards";
-import type { TriviaGameSession, TriviaAnswerResult } from "@/shared/types/trivia-game";
-import { createGameSession, answerQuestion, isGameComplete } from "@/utils/triviaGameSession";
+import type { TriviaGameSession } from "@/shared/types/trivia-game";
+import { createGameSession, answerQuestion } from "@/utils/triviaGameSession";
 import type { HubCell } from "@/components/HubGrid";
 
 interface SourceContentSet {
@@ -238,9 +238,6 @@ export default function TriviaArenaPage(): JSX.Element {
                   ),
                 }))
               );
-            }}
-            onCompleteGame={() => {
-              // Game completion is handled by ResultsModal
             }}
             onResetGame={() => {
               // Reset game session

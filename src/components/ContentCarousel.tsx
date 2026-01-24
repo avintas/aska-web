@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import type { CarouselCard } from "@/config/carousel-cards";
 import { ContentGrid } from "./ContentGrid";
 import { HubCell } from "./HubGrid";
-import type { TriviaGameSession, TriviaAnswerResult } from "@/shared/types/trivia-game";
+import type { TriviaGameSession, TriviaAnswerResult, TriviaQuestionData } from "@/shared/types/trivia-game";
 import { QuestionCountModal } from "./trivia/QuestionCountModal";
 import { QuestionModal } from "./trivia/QuestionModal";
 import { ScoreDisplay } from "./trivia/ScoreDisplay";
@@ -26,12 +26,10 @@ interface ContentCarouselProps {
   // Trivia game props
   gameSession?: TriviaGameSession | null;
   onStartGame?: (questionCount: number, cardId: number) => void;
-  onAnswerQuestion?: (tileId: string, answer: string, questionData: any) => TriviaAnswerResult;
+  onAnswerQuestion?: (tileId: string, answer: string, questionData: TriviaQuestionData) => TriviaAnswerResult;
   onUpdateTileState?: (tileId: string, isAnswered: boolean, isCorrect: boolean, pointsGained: number) => void;
-  onCompleteGame?: () => void;
   onResetGame?: () => void;
   isTriviaMode?: boolean; // Whether this carousel is in trivia mode
-  onNavigateToCard?: (cardIndex: number) => void; // Callback to navigate to a specific card
 }
 
 export function ContentCarousel({
@@ -42,10 +40,8 @@ export function ContentCarousel({
   onStartGame,
   onAnswerQuestion,
   onUpdateTileState,
-  onCompleteGame,
   onResetGame,
   isTriviaMode = false,
-  onNavigateToCard,
 }: ContentCarouselProps): JSX.Element {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -166,14 +162,14 @@ export function ContentCarousel({
                 <ContentGrid
                   cells={card.cells}
                   flippedCards={flippedCards}
-                  onCellClick={(cellId, content, theme, attribution, set_title, questionData) => {
+                  onCellClick={(cellId, content, theme, attribution, set_title) => {
                     // Find the clicked cell
                     const clickedCell = card.cells.find(c => c?.id === cellId);
                     
                     // Check if this is a hub navigation tile (Card 0 - has targetCardIndex)
-                    if (isTriviaMode && card.id === 0 && clickedCell && 'targetCardIndex' in clickedCell && typeof (clickedCell as any).targetCardIndex === 'number') {
+                    if (isTriviaMode && card.id === 0 && clickedCell && clickedCell.targetCardIndex !== undefined) {
                       // Hub tile clicked - navigate to target card
-                      const targetIndex = (clickedCell as any).targetCardIndex;
+                      const targetIndex = clickedCell.targetCardIndex;
                       // Use scrollTo to navigate to the target card
                       scrollTo(targetIndex);
                     }
@@ -273,7 +269,6 @@ export function ContentCarousel({
           isOpen={isQuestionModalOpen}
           questionData={currentQuestionTile.questionData}
           isReviewMode={currentQuestionTile.isAnswered === true}
-          isCorrect={currentQuestionTile.isCorrect}
           onAnswer={(answer) => {
             // Don't process answer if in review mode
             if (currentQuestionTile.isAnswered) {

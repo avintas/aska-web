@@ -8,7 +8,6 @@ interface ScoreDisplayProps {
 }
 
 export function ScoreDisplay({ session }: ScoreDisplayProps): JSX.Element {
-  const percentage = getScorePercentage(session);
   const displayText = getScoreDisplay(session);
 
   return (

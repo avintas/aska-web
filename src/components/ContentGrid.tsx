@@ -4,6 +4,7 @@ import Link from "next/link";
 import type React from "react";
 import { HubCell } from "./HubGrid";
 import { isVisualAnchorIndex } from "@/utils/visualAnchor";
+import type { TriviaQuestionData } from "@/shared/types/trivia-game";
 
 interface ContentGridProps {
   cells: (HubCell | null)[];
@@ -14,7 +15,6 @@ interface ContentGridProps {
     theme?: string,
     attribution?: string,
     set_title?: string,
-    questionData?: any,
   ) => void;
   emptyCellBg?: string;
 }
@@ -171,7 +171,6 @@ export function ContentGrid({
                       cell.theme,
                       cell.attribution || undefined,
                       cell.set_title,
-                      cell.questionData,
                     );
                   }
                 }}

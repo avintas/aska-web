@@ -18,7 +18,7 @@ interface UserStats {
 
 export function Navbar(): JSX.Element {
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
