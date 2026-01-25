@@ -1,9 +1,22 @@
 import Link from "next/link";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 export default function AboutPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="We launched OnlyHockey as a tribute to the great Game of Hockey. You can challenge yourself and your friends with hockey trivia games, support people you care about with H.U.G.s, and find and share motivational quotes from legendary players and epic coaches as well as interesting facts, anecdotes, and curiosities of hockey culture."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">

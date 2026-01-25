@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
+import { formatModalContent } from "@/utils/formatModalContent";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 interface CollectionItem {
   id: number;
@@ -276,6 +278,18 @@ export default function RinkPhilosopherPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 md:pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Sometimes the best lessons come from the rink. Deep wisdom, mental toughness insights, and philosophical reflections from the game's greatest minds. Whether you need perspective on the grind, clarity in the flow, or wisdom from the room, find the words that elevate your mindset."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
           <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
@@ -480,9 +494,14 @@ export default function RinkPhilosopherPage(): JSX.Element {
             <div className="p-4 md:p-5">
               {/* Quote */}
               <div className="mb-4 md:mb-5">
-                <p className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
-                  &ldquo;{getQuote(selectedItem)}&rdquo;
-                </p>
+                <div className="text-base md:text-lg text-gray-800 dark:text-gray-200 leading-relaxed italic">
+                  &ldquo;
+                  {formatModalContent(getQuote(selectedItem), {
+                    className: "",
+                    preserveLineBreaks: true,
+                  })}
+                  &rdquo;
+                </div>
               </div>
 
               {/* Share Button */}

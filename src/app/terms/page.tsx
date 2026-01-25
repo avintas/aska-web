@@ -1,9 +1,22 @@
 import Link from "next/link";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 export default function TermsPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Our terms of service outline the rules and guidelines for using OnlyHockey.com. By using our site, you agree to these terms. Please read them carefully to understand your rights and responsibilities."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">

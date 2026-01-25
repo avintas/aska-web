@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ContentCarousel } from "@/components/ContentCarousel";
 import { mapSetsToCarouselCards } from "@/utils/mapSetsToCarouselCards";
 import type { CarouselCard } from "@/config/carousel-cards";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 interface SourceContentSet {
   id: number;
@@ -63,11 +64,25 @@ export default function MotivatorsPage(): JSX.Element {
         if (result.success && result.data && result.data.length > 0) {
           const sets = result.data as SourceContentSet[];
 
-          // Map sets to carousel cards
-          // Each set becomes one card, each set_item becomes one tile
-          const cards = mapSetsToCarouselCards(sets);
+          // Progressive rendering: Process first 2 cards immediately
+          const INITIAL_CARDS_COUNT = 2;
+          const initialSets = sets.slice(0, INITIAL_CARDS_COUNT);
+          const remainingSets = sets.slice(INITIAL_CARDS_COUNT);
 
-          setCarouselCards(cards);
+          // Process and render initial cards immediately
+          const initialCards = mapSetsToCarouselCards(initialSets);
+          setCarouselCards(initialCards);
+          setLoading(false);
+
+          // Process remaining cards in background
+          if (remainingSets.length > 0) {
+            // Use setTimeout to defer processing until after initial render
+            setTimeout(() => {
+              const remainingCards = mapSetsToCarouselCards(remainingSets);
+              // Append cards progressively
+              setCarouselCards((prev) => [...prev, ...remainingCards]);
+            }, 0);
+          }
         } else {
           // If no sets found, create empty card with inactive cells
           // Use center-tile.webp as fallback for all motivator tiles
@@ -82,6 +97,7 @@ export default function MotivatorsPage(): JSX.Element {
             })),
           };
           setCarouselCards([emptyCard]);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching motivator sets:", error);
@@ -97,7 +113,6 @@ export default function MotivatorsPage(): JSX.Element {
           })),
         };
         setCarouselCards([emptyCard]);
-      } finally {
         setLoading(false);
       }
     }
@@ -108,6 +123,18 @@ export default function MotivatorsPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-20 pb-16 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Inspiration from hockey life and culture. Swipe through different collections and tap any tile to reveal a motivational quote you can share. Get inspired by legendary coaches, iconic players, and the wisdom that drives the game."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header Section */}
         <div className="text-center mb-16 md:mb-20">
           <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">

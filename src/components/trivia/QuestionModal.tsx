@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { TriviaQuestionData } from "@/shared/types/trivia-game";
+import { formatModalContent } from "@/utils/formatModalContent";
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -20,14 +21,18 @@ export function QuestionModal({
 }: QuestionModalProps): JSX.Element | null {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
-  const isMultipleChoice = questionData.question_type === "multiple-choice" || 
+  const isMultipleChoice =
+    questionData.question_type === "multiple-choice" ||
     (questionData.wrong_answers && questionData.wrong_answers.length > 0);
 
   // Prepare options - shuffle for multiple choice
   // Use question_text as key for memoization since questionData doesn't have id
   const options = useMemo(() => {
     if (isMultipleChoice && questionData.wrong_answers) {
-      const allOptions = [questionData.correct_answer, ...questionData.wrong_answers];
+      const allOptions = [
+        questionData.correct_answer,
+        ...questionData.wrong_answers,
+      ];
       // Shuffle using Fisher-Yates algorithm
       const shuffled = [...allOptions];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -37,7 +42,12 @@ export function QuestionModal({
       return shuffled;
     }
     return ["True", "False"];
-  }, [questionData.question_text, isMultipleChoice, questionData.correct_answer, questionData.wrong_answers]);
+  }, [
+    questionData.question_text,
+    isMultipleChoice,
+    questionData.correct_answer,
+    questionData.wrong_answers,
+  ]);
 
   if (!isOpen) return null;
 
@@ -90,9 +100,12 @@ export function QuestionModal({
 
         {/* Question Text */}
         <div className="p-6 md:p-8">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-relaxed text-center mb-6">
-            {questionData.question_text}
-          </h2>
+          <div className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white leading-relaxed text-center mb-6">
+            {formatModalContent(questionData.question_text, {
+              className: "",
+              preserveLineBreaks: true,
+            })}
+          </div>
 
           {/* Difficulty Badge */}
           {questionData.difficulty && (
@@ -106,9 +119,11 @@ export function QuestionModal({
           {/* Answer Options */}
           <div className="grid gap-3 mt-8">
             {options.map((option) => {
-              const isCorrectAnswer = option.toLowerCase().trim() === questionData.correct_answer.toLowerCase().trim();
+              const isCorrectAnswer =
+                option.toLowerCase().trim() ===
+                questionData.correct_answer.toLowerCase().trim();
               const showCorrect = isReviewMode && isCorrectAnswer;
-              
+
               return (
                 <button
                   key={option}
@@ -120,14 +135,16 @@ export function QuestionModal({
                         ? "border-green-500 bg-green-100 dark:bg-green-900/30"
                         : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 opacity-60"
                       : selectedAnswer === option
-                      ? "border-navy-900 dark:border-orange-500 bg-navy-100 dark:bg-orange-900/30 shadow-md"
-                      : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-navy-500 dark:hover:border-orange-500 hover:shadow-md"
+                        ? "border-navy-900 dark:border-orange-500 bg-navy-100 dark:bg-orange-900/30 shadow-md"
+                        : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-navy-500 dark:hover:border-orange-500 hover:shadow-md"
                   } text-gray-700 dark:text-gray-200 ${!isReviewMode ? "active:scale-[0.99]" : ""}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{option}</span>
                     {isReviewMode && showCorrect && (
-                      <span className="text-green-600 dark:text-green-400 font-bold">✓ Correct Answer</span>
+                      <span className="text-green-600 dark:text-green-400 font-bold">
+                        ✓ Correct Answer
+                      </span>
                     )}
                   </div>
                 </button>
@@ -138,9 +155,13 @@ export function QuestionModal({
           {/* Explanation (for review mode) */}
           {isReviewMode && questionData.explanation && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm md:text-base text-gray-700 dark:text-gray-300">
-                <strong>Explanation:</strong> {questionData.explanation}
-              </p>
+              <div className="text-sm md:text-base text-gray-700 dark:text-gray-300">
+                <strong>Explanation:</strong>{" "}
+                {formatModalContent(questionData.explanation, {
+                  className: "",
+                  preserveLineBreaks: true,
+                })}
+              </div>
             </div>
           )}
 

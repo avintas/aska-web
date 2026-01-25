@@ -79,33 +79,31 @@ export default function Home(): JSX.Element {
           />
         </div>
 
-        {/* Game Boy Device Container - Screen + Buttons aligned */}
-        <div className="flex flex-col items-center">
-          {/* Game Boy Screen - Title Display Only */}
-          <div className="w-[19.5rem] sm:w-[22.5rem] md:w-[42.5rem] rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 shadow-inner mb-6 md:mb-8">
-            {/* Screen Inner Bezel */}
-            <div className="border-2 border-gray-600 dark:border-gray-500 rounded bg-gradient-to-b from-green-200/80 to-green-100/80 dark:from-green-900/30 dark:to-green-800/20 p-4 md:p-6">
-              <div className="text-center">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
-                  There Is Only Hockey!
-                </h1>
-                <p className="text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider mb-1">
-                  L❤️VE FOR THE GAME IS ALL YOU NEED
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold italic">
-                  — Captain Heart
-                </p>
-              </div>
-            </div>
+        {/* Title Section */}
+        <div className="text-center mb-16 md:mb-20">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
+            There Is Only Hockey!
+          </h1>
+          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
+            <span className="text-5xl md:text-6xl lg:text-7xl">🏒</span>
+            <span className="text-5xl md:text-6xl lg:text-7xl">🥅</span>
           </div>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center mb-2">
+              L❤️VE FOR THE GAME IS ALL YOU NEED
+            </p>
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-semibold italic text-center">
+              — Captain Heart
+            </p>
+          </div>
+        </div>
 
-          {/* Hub Selector - Grid Section (Dial Pad) */}
-          <div className="mb-8 md:mb-10">
-            <LandingCarousel
-              className="w-full"
-              onShopClick={() => setShowStoreModal(true)}
-            />
-          </div>
+        {/* Hub Selector - Grid Section */}
+        <div className="mb-8 md:mb-10">
+          <LandingCarousel
+            className="w-full"
+            onShopClick={() => setShowStoreModal(true)}
+          />
         </div>
 
         {/* Call to Action - Game Boy Style Card */}

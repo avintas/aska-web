@@ -14,6 +14,7 @@ import { QuestionCountModal } from "./trivia/QuestionCountModal";
 import { QuestionModal } from "./trivia/QuestionModal";
 import { ScoreDisplay } from "./trivia/ScoreDisplay";
 import { ResultsModal } from "./trivia/ResultsModal";
+import { FormattedModalContent } from "@/utils/formatModalContent";
 
 interface ContentItem {
   id: string;
@@ -168,6 +169,15 @@ export function ContentCarousel({
           {cards.map((card) => (
             <div key={card.id} className="flex-[0_0_100%] min-w-0 px-2 md:px-4">
               <div className="flex flex-col items-center">
+                {/* Card Title */}
+                {card.title && (
+                  <div className="text-center mb-4 md:mb-6">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                      {card.title}
+                    </h2>
+                  </div>
+                )}
+
                 {/* Score Display for trivia games */}
                 {isTriviaMode &&
                   gameSession &&
@@ -407,7 +417,7 @@ export function ContentCarousel({
                   : selectedItem.isSponsored
                     ? "Sponsored"
                     : selectedItem.theme
-                      ? `${selectedItem.theme} collection`
+                      ? selectedItem.theme
                       : selectedItem.set_title || "OnlyHockey"}
               </h2>
               <button
@@ -454,9 +464,7 @@ export function ContentCarousel({
                   </div>
                 ) : (
                   // Regular content
-                  <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {selectedItem.content}
-                  </p>
+                  <FormattedModalContent content={selectedItem.content} />
                 )}
               </div>
 

@@ -1,9 +1,22 @@
 import Link from "next/link";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 export default function PrivacyPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Our privacy policy explains how we collect, use, and protect your personal information when you use OnlyHockey.com. We are committed to protecting your privacy and ensuring transparency about our data practices."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">

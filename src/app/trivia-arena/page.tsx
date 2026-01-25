@@ -7,6 +7,7 @@ import type { CarouselCard } from "@/config/carousel-cards";
 import type { TriviaGameSession } from "@/shared/types/trivia-game";
 import { createGameSession, answerQuestion } from "@/utils/triviaGameSession";
 import type { HubCell } from "@/components/HubGrid";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 interface SourceContentSet {
   id: number;
@@ -63,9 +64,16 @@ export default function TriviaArenaPage(): JSX.Element {
         if (result.success && result.data && result.data.length > 0) {
           const sets = result.data as SourceContentSet[];
 
-          // Map sets to carousel cards
-          // Each set becomes one card, each set_item becomes one tile
-          const collectionCards = mapSetsToCarouselCards(sets);
+          // Progressive rendering: Process first 2 cards immediately
+          const INITIAL_CARDS_COUNT = 2;
+          const initialSets = sets.slice(0, INITIAL_CARDS_COUNT);
+          const remainingSets = sets.slice(INITIAL_CARDS_COUNT);
+
+          // Process all sets to create hub card (needs all cards for navigation)
+          const allCollectionCards = mapSetsToCarouselCards(sets);
+
+          // Process initial collection cards immediately
+          const initialCollectionCards = mapSetsToCarouselCards(initialSets);
 
           // Create Card 0 (Hub) - tiles represent collections, clicking navigates to that card
           // Fill sequentially, keeping center tile (index 7) unoccupied
@@ -78,6 +86,7 @@ export default function TriviaArenaPage(): JSX.Element {
           );
 
           // Fill tiles sequentially, skipping center tile
+          // Use allCollectionCards for hub navigation (even if not all rendered yet)
           let gameIndex = 0; // Track which game we're placing
           for (let i = 0; i < 15; i++) {
             // Skip center tile (index 7)
@@ -93,8 +102,8 @@ export default function TriviaArenaPage(): JSX.Element {
             }
 
             // Place trivia game if available
-            if (gameIndex < collectionCards.length) {
-              const card = collectionCards[gameIndex];
+            if (gameIndex < allCollectionCards.length) {
+              const card = allCollectionCards[gameIndex];
               const cardIndex = gameIndex + 1; // Card index will be index + 1 (since Card 0 is index 0)
 
               // Get collection title for display
@@ -134,10 +143,23 @@ export default function TriviaArenaPage(): JSX.Element {
             cells: hubCells as HubCell[],
           };
 
-          // Prepend hub card to collection cards
-          const allCards = [hubCard, ...collectionCards];
+          // Render hub card + initial collection cards immediately
+          const initialCards = [hubCard, ...initialCollectionCards];
+          setCarouselCards(initialCards);
+          setLoading(false);
 
-          setCarouselCards(allCards);
+          // Process remaining collection cards in background
+          if (remainingSets.length > 0) {
+            // Use setTimeout to defer processing until after initial render
+            setTimeout(() => {
+              const remainingCards = mapSetsToCarouselCards(remainingSets);
+              // Append cards progressively (after hub card)
+              setCarouselCards((prev) => {
+                // prev[0] is hub card, append remaining after it
+                return [prev[0], ...prev.slice(1), ...remainingCards];
+              });
+            }, 0);
+          }
         } else {
           // If no sets found, create empty card with inactive cells
           // Use center-tile.webp as fallback for all trivia tiles
@@ -152,6 +174,7 @@ export default function TriviaArenaPage(): JSX.Element {
             })),
           };
           setCarouselCards([emptyCard]);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching trivia sets:", error);
@@ -167,7 +190,6 @@ export default function TriviaArenaPage(): JSX.Element {
           })),
         };
         setCarouselCards([emptyCard]);
-      } finally {
         setLoading(false);
       }
     }
@@ -177,6 +199,18 @@ export default function TriviaArenaPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-20 pb-16 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Test your hockey knowledge! Each card represents a trivia collection. Swipe through different themes and tap any tile to play. Challenge yourself with multiple choice and true/false questions about hockey history, players, teams, and the game we love."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
+        </div>
+
         {/* Header Section */}
         <div className="text-center mb-16 md:mb-20">
           <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
