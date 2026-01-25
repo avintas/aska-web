@@ -107,16 +107,18 @@ export default function TheCodePage(): JSX.Element {
 
   // Page structure
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+        <div className="text-center mb-16 md:mb-20">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             The Code
           </h1>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-            The unwritten rules and principles that govern hockey culture.
-          </p>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
+              The unwritten rules and principles that govern hockey culture.
+            </p>
+          </div>
         </div>
 
         {/* Loading State */}

@@ -119,20 +119,22 @@ export default function GamePlanPage(): JSX.Element {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-16 md:mb-20">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="text-5xl">📋</span>
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-gray-900 dark:text-white">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
               Game Plan
             </h1>
           </div>
-          <p className="text-lg md:text-xl lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-            Motivational quotes and wisdom from legendary players and epic
-            coaches to inspire your game.
-          </p>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
+              Motivational quotes and wisdom from legendary players and epic
+              coaches to inspire your game.
+            </p>
+          </div>
         </div>
 
         {/* Loading State */}

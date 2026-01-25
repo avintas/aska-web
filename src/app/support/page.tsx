@@ -3,7 +3,7 @@ import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 export default function SupportPage(): JSX.Element {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Circular Navigation Menu */}
         <div className="mb-6 md:mb-8">
@@ -18,8 +18,8 @@ export default function SupportPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+        <div className="text-center mb-16 md:mb-20">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             Support
           </h1>
         </div>
