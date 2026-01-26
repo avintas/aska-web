@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 /**
  * GET /api/collections/trivia-multiple-choice
  * Fetches multiple-choice trivia sets from source_content_sets
- * set_type: ["trivia-multiple-choice"]
+ * set_type: ["trivia_multiple_choice"]
  */
 export async function GET(): Promise<NextResponse> {
   try {
@@ -17,13 +17,15 @@ export async function GET(): Promise<NextResponse> {
       .select("*")
       .eq("app_id", 1)
       .eq("active", true)
-      .contains("set_type", ["trivia-multiple-choice"])
+      .contains("set_type", ["trivia_multiple_choice"])
       .order("set_created_at", { ascending: false })
       .limit(30);
 
     if (error) throw error;
 
-    console.log(`✅ [Multiple Choice Trivia API] Fetched ${data?.length || 0} sets`);
+    console.log(
+      `✅ [Multiple Choice Trivia API] Fetched ${data?.length || 0} sets`,
+    );
 
     return NextResponse.json({
       success: true,

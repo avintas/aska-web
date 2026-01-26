@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
 
 export default function ShopPage(): JSX.Element {
   return (
@@ -19,12 +19,11 @@ export default function ShopPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Shop
-          </h1>
-          <PageSloganServer />
-        </div>
+        <PageHeaderServer
+          title="Shop"
+          subtitle="Browse our collection of hockey merchandise and gear. Show your love for the game with official OnlyHockey products! Our storefront is coming soon."
+          emoji="🛒"
+        />
 
         {/* Coming Soon Message */}
         <div className="text-center py-20">

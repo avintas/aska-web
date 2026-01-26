@@ -5,7 +5,7 @@ import { ContentCarousel } from "@/components/ContentCarousel";
 import { mapSetsToCarouselCards } from "@/utils/mapSetsToCarouselCards";
 import type { CarouselCard } from "@/config/carousel-cards";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageHeader } from "@/components/PageHeader";
 
 interface SourceContentSet {
   id: number;
@@ -193,22 +193,11 @@ export default function MotivatorsPage(): JSX.Element {
         </div>
 
         {/* Header Section */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Get Inspired. Feel Supported.
-          </h1>
-          <div className="max-w-2xl mx-auto mb-4 md:mb-6">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Inspiration from hockey life and culture. Swipe through different
-              collections and tap any tile to reveal a motivational quote you
-              can share.
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-            <span className="text-5xl md:text-6xl lg:text-7xl">🔥</span>
-          </div>
-          <PageSlogan />
-        </div>
+        <PageHeader
+          title="Get Inspired. Feel Supported."
+          subtitle="Inspiration from hockey life and culture. Swipe through different collections and tap any tile to reveal a motivational quote you can share. Get inspired by legendary coaches, iconic players, and the wisdom that drives the game."
+          emoji="🔥"
+        />
 
         {/* Motivator Collections Carousel */}
         {loading ? (

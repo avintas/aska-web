@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 import { formatModalContent } from "@/utils/formatModalContent";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageHeader } from "@/components/PageHeader";
 
 interface CollectionItem {
   id: number;
@@ -292,22 +292,11 @@ export default function RinkPhilosopherPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
-            <span className="text-3xl md:text-4xl">🎓</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-              Rink Philosopher
-            </h1>
-          </div>
-          <PageSlogan />
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5 mt-4">
-            Sometimes the best lessons come from the rink. Deep wisdom, mental
-            toughness insights, and philosophical reflections from the
-            game&apos;s greatest minds. Whether you need perspective on the
-            grind, clarity in the flow, or wisdom from the room, find the words
-            that elevate your mindset. Get inspired and share the 🎓 knowledge.
-          </p>
-        </div>
+        <PageHeader
+          title="Rink Philosopher"
+          subtitle="Sometimes the best lessons come from the rink. Deep wisdom, mental toughness insights, and philosophical reflections from the game's greatest minds. Whether you need perspective on the grind, clarity in the flow, or wisdom from the room, find the words that elevate your mindset."
+          emoji="🎓"
+        />
 
         {/* Loading State */}
         {loading && (

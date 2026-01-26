@@ -23,6 +23,7 @@ export function Navbar(): JSX.Element {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
   const supabase = createClient();
 
   // Define functions BEFORE they're used (fixes hoisting issue)
@@ -55,20 +56,30 @@ export function Navbar(): JSX.Element {
     }
   };
 
+  // Fetch user data with loading state
+  const fetchUserDataWithLoading = async (userId: string): Promise<void> => {
+    setProfileLoading(true);
+    try {
+      await fetchUserData(userId);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   // Defer user data fetching until after initial render
   const deferUserDataFetch = (userId: string): void => {
     // Use requestIdleCallback if available, otherwise setTimeout
     if (typeof window !== "undefined" && "requestIdleCallback" in window) {
       requestIdleCallback(
         () => {
-          fetchUserData(userId);
+          fetchUserDataWithLoading(userId);
         },
         { timeout: 2000 },
       );
     } else {
       // Fallback for browsers without requestIdleCallback
       setTimeout(() => {
-        fetchUserData(userId);
+        fetchUserDataWithLoading(userId);
       }, 100);
     }
   };
@@ -105,6 +116,7 @@ export function Navbar(): JSX.Element {
       } else {
         setProfile(null);
         setStats(null);
+        setProfileLoading(false);
       }
     });
 
@@ -117,6 +129,7 @@ export function Navbar(): JSX.Element {
     setUser(null);
     setProfile(null);
     setStats(null);
+    setProfileLoading(false);
   };
 
   return (
@@ -146,8 +159,8 @@ export function Navbar(): JSX.Element {
                 Home
               </Link>
 
-              {loading ? (
-                // Loading state
+              {loading || (user && profileLoading) ? (
+                // Loading state - show while checking auth or loading profile
                 <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
                   Loading...
                 </span>

@@ -23,7 +23,7 @@ interface SourceContentSetItem {
 
   // Content fields (TYPE-SPECIFIC - this is the key!)
   content?: string; // factoid, motivational, supportive, advisory, slogans, shareables
-  question_text?: string; // trivia-multiple-choice, trivia_true_false
+  question_text?: string; // trivia_multiple_choice, trivia_true_false, trivia_who_am_i
 
   // Trivia-specific fields
   question_type?: string;
@@ -60,8 +60,9 @@ function extractContentFromItem(
 ): string {
   // Trivia types use question_text
   if (
-    setType?.includes("trivia-multiple-choice") ||
-    setType?.includes("trivia_true_false")
+    setType?.includes("trivia_multiple_choice") ||
+    setType?.includes("trivia_true_false") ||
+    setType?.includes("trivia_who_am_i")
   ) {
     return item.question_text || "Question unavailable";
   }
@@ -84,12 +85,16 @@ function mapSetItemsToTiles(
   let badge: string | undefined;
   let badgeColor = "bg-blue-500";
 
-  if (setType?.includes("trivia-multiple-choice")) {
+  if (setType?.includes("trivia_multiple_choice")) {
     emoji = "🎯";
     badge = "PLAY";
     badgeColor = "bg-green-500";
   } else if (setType?.includes("trivia_true_false")) {
     emoji = "✅";
+    badge = "PLAY";
+    badgeColor = "bg-green-500";
+  } else if (setType?.includes("trivia_who_am_i")) {
+    emoji = "❓";
     badge = "PLAY";
     badgeColor = "bg-green-500";
   } else if (setType?.includes("factoid")) {
@@ -119,23 +124,25 @@ function mapSetItemsToTiles(
   }
 
   // Determine content type string for image lookup
-  const contentType = setType?.includes("trivia-multiple-choice")
-    ? "trivia-multiple-choice"
+  const contentType = setType?.includes("trivia_multiple_choice")
+    ? "trivia_multiple_choice"
     : setType?.includes("trivia_true_false")
       ? "trivia_true_false"
-      : setType?.includes("factoid")
-        ? "factoid"
-        : setType?.includes("motivational")
-          ? "motivational"
-          : setType?.includes("supportive")
-            ? "supportive"
-            : setType?.includes("advisory")
-              ? "advisory"
-              : setType?.includes("slogans")
-                ? "slogans"
-                : setType?.includes("shareables")
-                  ? "shareables"
-                  : "unknown";
+      : setType?.includes("trivia_who_am_i")
+        ? "trivia_who_am_i"
+        : setType?.includes("factoid")
+          ? "factoid"
+          : setType?.includes("motivational")
+            ? "motivational"
+            : setType?.includes("supportive")
+              ? "supportive"
+              : setType?.includes("advisory")
+                ? "advisory"
+                : setType?.includes("slogans")
+                  ? "slogans"
+                  : setType?.includes("shareables")
+                    ? "shareables"
+                    : "unknown";
 
   // Map up to 15 items to tiles
   const tiles: (HubCell | null)[] = items.slice(0, 15).map((item, index) => {
@@ -189,8 +196,9 @@ function mapSetItemsToTiles(
     }
     // For trivia-related content types: Use center-tile.webp for center tile and as fallback
     else if (
-      contentType === "trivia-multiple-choice" ||
-      contentType === "trivia_true_false"
+      contentType === "trivia_multiple_choice" ||
+      contentType === "trivia_true_false" ||
+      contentType === "trivia_who_am_i"
     ) {
       if (isAnchor) {
         // Center tile always uses center-tile.webp
@@ -206,8 +214,9 @@ function mapSetItemsToTiles(
     // For trivia types, extract full question data
     let questionData: TriviaQuestionData | undefined;
     const isTriviaType =
-      setType?.includes("trivia-multiple-choice") ||
-      setType?.includes("trivia_true_false");
+      setType?.includes("trivia_multiple_choice") ||
+      setType?.includes("trivia_true_false") ||
+      setType?.includes("trivia_who_am_i");
 
     if (isTriviaType && item.question_text) {
       questionData = {
@@ -220,9 +229,11 @@ function mapSetItemsToTiles(
         difficulty: item.difficulty || null,
         question_type:
           item.question_type ||
-          (setType?.includes("trivia-multiple-choice")
+          (setType?.includes("trivia_multiple_choice")
             ? "multiple-choice"
-            : "true-false"),
+            : setType?.includes("trivia_true_false")
+              ? "true-false"
+              : "who-am-i"),
       };
     }
 
@@ -259,8 +270,9 @@ function mapSetItemsToTiles(
     ) {
       inactiveImage = "/motivators/center-tile.webp";
     } else if (
-      contentType === "trivia-multiple-choice" ||
-      contentType === "trivia_true_false"
+      contentType === "trivia_multiple_choice" ||
+      contentType === "trivia_true_false" ||
+      contentType === "trivia_who_am_i"
     ) {
       inactiveImage = "/trivia-arena/center-tile.webp";
     } else {

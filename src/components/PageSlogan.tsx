@@ -45,7 +45,7 @@ export function PageSlogan({
       } catch (error) {
         console.error("Error fetching slogan:", error);
         // Fallback to default message on error
-        setSloganMessage("The love for the game is all you need.");
+        setSloganMessage("Love of the game is all you need.");
       }
     }
 
@@ -55,7 +55,7 @@ export function PageSlogan({
   return (
     <div className="max-w-2xl mx-auto">
       <p className="text-base md:text-base text-orange-600 dark:text-orange-400 leading-relaxed text-center font-medium italic">
-        {sloganMessage || "The love for the game is all you need."}
+        {sloganMessage || "Love of the game is all you need."}
       </p>
     </div>
   );

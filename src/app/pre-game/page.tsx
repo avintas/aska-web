@@ -1,6 +1,7 @@
 "use client";
 
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageHeader } from "@/components/PageHeader";
 
 interface GoodLuckMessage {
   id: number;
@@ -51,22 +52,24 @@ export default function PreGamePage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl">🍀</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-              Good Luck
-            </h1>
-          </div>
-          <PageSlogan />
-          <div className="max-w-2xl mx-auto mt-4">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Share encouragement and support before the game. Find the perfect
-              words to calm pre-game jitters and boost confidence.
-            </p>
-          </div>
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Share encouragement and support before the game. Find the perfect words to calm pre-game jitters and boost confidence."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
         </div>
+
+        {/* Header */}
+        <PageHeader
+          title="Good Luck"
+          subtitle="Share encouragement and support before the game. Find the perfect words to calm pre-game jitters and boost confidence."
+          emoji="🍀"
+        />
 
         {/* Messages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">

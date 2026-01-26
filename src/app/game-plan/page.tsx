@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageHeader } from "@/components/PageHeader";
 
 interface MotivationalItem {
   id?: number;
@@ -122,22 +123,24 @@ export default function GamePlanPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl">📋</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-              Game Plan
-            </h1>
-          </div>
-          <PageSlogan />
-          <div className="max-w-2xl mx-auto mt-4">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Motivational quotes and wisdom from legendary players and epic
-              coaches to inspire your game.
-            </p>
-          </div>
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Motivational quotes and wisdom from legendary players and epic coaches to inspire your game."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
         </div>
+
+        {/* Header */}
+        <PageHeader
+          title="Game Plan"
+          subtitle="Motivational quotes and wisdom from legendary players and epic coaches to inspire your game."
+          emoji="📋"
+        />
 
         {/* Loading State */}
         {loading && (

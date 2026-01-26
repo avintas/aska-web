@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 import { formatModalContent } from "@/utils/formatModalContent";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageHeader } from "@/components/PageHeader";
 
 interface MotivationalItem {
   id: number;
@@ -284,20 +284,11 @@ export default function CaptainHeartPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
-            <span className="text-3xl md:text-4xl">💙</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-              Captain Heart
-            </h1>
-          </div>
-          <PageSlogan />
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5 mt-4">
-            The game starts before the puck drops. Whether you need a pre-game
-            boost or a post-game high five, we&apos;ve got the perfect message
-            ready to text. Get inspired and send the ❤️ love.
-          </p>
-        </div>
+        <PageHeader
+          title="Captain Heart"
+          subtitle="The game starts before the puck drops. Whether you need a pre-game boost or a post-game high five, we've got the perfect message ready to text. Get inspired and send the ❤️ love."
+          emoji="💙"
+        />
 
         {/* Loading State */}
         {loading && (

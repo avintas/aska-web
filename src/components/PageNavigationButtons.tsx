@@ -101,7 +101,7 @@ export function PageNavigationButtons({
 
             {/* Modal Content */}
             <div className="p-4 md:p-6">
-              <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                 {infoContent}
               </p>
             </div>
@@ -147,7 +147,7 @@ export function PageNavigationButtons({
 
             {/* Modal Content */}
             <div className="p-4 md:p-6">
-              <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                 {extrasContent}
               </p>
             </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
 
 export default function AboutPage(): JSX.Element {
   return (
@@ -19,12 +19,11 @@ export default function AboutPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            About OnlyHockey
-          </h1>
-          <PageSloganServer />
-        </div>
+        <PageHeaderServer
+          title="About OnlyHockey"
+          subtitle="We launched OnlyHockey as a tribute to the great Game of Hockey. You can challenge yourself and your friends with hockey trivia games, support people you care about with H.U.G.s, and find and share motivational quotes from legendary players and epic coaches as well as interesting facts, anecdotes, and curiosities of hockey culture."
+          emoji="🏒"
+        />
 
         {/* Main Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">

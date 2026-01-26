@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
 
 export default function TermsPage(): JSX.Element {
   return (
@@ -19,12 +19,11 @@ export default function TermsPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Terms of Service
-          </h1>
-          <PageSloganServer />
-        </div>
+        <PageHeaderServer
+          title="Terms of Service"
+          subtitle="Our terms of service outline the rules and guidelines for using OnlyHockey.com. By using our site, you agree to these terms. Please read them carefully to understand your rights and responsibilities."
+          emoji="📜"
+        />
 
         {/* Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">

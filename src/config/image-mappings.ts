@@ -71,10 +71,13 @@ const THEME_IMAGE_MAP: Record<string, Record<string, ThemeImageConfig>> = {
     // Add your shareables theme mappings here
     // Example: "History": { folder: "/shareables", prefix: "history", variants: 6 },
   },
-  "trivia-multiple-choice": {
+  trivia_multiple_choice: {
     // Add your trivia theme mappings here
   },
   trivia_true_false: {
+    // Add your trivia theme mappings here
+  },
+  trivia_who_am_i: {
     // Add your trivia theme mappings here
   },
 };
@@ -87,8 +90,9 @@ const CONTENT_TYPE_DEFAULTS: Record<string, string> = {
   advisory: "/motivators/center-tile.webp", // Use center-tile.webp as fallback for advisory (shown on motivators page)
   slogans: "/motivators/center-tile.webp", // Use center-tile.webp as fallback for slogans (shown on motivators page)
   shareables: "/motivators/center-tile.webp", // Use center-tile.webp as fallback for shareables (shown on motivators page)
-  "trivia-multiple-choice": "/trivia-arena/center-tile.webp", // Use center-tile.webp as default fallback for trivia
+  trivia_multiple_choice: "/trivia-arena/center-tile.webp", // Use center-tile.webp as default fallback for trivia
   trivia_true_false: "/trivia-arena/center-tile.webp", // Use center-tile.webp as default fallback for trivia
+  trivia_who_am_i: "/trivia-arena/center-tile.webp", // Use center-tile.webp as default fallback for trivia
 };
 
 // =============================================================================

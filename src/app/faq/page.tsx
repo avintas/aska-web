@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
 
 export default function FAQPage(): JSX.Element {
   return (
@@ -19,12 +19,11 @@ export default function FAQPage(): JSX.Element {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Frequently Asked Questions
-          </h1>
-          <PageSloganServer />
-        </div>
+        <PageHeaderServer
+          title="Frequently Asked Questions"
+          subtitle="Everything you need to know about OnlyHockey.com and our hockey content. Find answers to common questions about trivia games, motivational quotes, factoids, and more."
+          emoji="❓"
+        />
 
         {/* Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">

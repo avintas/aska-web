@@ -1,27 +1,28 @@
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 
 export default function PBPPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-5xl">💭</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-              P.B.P.
-            </h1>
-          </div>
-          <PageSloganServer />
-          <div className="max-w-2xl mx-auto mt-4">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Rink Philosopher — Wisdom and insights from the game of hockey.
-            </p>
-            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2 italic text-center">
-              Also known as the Wisdom Table
-            </p>
-          </div>
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="Rink Philosopher — Wisdom and insights from the game of hockey. Also known as the Wisdom Table."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
         </div>
+
+        {/* Header */}
+        <PageHeaderServer
+          title="P.B.P."
+          subtitle="Rink Philosopher — Wisdom and insights from the game of hockey. Also known as the Wisdom Table."
+          emoji="💭"
+        />
 
         {/* Content Placeholder */}
         <div className="text-center py-20">

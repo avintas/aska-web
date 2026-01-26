@@ -1,17 +1,29 @@
 import Link from "next/link";
-import { PageSloganServer } from "@/components/PageSloganServer";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageHeaderServer } from "@/components/PageHeaderServer";
 
 export default function EthosPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Ethos
-          </h1>
-          <PageSloganServer />
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="The ethos of OnlyHockey is built on the core values that make hockey the greatest game on earth. We believe in respect, teamwork, perseverance, and the pure love of the game."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
         </div>
+
+        {/* Header */}
+        <PageHeaderServer
+          title="Ethos"
+          subtitle="The ethos of OnlyHockey is built on the core values that make hockey the greatest game on earth. We believe in respect, teamwork, perseverance, and the pure love of the game."
+          emoji="💎"
+        />
 
         {/* Main Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">

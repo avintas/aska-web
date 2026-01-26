@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageHeader } from "@/components/PageHeader";
 
 // Define TypeScript interfaces for your data
 interface CodeItem {
@@ -110,18 +111,24 @@ export default function TheCodePage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            The Code
-          </h1>
-          <PageSlogan />
-          <div className="max-w-2xl mx-auto mt-4">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              The unwritten rules and principles that govern hockey culture.
-            </p>
-          </div>
+        {/* Circular Navigation Menu */}
+        <div className="mb-6 md:mb-8">
+          <PageNavigationButtons
+            homeLabel="Home"
+            homeHref="/"
+            infoTitle="Info"
+            infoContent="The unwritten rules and principles that govern hockey culture."
+            extrasTitle="Extras"
+            extrasContent="Settings and other options coming soon..."
+          />
         </div>
+
+        {/* Header Section */}
+        <PageHeader
+          title="The Code"
+          subtitle="The unwritten rules and principles that govern hockey culture."
+          emoji="📋"
+        />
 
         {/* Loading State */}
         {loading && (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { LandingCarousel } from "@/components/LandingCarousel";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 import { StoreModal } from "@/components/StoreModal";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageHeader } from "@/components/PageHeader";
 
 export default function Home(): JSX.Element {
   const [showStoreModal, setShowStoreModal] = useState(false);
@@ -68,28 +68,30 @@ export default function Home(): JSX.Element {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 pt-8 pb-12 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Hardware Buttons - Above the Screen */}
+        {/* Circular Navigation Menu */}
         <div className="mb-6 md:mb-8">
           <PageNavigationButtons
             homeLabel="Home"
             homeHref="/"
             infoTitle="Info"
-            infoContent="We launched OnlyHockey as a tribute to the great Game of Hockey. Here, you can immerse yourself in the curiosities of hockey culture and interesting facts from the sport's past and present. Challenge yourself and your friends to engaging hockey trivia and get a motivational boost from legendary coaches and iconic players. We hope you will discover what makes our hockey community so special. 🏠✨"
+            infoContent={`OnlyHockey is a content experience company dedicated to the game's rich history. We transform legendary moments into bite-sized, shareable digital "cultural currency" for the modern fan.
+
+The interface uses a Home Grid system. Colored tiles are active entry points to specific content zones, while gray tiles serve as structural placeholders. You can navigate the grid by swiping left or right or by using the dot indicators below the cards.
+
+The Carousel: Certain cards feature internal sliders for swiping through historical sequences and shareable facts.
+
+Join our newsletter via the signup at the bottom of the grid for curated hockey history. No account is required to explore—simply click and play.`}
             extrasTitle="Extras"
             extrasContent="Settings and other options coming soon..."
           />
         </div>
 
-        {/* Title Section */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-            <span className="text-5xl md:text-6xl lg:text-7xl">🏒</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            There Is Only Hockey!
-          </h1>
-          <PageSlogan />
-        </div>
+        {/* Header Section */}
+        <PageHeader
+          title="There Is Only Hockey!"
+          subtitle="We launched OnlyHockey as a tribute to the great Game of Hockey. Here, you can immerse yourself in the curiosities of hockey culture and interesting facts from the sport's past and present. Challenge yourself and your friends to engaging hockey trivia and get a motivational boost from legendary coaches and iconic players. We hope you will discover what makes our hockey community so special. 🏠✨"
+          emoji="🏒"
+        />
 
         {/* Hub Selector - Grid Section */}
         <div className="mb-8 md:mb-10">

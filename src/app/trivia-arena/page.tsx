@@ -8,7 +8,7 @@ import type { TriviaGameSession } from "@/shared/types/trivia-game";
 import { createGameSession, answerQuestion } from "@/utils/triviaGameSession";
 import type { HubCell } from "@/components/HubGrid";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageHeader } from "@/components/PageHeader";
 
 interface SourceContentSet {
   id: number;
@@ -213,15 +213,11 @@ export default function TriviaArenaPage(): JSX.Element {
         </div>
 
         {/* Header Section */}
-        <div className="text-center mb-16 md:mb-20">
-          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-            <span className="text-5xl md:text-6xl lg:text-7xl">🎯</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            Trivia Arena
-          </h1>
-          <PageSlogan />
-        </div>
+        <PageHeader
+          title="Trivia Arena"
+          subtitle="Test your hockey knowledge! Each card represents a trivia collection. Swipe through different themes and tap any tile to play. Challenge yourself with multiple choice and true/false questions about hockey history, players, teams, and the game we love."
+          emoji="🎯"
+        />
 
         {/* Trivia Collections Carousel */}
         {loading ? (
