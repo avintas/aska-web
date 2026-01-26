@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit",
     "type-check:patterns": "npx tsx scripts/type-check.ts",
     "type-check:all": "npm run type-check && npm run type-check:patterns",
-    "vercel-check": "npm run type-check && npm run type-check:patterns && node -e \"process.on('unhandledRejection', () => {}); require('child_process').exec('npm run build', (err, stdout, stderr) => { console.log(stdout); if (err && !stdout.includes('Compiled successfully')) process.exit(err.code || 1); });\"",
+    "vercel-check": "npm run type-check && npm run type-check:patterns && node scripts/build-with-error-handling.js",
     "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
