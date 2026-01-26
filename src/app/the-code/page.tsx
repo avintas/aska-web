@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PageSlogan } from "@/components/PageSlogan";
 
 // Define TypeScript interfaces for your data
 interface CodeItem {
@@ -114,7 +115,8 @@ export default function TheCodePage(): JSX.Element {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             The Code
           </h1>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               The unwritten rules and principles that govern hockey culture.
             </p>

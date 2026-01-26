@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageSlogan } from "@/components/PageSlogan";
 
 export default function EthosPage(): JSX.Element {
   return (
@@ -9,6 +10,7 @@ export default function EthosPage(): JSX.Element {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             Ethos
           </h1>
+          <PageSlogan />
         </div>
 
         {/* Main Content */}

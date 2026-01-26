@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 import { formatModalContent } from "@/utils/formatModalContent";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface MotivationalItem {
   id: number;
@@ -331,7 +332,8 @@ export default function BenchBossPage(): JSX.Element {
               Bench Boss
             </h1>
           </div>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5">
+          <PageSlogan />
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5 mt-4">
             The voice from the bench that pushes you harder, believes in you
             deeper, and never lets you quit.
           </p>

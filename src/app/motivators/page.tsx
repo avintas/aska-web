@@ -5,6 +5,7 @@ import { ContentCarousel } from "@/components/ContentCarousel";
 import { mapSetsToCarouselCards } from "@/utils/mapSetsToCarouselCards";
 import type { CarouselCard } from "@/config/carousel-cards";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface SourceContentSet {
   id: number;
@@ -199,7 +200,8 @@ export default function MotivatorsPage(): JSX.Element {
           <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
             <span className="text-5xl md:text-6xl lg:text-7xl">🔥</span>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Inspiration from hockey life and culture. Swipe through different
               collections and tap any tile to reveal a motivational quote you

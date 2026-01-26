@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { LandingCarousel } from "@/components/LandingCarousel";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 import { StoreModal } from "@/components/StoreModal";
+import { PageSlogan } from "@/components/PageSlogan";
 
 export default function Home(): JSX.Element {
   const [showStoreModal, setShowStoreModal] = useState(false);
@@ -15,34 +16,6 @@ export default function Home(): JSX.Element {
     type: "success" | "error";
     text: string;
   } | null>(null);
-
-  // Semiotic message state
-  const [semioticMessage, setSemioticMessage] = useState<string | null>(null);
-
-  // Fetch semiotic message on mount
-  useEffect(() => {
-    async function fetchSemioticMessage() {
-      try {
-        const response = await fetch("/api/collections/semiotics");
-        const result = await response.json();
-
-        if (result.success && result.data && result.data.length > 0) {
-          // Pick a random slogan from the results
-          const randomIndex = Math.floor(Math.random() * result.data.length);
-          const randomSlogan = result.data[randomIndex];
-          if (randomSlogan && randomSlogan.slogan) {
-            setSemioticMessage(randomSlogan.slogan);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching semiotic message:", error);
-        // Fallback to default message on error
-        setSemioticMessage("L❤️VE FOR THE GAME IS ALL YOU NEED");
-      }
-    }
-
-    fetchSemioticMessage();
-  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -109,17 +82,13 @@ export default function Home(): JSX.Element {
 
         {/* Title Section */}
         <div className="text-center mb-16 md:mb-20">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
-            There Is Only Hockey!
-          </h1>
           <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
             <span className="text-5xl md:text-6xl lg:text-7xl">🏒</span>
           </div>
-          <div className="max-w-2xl mx-auto">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              {semioticMessage || "L❤️VE FOR THE GAME IS ALL YOU NEED"}
-            </p>
-          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
+            There Is Only Hockey!
+          </h1>
+          <PageSlogan />
         </div>
 
         {/* Hub Selector - Grid Section */}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 import { formatModalContent } from "@/utils/formatModalContent";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface MotivationalItem {
   id: number;
@@ -290,7 +291,8 @@ export default function CaptainHeartPage(): JSX.Element {
               Captain Heart
             </h1>
           </div>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5">
+          <PageSlogan />
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5 mt-4">
             The game starts before the puck drops. Whether you need a pre-game
             boost or a post-game high five, we&apos;ve got the perfect message
             ready to text. Get inspired and send the ❤️ love.

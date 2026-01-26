@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface MotivationalItem {
   id?: number;
@@ -129,7 +130,8 @@ export default function GamePlanPage(): JSX.Element {
               Game Plan
             </h1>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Motivational quotes and wisdom from legendary players and epic
               coaches to inspire your game.

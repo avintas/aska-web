@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface SemioticSlogan {
   id: number;
@@ -60,7 +61,8 @@ export default function SemioticsPage(): JSX.Element {
           <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
             <span className="text-5xl md:text-6xl lg:text-7xl">🎯</span>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Powerful slogans extracted from semiotic analysis of hockey
               culture.

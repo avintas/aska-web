@@ -1,5 +1,7 @@
 "use client";
 
+import { PageSlogan } from "@/components/PageSlogan";
+
 export default function HockeyCulturePage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
@@ -12,7 +14,8 @@ export default function HockeyCulturePage(): JSX.Element {
               Hockey Culture
             </h1>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Explore the unwritten rules and traditions of hockey culture.
               Learn about the code that players live by on and off the ice.

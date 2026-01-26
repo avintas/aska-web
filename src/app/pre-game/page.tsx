@@ -1,5 +1,7 @@
 "use client";
 
+import { PageSlogan } from "@/components/PageSlogan";
+
 interface GoodLuckMessage {
   id: number;
   text: string;
@@ -57,7 +59,8 @@ export default function PreGamePage(): JSX.Element {
               Good Luck
             </h1>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Share encouragement and support before the game. Find the perfect
               words to calm pre-game jitters and boost confidence.

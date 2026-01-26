@@ -1,3 +1,5 @@
+import { PageSlogan } from "@/components/PageSlogan";
+
 export default function PBPPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pt-16 pb-12 px-4 md:px-6 lg:px-8">
@@ -10,7 +12,8 @@ export default function PBPPage(): JSX.Element {
               P.B.P.
             </h1>
           </div>
-          <div className="max-w-2xl mx-auto">
+          <PageSlogan />
+          <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Rink Philosopher — Wisdom and insights from the game of hockey.
             </p>

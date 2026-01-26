@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { HubGrid, type HubCell } from "@/components/HubGrid";
 import { formatModalContent } from "@/utils/formatModalContent";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
+import { PageSlogan } from "@/components/PageSlogan";
 
 interface CollectionItem {
   id: number;
@@ -298,7 +299,8 @@ export default function RinkPhilosopherPage(): JSX.Element {
               Rink Philosopher
             </h1>
           </div>
-          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5">
+          <PageSlogan />
+          <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 md:px-0 mb-4 md:mb-5 mt-4">
             Sometimes the best lessons come from the rink. Deep wisdom, mental
             toughness insights, and philosophical reflections from the
             game&apos;s greatest minds. Whether you need perspective on the
