@@ -1,4 +1,4 @@
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageSloganServer } from "@/components/PageSloganServer";
 
 export default function MyRecordsPage(): JSX.Element {
   return (
@@ -12,7 +12,7 @@ export default function MyRecordsPage(): JSX.Element {
               My Records
             </h1>
           </div>
-          <PageSlogan />
+          <PageSloganServer />
           <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               View your personal records, achievements, and statistics.

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageSloganServer } from "@/components/PageSloganServer";
 
 export default function ShopPage(): JSX.Element {
   return (
@@ -23,7 +23,7 @@ export default function ShopPage(): JSX.Element {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             Shop
           </h1>
-          <PageSlogan />
+          <PageSloganServer />
         </div>
 
         {/* Coming Soon Message */}

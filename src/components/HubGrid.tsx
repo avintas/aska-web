@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type React from "react";
 
 export interface TriviaQuestionData {
@@ -81,10 +82,14 @@ export function HubGrid({
                 className={`relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 ${emptyCellBg} rounded-lg overflow-hidden`}
                 aria-hidden="true"
               >
-                <img
+                <Image
                   src={cell.inactiveImage}
                   alt=""
+                  width={128}
+                  height={128}
+                  loading="lazy"
                   className="w-full h-full object-cover opacity-10"
+                  unoptimized={cell.inactiveImage.startsWith("/")}
                 />
               </div>
             );

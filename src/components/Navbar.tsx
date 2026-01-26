@@ -25,43 +25,8 @@ export function Navbar(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
-  useEffect(() => {
-    // Check auth state on mount
-    checkAuth();
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      } else {
-        setProfile(null);
-        setStats(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchUserData(session.user.id);
-      }
-    } catch (error) {
-      console.error("Error checking auth:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserData = async (userId: string) => {
+  // Define functions BEFORE they're used (fixes hoisting issue)
+  const fetchUserData = async (userId: string): Promise<void> => {
     try {
       // Fetch profile
       const { data: profileData } = await supabase
@@ -89,6 +54,63 @@ export function Navbar(): JSX.Element {
       console.error("Error fetching user data:", error);
     }
   };
+
+  // Defer user data fetching until after initial render
+  const deferUserDataFetch = (userId: string): void => {
+    // Use requestIdleCallback if available, otherwise setTimeout
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      requestIdleCallback(
+        () => {
+          fetchUserData(userId);
+        },
+        { timeout: 2000 },
+      );
+    } else {
+      // Fallback for browsers without requestIdleCallback
+      setTimeout(() => {
+        fetchUserData(userId);
+      }, 100);
+    }
+  };
+
+  const checkAuth = async (): Promise<void> => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        // Defer user data loading - non-critical for initial render
+        deferUserDataFetch(session.user.id);
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Check auth state on mount (critical - needed for UI)
+    checkAuth();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        // Defer user data loading - non-critical for initial render
+        deferUserDataFetch(session.user.id);
+      } else {
+        setProfile(null);
+        setStats(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

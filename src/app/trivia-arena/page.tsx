@@ -221,13 +221,6 @@ export default function TriviaArenaPage(): JSX.Element {
             Trivia Arena
           </h1>
           <PageSlogan />
-          <div className="max-w-2xl mx-auto mt-4">
-            <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Test your hockey knowledge! Each card represents a trivia
-              collection. Swipe through different themes and tap any tile to
-              play that trivia question.
-            </p>
-          </div>
         </div>
 
         {/* Trivia Collections Carousel */}

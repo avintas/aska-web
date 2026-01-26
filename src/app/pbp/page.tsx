@@ -1,4 +1,4 @@
-import { PageSlogan } from "@/components/PageSlogan";
+import { PageSloganServer } from "@/components/PageSloganServer";
 
 export default function PBPPage(): JSX.Element {
   return (
@@ -12,7 +12,7 @@ export default function PBPPage(): JSX.Element {
               P.B.P.
             </h1>
           </div>
-          <PageSlogan />
+          <PageSloganServer />
           <div className="max-w-2xl mx-auto mt-4">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Rink Philosopher — Wisdom and insights from the game of hockey.

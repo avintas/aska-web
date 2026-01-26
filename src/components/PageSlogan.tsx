@@ -2,15 +2,33 @@
 
 import { useState, useEffect } from "react";
 
+interface PageSloganProps {
+  /**
+   * Optional initial slogan from server-side fetch
+   * If provided, skips client-side API call
+   */
+  initialSlogan?: string | null;
+}
+
 /**
  * PageSlogan Component
- * Fetches and displays a random slogan from the shareables API
- * Used on all pages below the title and emoji
+ * Displays a random slogan from the shareables API
+ * Accepts initialSlogan prop from server-side fetch to avoid client-side API calls
+ * Falls back to client-side fetch if initialSlogan not provided
  */
-export function PageSlogan(): JSX.Element {
-  const [sloganMessage, setSloganMessage] = useState<string | null>(null);
+export function PageSlogan({
+  initialSlogan,
+}: PageSloganProps = {}): JSX.Element {
+  const [sloganMessage, setSloganMessage] = useState<string | null>(
+    initialSlogan || null,
+  );
 
   useEffect(() => {
+    // If we already have a slogan from server, don't fetch again
+    if (initialSlogan) {
+      return;
+    }
+
     async function fetchSlogan() {
       try {
         const response = await fetch("/api/collections/shareables");
@@ -32,7 +50,7 @@ export function PageSlogan(): JSX.Element {
     }
 
     fetchSlogan();
-  }, []);
+  }, [initialSlogan]);
 
   return (
     <div className="max-w-2xl mx-auto">

@@ -197,17 +197,17 @@ export default function MotivatorsPage(): JSX.Element {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-4 md:mb-6">
             Get Inspired. Feel Supported.
           </h1>
-          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
-            <span className="text-5xl md:text-6xl lg:text-7xl">🔥</span>
-          </div>
-          <PageSlogan />
-          <div className="max-w-2xl mx-auto mt-4">
+          <div className="max-w-2xl mx-auto mb-4 md:mb-6">
             <p className="text-base md:text-base text-gray-700 dark:text-gray-300 leading-relaxed text-center">
               Inspiration from hockey life and culture. Swipe through different
               collections and tap any tile to reveal a motivational quote you
               can share.
             </p>
           </div>
+          <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
+            <span className="text-5xl md:text-6xl lg:text-7xl">🔥</span>
+          </div>
+          <PageSlogan />
         </div>
 
         {/* Motivator Collections Carousel */}

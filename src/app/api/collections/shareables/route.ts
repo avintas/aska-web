@@ -60,11 +60,18 @@ export async function GET(): Promise<NextResponse> {
 
     console.log(`✅ [Shareables API] Extracted ${slogans.length} slogans`);
 
-    return NextResponse.json({
-      success: true,
-      data: slogans,
-      count: slogans.length,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: slogans,
+        count: slogans.length,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        },
+      },
+    );
   } catch (error) {
     console.error("❌ [Shareables API] Error:", error);
     return NextResponse.json(
