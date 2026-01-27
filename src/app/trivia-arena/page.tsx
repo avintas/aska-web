@@ -6,7 +6,6 @@ import { mapSetsToCarouselCards } from "@/utils/mapSetsToCarouselCards";
 import type { CarouselCard } from "@/config/carousel-cards";
 import type { TriviaGameSession } from "@/shared/types/trivia-game";
 import { createGameSession, answerQuestion } from "@/utils/triviaGameSession";
-import type { HubCell } from "@/components/HubGrid";
 import { PageNavigationButtons } from "@/components/PageNavigationButtons";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -70,83 +69,11 @@ export default function TriviaArenaPage(): JSX.Element {
           const initialSets = sets.slice(0, INITIAL_CARDS_COUNT);
           const remainingSets = sets.slice(INITIAL_CARDS_COUNT);
 
-          // Process all sets to create hub card (needs all cards for navigation)
-          const allCollectionCards = mapSetsToCarouselCards(sets);
-
           // Process initial collection cards immediately
           const initialCollectionCards = mapSetsToCarouselCards(initialSets);
 
-          // Create Card 0 (Hub) - tiles represent collections, clicking navigates to that card
-          // Fill sequentially, keeping center tile (index 7) unoccupied
-          const CENTER_TILE_INDEX = 7;
-
-          // Initialize array with 15 null cells
-          const hubCells: (HubCell | null)[] = Array.from(
-            { length: 15 },
-            () => null,
-          );
-
-          // Fill tiles sequentially, skipping center tile
-          // Use allCollectionCards for hub navigation (even if not all rendered yet)
-          let gameIndex = 0; // Track which game we're placing
-          for (let i = 0; i < 15; i++) {
-            // Skip center tile (index 7)
-            if (i === CENTER_TILE_INDEX) {
-              // Center tile uses trivia-arena center-tile.webp
-              hubCells[i] = {
-                id: `hub-inactive-${i}`,
-                name: "",
-                emoji: "",
-                inactiveImage: "/trivia-arena/center-tile.webp",
-              };
-              continue;
-            }
-
-            // Place trivia game if available
-            if (gameIndex < allCollectionCards.length) {
-              const card = allCollectionCards[gameIndex];
-              const cardIndex = gameIndex + 1; // Card index will be index + 1 (since Card 0 is index 0)
-
-              // Get collection title for display
-              const displayTitle = card.title || `Collection ${cardIndex}`;
-
-              // Truncate title for tile display (show first 30 chars max)
-              const truncatedTitle =
-                displayTitle.length > 30
-                  ? `${displayTitle.substring(0, 30)}...`
-                  : displayTitle;
-
-              hubCells[i] = {
-                id: `hub-${card.id}`,
-                name: truncatedTitle.toUpperCase(),
-                emoji: "🎯",
-                description: displayTitle, // Full title for tooltip/accessibility
-                badge: "PLAY",
-                badgeColor: "bg-green-500",
-                targetCardIndex: cardIndex, // Store target card index for navigation
-                inactiveImage: `/hcip-${(i % 40) + 1}.png`,
-              };
-              gameIndex++;
-            } else {
-              // Fill remaining positions with inactive cells using trivia-arena fallback
-              hubCells[i] = {
-                id: `hub-inactive-${i}`,
-                name: "",
-                emoji: "",
-                inactiveImage: "/trivia-arena/center-tile.webp",
-              };
-            }
-          }
-
-          const hubCard: CarouselCard = {
-            id: 0,
-            title: "Trivia Collections",
-            cells: hubCells as HubCell[],
-          };
-
-          // Render hub card + initial collection cards immediately
-          const initialCards = [hubCard, ...initialCollectionCards];
-          setCarouselCards(initialCards);
+          // Render initial collection cards immediately
+          setCarouselCards(initialCollectionCards);
           setLoading(false);
 
           // Process remaining collection cards in background
@@ -154,11 +81,8 @@ export default function TriviaArenaPage(): JSX.Element {
             // Use setTimeout to defer processing until after initial render
             setTimeout(() => {
               const remainingCards = mapSetsToCarouselCards(remainingSets);
-              // Append cards progressively (after hub card)
-              setCarouselCards((prev) => {
-                // prev[0] is hub card, append remaining after it
-                return [prev[0], ...prev.slice(1), ...remainingCards];
-              });
+              // Append cards progressively
+              setCarouselCards((prev) => [...prev, ...remainingCards]);
             }, 0);
           }
         } else {

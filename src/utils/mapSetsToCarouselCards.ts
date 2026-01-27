@@ -362,7 +362,7 @@ export function mapSetsToCarouselCards(
 ): CarouselCard[] {
   return sets.map((set) => ({
     id: set.id,
-    title: set.set_theme || set.set_title, // Use theme as title, fallback to set_title
+    title: set.set_title, // Use set_title as the card title
     cells: mapSetItemsToTiles(set.set_items, set.set_type, set.id).map(
       (cell) => {
         // Add set_title to each cell for modal display

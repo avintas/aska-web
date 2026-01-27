@@ -200,20 +200,8 @@ export function ContentCarousel({
                       (c) => c?.id === cellId,
                     );
 
-                    // Check if this is a hub navigation tile (Card 0 - has targetCardIndex)
-                    if (
-                      isTriviaMode &&
-                      card.id === 0 &&
-                      clickedCell &&
-                      clickedCell.targetCardIndex !== undefined
-                    ) {
-                      // Hub tile clicked - navigate to target card
-                      const targetIndex = clickedCell.targetCardIndex;
-                      // Use scrollTo to navigate to the target card
-                      scrollTo(targetIndex);
-                    }
                     // Check if this is a trivia tile
-                    else if (isTriviaMode && clickedCell?.questionData) {
+                    if (isTriviaMode && clickedCell?.questionData) {
                       // Trivia tile clicked
                       const currentCardSession =
                         gameSession && gameSession.cardId === card.id
